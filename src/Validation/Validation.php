@@ -242,7 +242,7 @@ class Validation
 
         $type = gettype($value);
         if ($type === 'string') {
-            if (is_numeric($value) && stripos($value, '.') === false) // 是数字并且没有小数点
+            if (is_numeric($value) && strpos($value, '.') === false) // 是数字并且没有小数点
             {
                 $intValue = intval($value);
                 if (in_array($intValue, $valueList, true))
@@ -274,7 +274,7 @@ class Validation
 
         $type = gettype($value);
         if ($type === 'string') {
-            if (is_numeric($value) && stripos($value, '.') === false) // 是数字并且没有小数点
+            if (is_numeric($value) && strpos($value, '.') === false) // 是数字并且没有小数点
             {
                 $intValue = intval($value);
                 if (in_array($intValue, $valueList, true) === false)
@@ -1211,9 +1211,9 @@ class Validation
         $segCount = count($segments);
         for ($i = 0; $i < $segCount;) {
             $segment = $segments[$i];
-            if (stripos($segment, 'Regexp:') === 0) // 是正则表达式
+            if (strpos($segment, 'Regexp:') === 0) // 是正则表达式
             {
-                if (stripos($segment, '/') !== 7) // 非法的正则表达. 合法的必须首尾加/
+                if (strpos($segment, '/') !== 7) // 非法的正则表达. 合法的必须首尾加/
                     throw new \Exception("正则表达式验证器regexp格式非法. 正确的格式是 Regexp:/xxxx/");
 
                 $pos = 8;
@@ -1229,7 +1229,7 @@ class Validation
                     } else // 以/结尾, 可能是完整的正则表达式, 也可能是不完整的正则表达式
                     {
                         do {
-                            $pos = stripos($segment, '\\', $pos); // 从前往后扫描转义符\
+                            $pos = strpos($segment, '\\', $pos); // 从前往后扫描转义符\
                             if ($pos === false) // 结尾的/前面没有转义符\, 正则表达式扫描完毕
                             {
                                 $finish = true;
@@ -1262,9 +1262,9 @@ class Validation
                 } while (1);
 
                 $validatorUnits[] = ['Regexp', substr($segment, 7), null];
-            } // end if(stripos($segment, 'Regexp:')===0)
+            } // end if(strpos($segment, 'Regexp:')===0)
             else {
-                $pos = stripos($segment, ':');
+                $pos = strpos($segment, ':');
                 if ($pos === false) {
                     if ($segment === 'Required' && count($validatorUnits) > 0)
                         throw new \Exception("Required只能出现在验证器的开头");
@@ -1369,7 +1369,7 @@ class Validation
 
     private static function _isIntOrIntString($value)
     {
-        return (is_numeric($value) && stripos($value, '.') === false);
+        return (is_numeric($value) && strpos($value, '.') === false);
     }
 
     /**
@@ -1382,7 +1382,7 @@ class Validation
         $vals = explode(',', $value);
         $ints = [];
         foreach ($vals as $val) {
-            if(is_numeric($val) === false || stripos($val, '.') !== false)
+            if(is_numeric($val) === false || strpos($val, '.') !== false)
                 return false; // 检测到了非int
             $ints[] = intval($val);
         }
@@ -1464,7 +1464,7 @@ class Validation
 
                 if($value === null) //没有提供参数. 默认不检测, 直接通过
                 {
-                    if(($validator!=='Required' && stripos($validator, 'Required|') === false) // 也不包含Required验证子
+                    if(($validator!=='Required' && strpos($validator, 'Required|') === false) // 也不包含Required验证子
                         || $ignoreRequired) //忽略Required检测子
                     {
                         $passed = true;
@@ -1524,12 +1524,12 @@ class Validation
             if(strlen($key)===0)
                 throw new \Exception("“${keypath}”中包含空的字段名");
 
-            $i = stripos($key, '[');
+            $i = strpos($key, '[');
             if($i === false) // 普通的key
             {
-                if(stripos($key, '*') !== false)
+                if(strpos($key, '*') !== false)
                     throw new \Exception("“${keypath}”中'*'号只能处于方括号[]中");
-                if(stripos($key, ']') !== false)
+                if(strpos($key, ']') !== false)
                     throw new \Exception("“${key}”中包含了非法的']'号");
                 if(preg_match('/^[0-9]/', $key)===1) {
                     if(count($keys)===1)
@@ -1542,7 +1542,7 @@ class Validation
             } else if($i === 0) {
                 throw new \Exception("“${keypath}”中'['号前面没有变量名");
             } else {
-                $j = stripos($key, ']');
+                $j = strpos($key, ']');
                 if($j === false)
                     throw new \Exception("“${key}”中的'['号之后缺少']'");
                 if($i>$j)
@@ -1550,7 +1550,7 @@ class Validation
 
                 // 识别普通数组的变量名（'[*]'之前的部分）
                 $varName = substr($key, 0, $i);
-                if(stripos($varName, '*') !== false)
+                if(strpos($varName, '*') !== false)
                     throw new \Exception("“${key}”中包含了非法的'*'号");
                 if(preg_match('/^[0-9]/', $varName)===1)
                     throw new \Exception("“${keypath}”中包含了以数字开头的字段名“${varName}”");
@@ -1569,10 +1569,10 @@ class Validation
                 $len = strlen($key);
                 while($j < $len - 1) {
                     $j++;
-                    $i = stripos($key, '[', $j);
+                    $i = strpos($key, '[', $j);
                     if($i !== $j)
                         throw new \Exception("“${key}”中的“[$index]”之后包含非法字符");
-                    $j = stripos($key, ']', $i);
+                    $j = strpos($key, ']', $i);
                     if($j === false)
                         throw new \Exception("“${key}”中的'['号之后缺少']'");
 
