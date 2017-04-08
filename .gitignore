@@ -1,0 +1,74 @@
+# ======os======
+#.*
+*.DS_Store
+Thumbs.db
+
+# ======temp files======
+*~
+~$*.xls*
+~$*.doc*
+*.swp
+*.bak
+
+# ======git======
+!.gitignore
+!.gitattributes
+!.gitkeep
+!.gitkeeper
+
+# ======apache======
+!.htaccess
+
+# ============================== IDEs ==============================
+
+# ======eclipse======
+!.project
+!.cproject
+
+# ======netbeans======
+nbproject/
+nbproject/private/
+
+# ======phpstorm======
+.idea/
+
+# ======visual studio======
+*.suo
+*.ncb
+*.opensdf
+*.filters
+*.sdf
+*.vspscc
+*.user
+ipch/
+#Debug/
+#Release/
+
+# ======xcode======
+*.mode1v3
+xcuserdata/
+xcshareddata/
+
+# ============================== package manage ==============================
+
+# ======nodejs======
+# /node_modules
+npm-debug.log
+npm-debug.log.*
+
+# ======composer======
+/vendor
+
+# ============================== frameworks ==============================
+
+# ======laravel======
+# .env
+!.env.example
+
+# ======vue-webpack======
+/dist/
+test/unit/coverage
+test/e2e/reports
+selenium-debug.log
+
+# ============================== my project ==============================
