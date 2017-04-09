@@ -1431,13 +1431,13 @@ class Validation
                             break;
                     }
 
-                    $i++;
                     if ($i >= $segCount) // 后面没有segment了
                         throw new \Exception("正则表达式验证器格式错误. 正确的格式是 Regexp:/xxxx/");
 
                     $segment .= '|';
                     $segment .= $segments[$i]; // 拼接后面一个segment
                     $len = strlen($segment);
+                    $i++;
                     continue;
 
                 } while (1);

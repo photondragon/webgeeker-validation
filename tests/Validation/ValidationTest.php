@@ -212,6 +212,11 @@ class ValidationTest extends TestCase
         }
     }
 
+    public function testValidateCompile()
+    {
+        Validation::validateValue('1||2/3/', 'Regexp:/^1\|\|2\/3\//');
+    }
+
     public function testValidate()
     {
         $params = [
