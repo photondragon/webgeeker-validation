@@ -210,6 +210,21 @@ class ValidationTest extends TestCase
             $errstr = $e->getMessage();
             $this->assertEquals('对不起, 您必须输入一个包含数字的字符串', $errstr);
         }
+
+        // 参数别名相关
+        try {
+            Validation::validateValue('abc', 'Alias:参数别名|Int', null);
+        } catch (\Exception $e) {
+            $errstr = $e->getMessage();
+            $this->assertStringMatchesFormat('%S参数别名%S', $errstr);
+        }
+        try {
+            Validation::validateValue('abc', 'Bool|Alias:param alias', null);
+        } catch (\Exception $e) {
+            $errstr = $e->getMessage();
+            $this->assertStringMatchesFormat('%Sparam alias%S', $errstr);
+        }
+        Validation::validateValue('abc', 'Alias:参数别名', null);
     }
 
     public function testValidateCompile()

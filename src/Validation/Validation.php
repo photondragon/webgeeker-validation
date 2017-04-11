@@ -1362,22 +1362,23 @@ class Validation
      * 示例1:
      * 输入: $validator = 'Length:6,16|regex:/^[a-zA-Z0-9]+$/'
      * 输出: [
-     *     ['Length', 6, 16, null],
-     *     ['regex', '/^[a-zA-Z0-9]+$/', null],
+     *     ['Length', 6, 16, null, $alias],
+     *     ['regex', '/^[a-zA-Z0-9]+$/', null, $alias],
      * ]
      *
      * 示例2（自定义验证失败的提示）:
      * 输入: $validator = 'Length:6,16|regex:/^[a-zA-Z0-9]+$/|>>>:参数验证失败了'
      * 输出: [
-     *     ['Length', 6, 16, '参数验证失败了'],
-     *     ['regex', '/^[a-zA-Z0-9]+$/', '参数验证失败了'],
+     *     ['Length', 6, 16, '参数验证失败了', $alias],
+     *     ['regex', '/^[a-zA-Z0-9]+$/', '参数验证失败了', $alias],
      * ]
      *
      * @param $validator string 一条验证字符串
+     * @param $alias string 参数的别名. 如果验证器中包含Alias:xxx, 会用xxx取代这个参数的值
      * @return array 返回验证子(Validator Unit)的数组
      * @throws \Exception
      */
-    private static function _compileValidator($validator)
+    private static function _compileValidator($validator, $alias)
     {
         if (is_string($validator) === false)
             return [];
@@ -1539,6 +1540,11 @@ class Validation
                             }
                             $validator = null;
                             break;
+                        case 'Alias':
+                            if(strlen($p))
+                                $alias = $p;
+                            $validator = null;
+                            break;
                         default:
                             throw new \Exception("无法识别的验证子“${segment}”");
                     }
@@ -1548,8 +1554,11 @@ class Validation
             } // end else 不是Regexp
         } // end for ($segments)
 
+        if(!is_string($alias) || strlen($alias) === 0)
+            $alias = 'UnknownParameter';
         for ($i = count($validatorUnits) -1 ; $i >= 0; $i--) {
             $validatorUnits[$i][] = $customReason;
+            $validatorUnits[$i][] = $alias;
         }
         return $validatorUnits;
     }
@@ -1653,7 +1662,7 @@ class Validation
         $passed = false;
         foreach ($validators as $validator) {
 
-            $validatorUnits = self::_compileValidator($validator);
+            $validatorUnits = self::_compileValidator($validator, $alias);
 
             try {
 
@@ -1681,10 +1690,8 @@ class Validation
                     for ($i = 1; $i < $paramsCount; $i++) {
                         $params[] = $validatorUnit[$i];
                     }
-                    $params[] = $alias;
 
                     $value = call_user_func_array([self::class, $method], $params);
-
                 }
 
                 // 多个validator只需要一条验证通过即可
