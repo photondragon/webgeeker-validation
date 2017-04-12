@@ -547,7 +547,7 @@ class Validation
     public static function validateLength($value, $length, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (strlen($value) == $length) {
+            if (mb_strlen($value) == $length) {
                 return $value;
             }
         }
@@ -564,7 +564,7 @@ class Validation
     public static function validateLengthGe($value, $min, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (strlen($value) >= $min) {
+            if (mb_strlen($value) >= $min) {
                 return $value;
             }
         }
@@ -581,7 +581,7 @@ class Validation
     public static function validateLengthLe($value, $max, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (strlen($value) <= $max) {
+            if (mb_strlen($value) <= $max) {
                 return $value;
             }
         }
@@ -601,7 +601,7 @@ class Validation
             throw new \Exception("“${alias}”参数的验证模版LengthGeAndLe格式错误, min不应该大于max");
 
         if (is_string($value)) {
-            $len = strlen($value);
+            $len = mb_strlen($value);
             if ($len >= $min && $len <= $max) {
                 return $value;
             }
@@ -611,6 +611,79 @@ class Validation
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['LengthGeAndLe'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{min}}', $min, $error);
+        $error = str_replace('{{max}}', $max, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateByteLength($value, $length, $reason = null, $alias = 'Parameter')
+    {
+        if (is_string($value)) {
+            if (strlen($value) == $length) {
+                return $value;
+            }
+        }
+
+        if($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['ByteLength'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{length}}', $length, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateByteLengthGe($value, $min, $reason = null, $alias = 'Parameter')
+    {
+        if (is_string($value)) {
+            if (strlen($value) >= $min) {
+                return $value;
+            }
+        }
+
+        if($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['ByteLengthGe'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{min}}', $min, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateByteLengthLe($value, $max, $reason = null, $alias = 'Parameter')
+    {
+        if (is_string($value)) {
+            if (strlen($value) <= $max) {
+                return $value;
+            }
+        }
+
+        if($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['ByteLengthLe'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{max}}', $max, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateByteLengthGeAndLe($value, $min, $max, $reason = null, $alias = 'Parameter')
+    {
+        if ($min > $max)
+            throw new \Exception("“${alias}”参数的验证模版LengthGeAndLe格式错误, min不应该大于max");
+
+        if (is_string($value)) {
+            $len = strlen($value);
+            if ($len >= $min && $len <= $max) {
+                return $value;
+            }
+        }
+
+        if($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['ByteLengthGeAndLe'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{min}}', $min, $error);
         $error = str_replace('{{max}}', $max, $error);
@@ -1213,6 +1286,10 @@ class Validation
         'LengthGe' => '“{{param}}”长度必须大于等于 {{min}}',
         'LengthLe' => '“{{param}}”长度必须小于等于 {{max}}',
         'LengthGeAndLe' => '“{{param}}”长度必须在 {{min}} - {{max}} 之间', // 字符串长度
+        'ByteLength' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
+        'ByteLengthGe' => '“{{param}}”长度必须大于等于 {{min}}',
+        'ByteLengthLe' => '“{{param}}”长度必须小于等于 {{max}}',
+        'ByteLengthGeAndLe' => '“{{param}}”长度必须在 {{min}} - {{max}} 之间', // 字符串长度
         'Letters' => '“{{param}}”只能包含字母',
         'Alphabet' => '“{{param}}”只能包含字母', // 同Letters
         'Numbers' => '“{{param}}”只能是纯数字',
@@ -1303,6 +1380,10 @@ class Validation
         'LengthGe' => 'LengthGe:8',
         'LengthLe' => 'LengthLe:8',
         'LengthGeAndLe' => 'LengthGeAndLe:6,8',
+        'ByteLength' => 'ByteLength:8',
+        'ByteLengthGe' => 'ByteLengthGe:8',
+        'ByteLengthLe' => 'ByteLengthLe:8',
+        'ByteLengthGeAndLe' => 'ByteLengthGeAndLe:6,8',
         'Letters' => 'Letters',
         'Alphabet' => 'Alphabet', // 同Letters
         'Numbers' => 'Numbers',
@@ -1467,6 +1548,9 @@ class Validation
                         case 'Length':
                         case 'LengthGe':
                         case 'LengthLe':
+                        case 'ByteLength':
+                        case 'ByteLengthGe':
+                        case 'ByteLengthLe':
                         case 'ArrayLength':
                         case 'ArrayLengthGe':
                         case 'ArrayLengthLe':
@@ -1479,6 +1563,7 @@ class Validation
                         case 'IntGtAndLe':
                         case 'IntGeAndLt':
                         case 'LengthGeAndLe':
+                        case 'ByteLengthGeAndLe':
                         case 'ArrayLengthGeAndLe':
                             $vals = explode(',', $p);
                             if (count($vals) !== 2)

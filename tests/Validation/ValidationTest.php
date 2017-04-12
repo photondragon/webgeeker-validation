@@ -140,13 +140,27 @@ class ValidationTest extends TestCase
 
     public function testValidateString()
     {
-        $this->assertNotNull(Validation::validateString('-12311112311111'));
-        $this->assertNotNull(Validation::validateLengthGe('10.', 0));
+        // String
+        $this->assertNotNull(Validation::validateValue('-12311112311111', 'String'));
 
-        $this->assertNotNull(Validation::validateEmail('photondragon@163.com'));
-        $this->assertNotNull(Validation::validateUrl('http://webgeeker.com'));
-        $this->assertNotNull(Validation::validateIp('10.1.1.1'));
-        $this->assertNotNull(Validation::validateMac('0a:32:dc:02:2f:0a'));
+        // LengthXXX
+        $this->assertNotNull(Validation::validateValue('你好', 'Length:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'LengthGe:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'LengthLe:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'LengthGeAndLe:2,2'));
+
+        // ByteLengthXXX
+        $this->assertNotNull(Validation::validateValue('你好', 'ByteLength:6'));
+        $this->assertNotNull(Validation::validateValue('你好', 'ByteLengthGe:6'));
+        $this->assertNotNull(Validation::validateValue('你好', 'ByteLengthLe:6'));
+        $this->assertNotNull(Validation::validateValue('你好', 'ByteLengthGeAndLe:6,6'));
+
+        // 各种其它检测
+        $this->assertNotNull(Validation::validateValue('photondragon@163.com', 'Email'));
+        $this->assertNotNull(Validation::validateValue('http://webgeeker.com', 'Url'));
+        $this->assertNotNull(Validation::validateValue('10.10.10.10', 'Ip'));
+        $this->assertNotNull(Validation::validateValue('01:32:DC:05:2f:0a', 'Mac'));
+
     }
 
     public function testValidateRegexp()
