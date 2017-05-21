@@ -62,8 +62,8 @@ class ValidationTest extends TestCase
             Validation::validateInt('abc');
         }, 'line ' . __LINE__ . ": Validation::validateInt('abc')应该抛出异常");
 
-        // IntEquals
-        $this->assertNotNull(Validation::validateIntEquals('-1', -1));
+        // IntEq
+        $this->assertNotNull(Validation::validateIntEq('-1', -1));
 
         // IntGt
         $this->assertNotNull(Validation::validateIntGt('1', 0));
@@ -103,24 +103,24 @@ class ValidationTest extends TestCase
         $this->assertNotNull(Validation::validateIntLe('0', 0));
         $this->assertNotNull(Validation::validateIntLe(0, 0));
 
-        // IntGeAndLe
-        $this->assertNotNull(Validation::validateIntGeAndLe('0', 0, 0));
-        $this->assertNotNull(Validation::validateIntGeAndLe(0, 0, 0));
-        $this->assertNotNull(Validation::validateIntGeAndLe('11', -100, 100));
-        $this->assertNotNull(Validation::validateIntGeAndLe(11, -100, 100));
-        $this->assertNotNull(Validation::validateIntGeAndLe('00123', 123, 123));
+        // IntGeLe
+        $this->assertNotNull(Validation::validateIntGeLe('0', 0, 0));
+        $this->assertNotNull(Validation::validateIntGeLe(0, 0, 0));
+        $this->assertNotNull(Validation::validateIntGeLe('11', -100, 100));
+        $this->assertNotNull(Validation::validateIntGeLe(11, -100, 100));
+        $this->assertNotNull(Validation::validateIntGeLe('00123', 123, 123));
 
-        // IntGtAndLt
-        $this->assertNotNull(Validation::validateIntGtAndLt('0', -1, 1));
-        $this->assertNotNull(Validation::validateIntGtAndLt(0, -1, 1));
+        // IntGtLt
+        $this->assertNotNull(Validation::validateIntGtLt('0', -1, 1));
+        $this->assertNotNull(Validation::validateIntGtLt(0, -1, 1));
 
-        // IntGtAndLe
-        $this->assertNotNull(Validation::validateIntGtAndLe('0', -1, 0));
-        $this->assertNotNull(Validation::validateIntGtAndLe(0, -1, 0));
+        // IntGtLe
+        $this->assertNotNull(Validation::validateIntGtLe('0', -1, 0));
+        $this->assertNotNull(Validation::validateIntGtLe(0, -1, 0));
 
-        // IntGeAndLt
-        $this->assertNotNull(Validation::validateIntGeAndLt('0', 0, 1));
-        $this->assertNotNull(Validation::validateIntGeAndLt(0, 0, 1));
+        // IntGeLt
+        $this->assertNotNull(Validation::validateIntGeLt('0', 0, 1));
+        $this->assertNotNull(Validation::validateIntGeLt(0, 0, 1));
 
         // IntIn
         $this->assertNotNull(Validation::validateIntIn('0', [0, 1]));
@@ -135,7 +135,7 @@ class ValidationTest extends TestCase
     public function testValidateFloat()
     {
         $this->assertNotNull(Validation::validateFloat('-12311112311111'));
-        $this->assertNotNull(Validation::validateFloatGtAndLt('10.', -100, 100));
+        $this->assertNotNull(Validation::validateFloatGtLt('10.', -100, 100));
     }
 
     public function testValidateString()
@@ -143,17 +143,17 @@ class ValidationTest extends TestCase
         // String
         $this->assertNotNull(Validation::validateValue('-12311112311111', 'String'));
 
-        // LengthXXX
-        $this->assertNotNull(Validation::validateValue('你好', 'Length:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'LengthGe:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'LengthLe:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'LengthGeAndLe:2,2'));
+        // LenXXX
+        $this->assertNotNull(Validation::validateValue('你好', 'Len:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'LenGe:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'LenLe:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'LenGeLe:2,2'));
 
-        // ByteLengthXXX
-        $this->assertNotNull(Validation::validateValue('你好', 'ByteLength:6'));
-        $this->assertNotNull(Validation::validateValue('你好', 'ByteLengthGe:6'));
-        $this->assertNotNull(Validation::validateValue('你好', 'ByteLengthLe:6'));
-        $this->assertNotNull(Validation::validateValue('你好', 'ByteLengthGeAndLe:6,6'));
+        // ByteLenXXX
+        $this->assertNotNull(Validation::validateValue('你好', 'ByteLen:6'));
+        $this->assertNotNull(Validation::validateValue('你好', 'ByteLenGe:6'));
+        $this->assertNotNull(Validation::validateValue('你好', 'ByteLenLe:6'));
+        $this->assertNotNull(Validation::validateValue('你好', 'ByteLenGeLe:6,6'));
 
         // 各种其它检测
         $this->assertNotNull(Validation::validateValue('photondragon@163.com', 'Email'));
@@ -180,10 +180,10 @@ class ValidationTest extends TestCase
             Validation::validateArray(['a'=>1]);
         }, 'line ' . __LINE__ . ": Validation::validateArray(['a'=>1])应该抛出异常");
 
-        $this->assertNotNull(Validation::validateArrayLength([1,2,3], 3));
-        $this->assertNotNull(Validation::validateArrayLengthGe([1,2,3], 3));
-        $this->assertNotNull(Validation::validateArrayLengthLe([1,2,3], 3));
-        $this->assertNotNull(Validation::validateArrayLengthGeAndLe([1,2,3], 3, 3));
+        $this->assertNotNull(Validation::validateArrayLen([1,2,3], 3));
+        $this->assertNotNull(Validation::validateArrayLenGe([1,2,3], 3));
+        $this->assertNotNull(Validation::validateArrayLenLe([1,2,3], 3));
+        $this->assertNotNull(Validation::validateArrayLenGeLe([1,2,3], 3, 3));
     }
 
     public function testValidateObject()
@@ -204,6 +204,9 @@ class ValidationTest extends TestCase
 
     public function testValidateOthers()
     {
+        // 验证器为空时
+        Validation::validate(['id' => 1], ['id' => '']);
+
         // 自定义验证失败的提示 >>>
         $this->assertNotNull(Validation::validateValue(1, 'Int|>>>:验证会通过,不会抛出异常'));
         try {
@@ -246,6 +249,48 @@ class ValidationTest extends TestCase
         Validation::validateValue('1||2/3/', 'Regexp:/^1\|\|2\/3\//');
     }
 
+    public function testValidateIf()
+    {
+        $validations = [
+            'type' => 'Required|IntIn:1,2',
+            'title' => 'Required|LenGeLe:2,100',
+            'content' => 'Required|LenGe:1|LenLe:10000000',
+            'state' => [
+                'IfIntEq:type,1|IntEq:0',
+                'IfIntEq:type,2|Required|IntIn:0,1,2',
+            ],
+        ];
+
+        $articleInfo = [
+            'type' => 1, // 1-普通文章, 2-用户投诉
+            'title' => 'WebGeeker Validation',
+            'content' => 'WebGeeker Validation 是一个非常强大的参数验证工具, 能够验证无限嵌套的数据结构',
+            'state' => 0,
+        ];
+        Validation::validate($articleInfo, $validations);
+
+        $complaintInfo = [
+            'type' => 2, // 1-普通新闻, 2-用户投诉
+            'title' => '客服（10000）的服务太差了',
+            'content' => '客服（10000）的服务太差了, 我要投诉他, 砸他饭碗',
+            'state' => 1, // 0-待处理, 1-处理中, 2-已处理
+        ];
+        Validation::validate($complaintInfo, $validations);
+
+        // 嵌套的条件检测
+        $validations2 = [
+            'article.type' => 'Required|IntIn:1,2',
+            'article.title' => 'Required|LenGeLe:2,100',
+            'article.content' => 'Required|LenGe:1|LenLe:10000000',
+            'article.state' => [
+                'IfIntEq:.type,1|IntEq:1',
+                'IfIntEq:article.type,2|Required|IntIn:0,1,2',
+            ],
+        ];
+        Validation::validate(['article' => $articleInfo], $validations2);
+        Validation::validate(['article' => $complaintInfo], $validations2);
+    }
+
     public function testValidate()
     {
         $params = [
@@ -276,21 +321,21 @@ class ValidationTest extends TestCase
 
         $validators = [
             'id' => 'Required|IntGt:0',
-            'title' => 'Required|LengthGeAndLe:2,100',
-            'content' => 'Required|LengthGe:1|LengthLe:10000000',
+            'title' => 'Required|LenGeLe:2,100',
+            'content' => 'Required|LenGe:1|LenLe:10000000',
             'timestamp' => 'FloatGt:0',
             'contentType' => 'Required|IntIn:0,1,2',
             'author' => 'Required|Object',
             'author.id' => 'Required|IntGt:0',
-            'author.username' => 'Required|LengthGe:4|Regexp:/^[a-zA-Z0-9]+$/',
-            'author.nickname' => 'LengthGe:0',
+            'author.username' => 'Required|LenGe:4|Regexp:/^[a-zA-Z0-9]+$/',
+            'author.nickname' => 'LenGe:0',
             'author.email' => 'Regexp:/^[a-zA-Z0-9]+@[a-zA-Z0-9-]+.[a-z]+$/',
             'comments' => 'Array',
             'comments[*]' => 'Object',
-            'comments[*].content' => 'Required|LengthGe:8',
+            'comments[*].content' => 'Required|LenGe:8',
             'comments[*].author' => 'Object',
             'comments[*].author.email' => 'Regexp:/^[a-zA-Z0-9]+@[a-zA-Z0-9-]+.[a-z]+$/',
-            'comments[*].author.nickname' => 'LengthGe:0',
+            'comments[*].author.nickname' => 'LenGe:0',
             'visitors' => 'Array',
             'visitors[*]' => 'Object',
             'visitors[*].id' => 'Required|IntGt:0',
@@ -301,7 +346,7 @@ class ValidationTest extends TestCase
 
         // ignore Required
         $params = ['content' => null];
-        $validators = ['content' => 'Required|LengthLe:20',];
+        $validators = ['content' => 'Required|LenLe:20',];
         $this->_assertThrowExpection(function () use ($params, $validators) {
             Validation::validate($params, $validators);
         }, 'line ' . __LINE__ . ": Validation::validate(\$params, \$validators)应该抛出异常");
@@ -309,7 +354,7 @@ class ValidationTest extends TestCase
 
         // ignore Required 2
         $params = ['content' => 'a'];
-        $validators = ['content' => 'Required|LengthGeAndLe:1,20',];
+        $validators = ['content' => 'Required|LenGeLe:1,20',];
         $this->assertNotNull(Validation::validate($params, $validators));
         $params = ['content' => null];
         $this->assertNotNull(Validation::validate($params, $validators, true));
