@@ -251,13 +251,53 @@ class ValidationTest extends TestCase
 
     public function testValidateIf()
     {
+        // If
+        $trues = [1, '1', true, 'true', 'yes', 'y'];
+        $falses = [0, '0', false, 'false', 'no', 'n', 'hello', 2.5];
+        for ($i = 0; $i < count($trues); $i++) {
+            for ($j = 0; $j < count($falses); $j++) {
+                $true = $trues[$i];
+                $false = $falses[$j];
+
+                $params = ['type' => $false,'state' => 0];
+                Validation::validate($params, ['state' => 'If:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
+                Validation::validate($params, ['state' => 'If:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
+                $params = ['type' => $true,'state' => 0];
+                Validation::validate($params, ['state' => 'If:type|IntEq:0']); //条件符合+验证通过
+                $this->_assertThrowExpection(function () use ($params) {
+                    Validation::validate($params, ['state' => 'If:type|IntEq:1']); //条件符合+验证不通过
+                }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+            }
+        }
+
+        // IfNot
+        $trues = [1, '1', true, 'true', 'yes', 'y', 'hello', 2.5];
+        $falses = [0, '0', false, 'false', 'no', 'n'];
+        for ($i = 0; $i < count($trues); $i++) {
+            for ($j = 0; $j < count($falses); $j++) {
+                $true = $trues[$i];
+                $false = $falses[$j];
+
+                $params = ['type' => $true,'state' => 0];
+                Validation::validate($params, ['state' => 'IfNot:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfNot:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
+                $params = ['type' => $false,'state' => 0];
+                Validation::validate($params, ['state' => 'IfNot:type|IntEq:0']); //条件符合+验证通过
+                $this->_assertThrowExpection(function () use ($params) {
+                    Validation::validate($params, ['state' => 'IfNot:type|IntEq:1']); //条件符合+验证不通过
+                }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+            }
+        }
+
         $validations = [
             'type' => 'Required|IntIn:1,2',
             'title' => 'Required|LenGeLe:2,100',
             'content' => 'Required|LenGe:1|LenLe:10000000',
             'state' => [
-                'IfIntEq:type,1|IntEq:0',
-                'IfIntEq:type,2|Required|IntIn:0,1,2',
+                'IfEq:type,1|IntEq:0',
+                'IfEq:type,2|Required|IntIn:0,1,2',
             ],
         ];
 
@@ -283,8 +323,8 @@ class ValidationTest extends TestCase
             'article.title' => 'Required|LenGeLe:2,100',
             'article.content' => 'Required|LenGe:1|LenLe:10000000',
             'article.state' => [
-                'IfIntEq:.type,1|IntEq:1',
-                'IfIntEq:article.type,2|Required|IntIn:0,1,2',
+                'IfEq:.type,1|IntEq:0',
+                'IfEq:article.type,2|Required|IntIn:0,1,2',
             ],
         ];
         Validation::validate(['article' => $articleInfo], $validations2);

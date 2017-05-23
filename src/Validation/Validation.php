@@ -1244,12 +1244,96 @@ class Validation
 
     //endregion
 
+    //region ifs
+
+    protected static function validateIf($value)
+    {
+        if (is_string($value))
+            $value = strtolower($value);
+        return in_array($value, [1, true, '1', 'true', 'yes', 'y'], true);
+    }
+
+    protected static function validateIfNot($value)
+    {
+        if (is_string($value))
+            $value = strtolower($value);
+        return in_array($value, [0, false, '0', 'false', 'no', 'n'], true);
+    }
+
+    protected static function validateIfTrue($value)
+    {
+        if (is_string($value))
+            return (strtolower($value) === 'true');
+        else
+            return ($value === true);
+    }
+
+    protected static function validateIfFalse($value)
+    {
+        if (is_string($value))
+            return (strtolower($value) === 'false');
+        else
+            return ($value === false);
+    }
+
+    protected static function validateIfExist($value)
+    {
+        return ($value !== null);
+    }
+
+    protected static function validateIfNotExist($value)
+    {
+        return ($value === null);
+    }
+
+    protected static function validateIfEq($value, $compareVal)
+    {
+        return ($value == $compareVal);
+    }
+
+    protected static function validateIfNe($value, $compareVal)
+    {
+        return ($value != $compareVal);
+    }
+
+    protected static function validateIfGt($value, $compareVal)
+    {
+        return ($value > $compareVal);
+    }
+
+    protected static function validateIfGe($value, $compareVal)
+    {
+        return ($value >= $compareVal);
+    }
+
+    protected static function validateIfLt($value, $compareVal)
+    {
+        return ($value < $compareVal);
+    }
+
+    protected static function validateIfLe($value, $compareVal)
+    {
+        return ($value <= $compareVal);
+    }
+
+    protected static function validateIfIn($value, $valuesList)
+    {
+        return in_array($value, $valuesList);
+    }
+
+    protected static function validateIfNotIn($value, $valuesList)
+    {
+        return !in_array($value, $valuesList);
+    }
+
+    //endregion
+
     /**
      * @var array 验证失败时的错误提示信息的模板
      *
      * 输入值一般为字符串
      */
-    static public $errorTemplates = [
+    static protected $errorTemplates = [
         // 整型（不提供length检测,因为负数的符号位会让人混乱, 可以用大于小于比较来做到这一点）
         'Int' => '“{{param}}”必须是整数',
         'IntEq' => '“{{param}}”必须是等于 {{value}} 的整数',
@@ -1422,26 +1506,24 @@ class Validation
 //        'or' => '', // 或关系
         'Required' => 'Required',
 
-        // 条件判断. 全部是===或!==比较
-        'If' => 'If:selected',
-        'IfNot' => 'IfNot:selected',
-        'IfSmartTrue' => 'IfSmartTrue:selected',
-        'IfSmartFalse' => 'IfSmartFalse:selected',
-        'IfIntEq' => 'IfIntEq:type,1',
-        'IfIntNe' => 'IfIntNe:state,2',
-        'IfIntGt' => 'IfIntGt:abc,0',
-        'IfIntLt' => 'IfIntLt:abc,1',
-        'IfIntGe' => 'IfIntGe:abc,6',
-        'IfIntLe' => 'IfIntLe:abc,8',
-        'IfIntIn' => 'IfIntIn:abc,2,3,5,7',
-        'IfIntNotIn' => 'IfIntNotIn:abc,2,3,5,7',
-        'IfStrEq' => 'IfStrEq:sex,male',
-        'IfStrNe' => 'IfStrNe:state,normal',
-        'IfStrIn' => 'IfStrIn:state,normal,warning',
-        'IfStrNotIn' => 'IfStrNotIn:state,error,offline',
-        'IfSame' => 'IfSame:AnotherParameter',
-        'IfNotSame' => 'IfNotSame:AnotherParameter',
-        'IfAny' => 'IfAny:type,1,type,2', //待定
+        // 条件判断
+        'If' => 'If:selected', // 值是否等于 1, true, '1', 'true', 'yes', 'y'(字符串忽略大小写)
+        'IfNot' => 'IfNot:selected', // 值是否等于 0, false, '0', 'false', 'no', 'n'(字符串忽略大小写)
+        'IfTrue' => 'IfTrue:selected', // 值是否等于 true 或 'true'(忽略大小写)
+        'IfFalse' => 'IfFalse:selected', // 值是否等于 false 或 'false'(忽略大小写)
+        'IfExist' => 'IfExist:var', // 参数 var 是否存在
+        'IfNotExist' => 'IfNotExist:var', // 参数 var 是否不存在
+        'IfEq' => 'IfEq:type,1', // if (type == 1)
+        'IfNe' => 'IfNe:state,2', // if (state != 2)
+        'IfGt' => 'IfGt:var,0', // if (var > 0)
+        'IfLt' => 'IfLt:var,1', // if (var < 0)
+        'IfGe' => 'IfGe:var,6', // if (var >= 6)
+        'IfLe' => 'IfLe:var,8', // if (var <= 8)
+        'IfIn' => 'IfIn:var,2,3,5,7', // if (in_array(var, [2,3,5,7]))
+        'IfNotIn' => 'IfNotIn:var,2,3,5,7', // if (!in_array(var, [2,3,5,7]))
+//        'IfSame' => 'IfSame:AnotherParameter',
+//        'IfNotSame' => 'IfNotSame:AnotherParameter',
+//        'IfAny' => 'IfAny:type,1,type,2', //待定
 
 //        // 其它
         'Object' => 'Object',
@@ -1637,29 +1719,45 @@ class Validation
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $strings];
                             break;
+                        case 'IfEq':
+                        case 'IfNe':
+                        case 'IfGt':
+                        case 'IfLt':
+                        case 'IfGe':
+                        case 'IfLe':
+                            if(count($validatorUnits) > $countOfIfs)
+                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                            $params = self::_parseIfXxxWith1Param1Value($p);
+                            if ($params === false)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $params[0], $params[1]];
+                            $countOfIfs ++;
+                            break;
+                        case 'IfIn':
+                        case 'IfNotIn':
+                            if(count($validatorUnits) > $countOfIfs)
+                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                            $params = self::_parseIfXxxWith1ParamMultiValue($p);
+                            if ($params === false)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $params[0], $params[1]];
+                            $countOfIfs ++;
+                            break;
                         case 'If':
                         case 'IfNot':
-                            break;
-                        case 'IfIntEq':
-                        case 'IfIntGt':
-                        case 'IfIntLt':
-                        case 'IfIntGe':
-                        case 'IfIntLe':
-                        if(count($validatorUnits) > $countOfIfs)
-                            throw new \Exception("IfXxx只能出现在验证器的开头");
-                        $params = self::_parseIfIntXXParams($p);
-                        if ($params === false)
-                            self::_throwFormatError($validatorName);
-                        $validator = [$validatorName, $params[0], $params[1]];
-                        $countOfIfs ++;
-                            break;
-                        case 'IfSame':
-                        case 'IfNotSame':
-//                            if(count($validatorUnits) > $countOfIfs)
-//                                throw new \Exception("IfXxx只能出现在验证器的开头");
-//                            $varName = trim($p);
-//                            $validator = [$validatorName, $varName];
-//                            $countOfIfs ++;
+                        case 'IfExist':
+                        case 'IfNotExist':
+                        case 'IfTrue':
+                        case 'IfFalse':
+//                        case 'IfSame':
+//                        case 'IfNotSame':
+                            if(count($validatorUnits) > $countOfIfs)
+                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                            $varname = self::_parseIfXxxWith1Param($p);
+                            if ($varname === false)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $varname];
+                            $countOfIfs ++;
                             break;
 //                        case 'IfAny':
 //                            break;
@@ -1772,21 +1870,57 @@ class Validation
     }
 
     /**
-     * 解析 IfIntXX:abc,0 中的冒号后面的部分
+     * 解析 IfXxx:varname,123 中的冒号后面的部分（1个条件参数后面带1个值）
      * @param $paramstr string
      * @return array|false 出错返回false, 否则返回 ['varname', 123]
      * @throws \Exception
      */
-    private static function _parseIfIntXXParams($paramstr)
+    private static function _parseIfXxxWith1Param1Value($paramstr)
     {
         $params = explode(',', $paramstr);
         if (count($params) != 2)
             return false;
-        $varName = $params[0];
-        $value = $params[1];
-//        self::validateVarName($varName);
-        self::validateInt($value);
-        return [$varName, intval($value)];
+
+//        $varName = $params[0];
+//        $value = $params[1];
+        return $params;
+    }
+
+    /**
+     * 解析 IfXxx:varname 中的冒号后面的部分（1个条件参数后面带0个值）
+     * @param $paramstr string
+     * @return string|false 出错返回false, 否则返回 'varname'
+     * @throws \Exception
+     */
+    private static function _parseIfXxxWith1Param($paramstr)
+    {
+        $params = explode(',', $paramstr);
+        if (count($params) != 1)
+            return false;
+
+//        $varName = $params[0];
+        return $params[0];
+    }
+
+    /**
+     * 解析 IfXxx:varname,1,2,3 中的冒号后面的部分（1个条件参数后面带多个变量）
+     * @param $paramstr string
+     * @return array|false 出错返回false, 否则返回 ['varname', ['1','2','3']]
+     * @throws \Exception
+     */
+    private static function _parseIfXxxWith1ParamMultiValue($paramstr)
+    {
+        $params = explode(',', $paramstr);
+        $c = count($params);
+        if ($c <= 2)
+            return false;
+
+//        $varName = $params[0];
+        $vals = [];
+        for ($i = 1; $i < $c; $i++) {
+            $vals[] = $params[$i];
+        }
+        return [$params[0], $vals];
     }
 
 //    /**
@@ -1860,18 +1994,22 @@ class Validation
                     $validatorUnit = $validatorUnits[$i];
 //                    echo "\n".json_encode($validatorUnit)."\n";
 
-                    // todo 检测各种IfXxx
-                    $validatorUnitName = $validatorUnit[0];
-                    $varkeypath = $validatorUnit[1];
-                    $compareVal = $validatorUnit[2];
+                    $ifName = $validatorUnit[0];
+                    $method = 'validate' . ucfirst($ifName);
+                    if(method_exists(self::class, $method)===false)
+                        throw new \Exception("找不到条件判断${$ifName}的验证方法");
 
+                    $varkeypath = $validatorUnit[1]; // 条件参数的路径
+                    // 提取条件参数的值
+                    // todo 如果条件参数不存在, 应该视为忽略还是检测不通过?
                     if (strpos($varkeypath, '.') === 0) // 以.开头, 是相对路径
                     {
                         $key = substr($varkeypath, 1); // 去掉开头的.号
                         self::validateVarName($key, 'IfXxx中的条件参数不是合法的变量名');
                         $actualValue = @$siblings[$key];
                         $ancestorExist = true;
-                    } else {
+                    } else // 绝对路径
+                    {
                         // 解析路径
                         $asterisksCount = 0;
                         $keys = self::_compileKeypath($varkeypath, $asterisksCount);
@@ -1889,8 +2027,10 @@ class Validation
 
                     if ($ancestorExist == false) // 条件参数的父级不存在
                         break;
-                    // todo 如果条件参数不存在, 是否应该报错
-                    if ($actualValue !== $compareVal) // If条件不满足
+                    $compareVal = $validatorUnit[2];
+                    $params = [$actualValue, $compareVal];
+                    $trueOfFalse = call_user_func_array([self::class, $method], $params);
+                    if ($trueOfFalse === false) // If条件不满足
                         break; // 跳出
                 }
 
@@ -2090,7 +2230,7 @@ class Validation
             $keysCount = count($keys);
             if($keysCount>1 && $cachedKeyValues === null)
                 $cachedKeyValues = [];
-            
+
             self::_validate($params, $keys, $keysCount, $validator, '', $ignoreRequired, $cachedKeyValues);
         }
 //        if(count($cachedKeyValues))
