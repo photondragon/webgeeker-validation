@@ -29,7 +29,7 @@ class ValidationTest extends TestCase
     // $callback必须抛出异常
     private function _assertThrowExpection(callable $callback, $message = '')
     {
-        if(is_callable($callback) === false)
+        if (is_callable($callback) === false)
             throw new \Exception("\$callback不是可执行函数");
         try {
             $callback();
@@ -39,7 +39,7 @@ class ValidationTest extends TestCase
         }
         $this->assertFalse($ret, $message);
     }
-    
+
     public function testValidateInt()
     {
         // Int
@@ -172,29 +172,29 @@ class ValidationTest extends TestCase
     public function testValidateArray()
     {
         $this->assertNotNull(Validation::validateArray([]));
-        $this->assertNotNull(Validation::validateArray([1,2,3]));
+        $this->assertNotNull(Validation::validateArray([1, 2, 3]));
         $this->_assertThrowExpection(function () {
             Validation::validateArray(1);
         }, 'line ' . __LINE__ . ": Validation::validateArray(1)应该抛出异常");
         $this->_assertThrowExpection(function () {
-            Validation::validateArray(['a'=>1]);
+            Validation::validateArray(['a' => 1]);
         }, 'line ' . __LINE__ . ": Validation::validateArray(['a'=>1])应该抛出异常");
 
-        $this->assertNotNull(Validation::validateArrayLen([1,2,3], 3));
-        $this->assertNotNull(Validation::validateArrayLenGe([1,2,3], 3));
-        $this->assertNotNull(Validation::validateArrayLenLe([1,2,3], 3));
-        $this->assertNotNull(Validation::validateArrayLenGeLe([1,2,3], 3, 3));
+        $this->assertNotNull(Validation::validateArrayLen([1, 2, 3], 3));
+        $this->assertNotNull(Validation::validateArrayLenGe([1, 2, 3], 3));
+        $this->assertNotNull(Validation::validateArrayLenLe([1, 2, 3], 3));
+        $this->assertNotNull(Validation::validateArrayLenGeLe([1, 2, 3], 3, 3));
     }
 
     public function testValidateObject()
     {
         $this->assertNotNull(Validation::validateObject([]));
-        $this->assertNotNull(Validation::validateObject(['a'=>1]));
+        $this->assertNotNull(Validation::validateObject(['a' => 1]));
         $this->_assertThrowExpection(function () {
             Validation::validateObject(1.23);
         }, 'line ' . __LINE__ . ": Validation::validateObject(1.23)应该抛出异常");
         $this->_assertThrowExpection(function () {
-            Validation::validateObject([1,2,3]);
+            Validation::validateObject([1, 2, 3]);
         }, 'line ' . __LINE__ . ": Validation::validateObject([1,2,3])应该抛出异常");
     }
 
@@ -210,13 +210,13 @@ class ValidationTest extends TestCase
         // 自定义验证失败的提示 >>>
         $this->assertNotNull(Validation::validateValue(1, 'Int|>>>:验证会通过,不会抛出异常'));
         try {
-            Validation::validateValue([1,2,3], 'Int|>>>:对不起, 您必须输入一个整数');
+            Validation::validateValue([1, 2, 3], 'Int|>>>:对不起, 您必须输入一个整数');
         } catch (\Exception $e) {
             $errstr = $e->getMessage();
             $this->assertEquals('对不起, 您必须输入一个整数', $errstr);
         }
         try {
-            Validation::validateValue([1,2,3], 'Int|>>>:|>>>:ERROR: 您必须输入一个整数|Array');
+            Validation::validateValue([1, 2, 3], 'Int|>>>:|>>>:ERROR: 您必须输入一个整数|Array');
         } catch (\Exception $e) {
             $errstr = $e->getMessage();
             $this->assertEquals('|>>>:ERROR: 您必须输入一个整数|Array', $errstr);
@@ -249,11 +249,11 @@ class ValidationTest extends TestCase
         Validation::validateValue('1||2/3/', 'Regexp:/^1\|\|2\/3\//');
     }
 
-    public function testValidateIf()
+    public function testValidateIfBool()
     {
         // If
         $trues = [1, '1', true, 'true', 'yes', 'y'];
-        $falses = [0, '0', false, 'false', 'no', 'n', 'hello', 2.5];
+        $falses = [0, '0', false, 'false', 'no', 'n', 'hello', 2.5]; //'hello'和2.5即不是true, 也不是false
         for ($i = 0; $i < count($trues); $i++) {
             for ($j = 0; $j < count($falses); $j++) {
                 $true = $trues[$i];
@@ -272,7 +272,7 @@ class ValidationTest extends TestCase
         }
 
         // IfNot
-        $trues = [1, '1', true, 'true', 'yes', 'y', 'hello', 2.5];
+        $trues = [1, '1', true, 'true', 'yes', 'y', 'hello', 2.5]; //'hello'和2.5即不是true, 也不是false
         $falses = [0, '0', false, 'false', 'no', 'n'];
         for ($i = 0; $i < count($trues); $i++) {
             for ($j = 0; $j < count($falses); $j++) {
@@ -291,6 +291,49 @@ class ValidationTest extends TestCase
             }
         }
 
+        // IfTrue
+        $trues = [true, 'true'];
+        $falses = [false, 'false', 'hello', 2.5]; //'hello'和2.5即不是true, 也不是false
+        for ($i = 0; $i < count($trues); $i++) {
+            for ($j = 0; $j < count($falses); $j++) {
+                $true = $trues[$i];
+                $false = $falses[$j];
+
+                $params = ['type' => $false,'state' => 0];
+                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
+                $params = ['type' => $true,'state' => 0];
+                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:0']); //条件符合+验证通过
+                $this->_assertThrowExpection(function () use ($params) {
+                    Validation::validate($params, ['state' => 'IfTrue:type|IntEq:1']); //条件符合+验证不通过
+                }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+            }
+        }
+
+        // IfFalse
+        $trues = [true, 'true', 'hello', 2.5]; //'hello'和2.5即不是true, 也不是false
+        $falses = [false, 'false'];
+        for ($i = 0; $i < count($trues); $i++) {
+            for ($j = 0; $j < count($falses); $j++) {
+                $true = $trues[$i];
+                $false = $falses[$j];
+
+                $params = ['type' => $true,'state' => 0];
+                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
+                $params = ['type' => $false,'state' => 0];
+                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:0']); //条件符合+验证通过
+                $this->_assertThrowExpection(function () use ($params) {
+                    Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件符合+验证不通过
+                }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+            }
+        }
+    }
+
+    public function testValidateIf()
+    {
         $validations = [
             'type' => 'Required|IntIn:1,2',
             'title' => 'Required|LenGeLe:2,100',
