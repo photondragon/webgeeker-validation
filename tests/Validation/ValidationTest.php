@@ -249,7 +249,7 @@ class ValidationTest extends TestCase
         Validation::validateValue('1||2/3/', 'Regexp:/^1\|\|2\/3\//');
     }
 
-    public function testValidateIfBool()
+    public function testValidateIfBools()
     {
         // If
         $trues = [1, '1', true, 'true', 'yes', 'y'];
@@ -328,6 +328,59 @@ class ValidationTest extends TestCase
                     Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件符合+验证不通过
                 }, 'line ' . __LINE__ . ": 应该抛出异常");
 
+            }
+        }
+    }
+
+    public function testValidateIfExists()
+    {
+        // IfExist
+        $existVals = [0, 123, '', '123', true, false, 0.0, 1.0, [], [1, 2, 3]];
+        $notExistVals = [null, 'undefined']; // 后面对 'undefined' 会作特殊处理
+        for ($i = 0; $i < count($existVals); $i++) {
+            for ($j = 0; $j < count($notExistVals); $j++) {
+                $existVal = $existVals[$i];
+                $notExistVal = $notExistVals[$j];
+
+                $params = ['param1' => $notExistVal, 'param2' => 0];
+                if ($notExistVal === 'undefined') unset($params['param1']);
+                //条件不符合+验证通过（这条会被忽略）
+                Validation::validate($params, ['param2' => 'IfExist:param1|IntEq:0']);
+                //条件不符合+验证不通过（这条会被忽略）
+                Validation::validate($params, ['param2' => 'IfExist:param1|IntEq:1']);
+
+                $params = ['param1' => $existVal, 'param2' => 0];
+                //条件符合+验证通过
+                Validation::validate($params, ['param2' => 'IfExist:param1|IntEq:0']);
+                $this->_assertThrowExpection(function () use ($params) {
+                    //条件符合+验证不通过
+                    Validation::validate($params, ['param2' => 'IfExist:param1|IntEq:1']);
+                }, 'line ' . __LINE__ . ": 应该抛出异常");
+            }
+        }
+
+        // IfNotExist
+        $existVals = [0, 123, '', '123', true, false, 0.0, 1.0, [], [1, 2, 3]];
+        $notExistVals = [null, 'undefined']; // 后面对 'undefined' 会作特殊处理
+        for ($i = 0; $i < count($existVals); $i++) {
+            for ($j = 0; $j < count($notExistVals); $j++) {
+                $existVal = $existVals[$i];
+                $notExistVal = $notExistVals[$j];
+
+                $params = ['param1' => $existVal, 'param2' => 0];
+                //条件不符合+验证通过（这条会被忽略）
+                Validation::validate($params, ['param2' => 'IfNotExist:param1|IntEq:0']);
+                //条件不符合+验证不通过（这条会被忽略）
+                Validation::validate($params, ['param2' => 'IfNotExist:param1|IntEq:1']);
+
+                $params = ['param1' => $notExistVal, 'param2' => 0];
+                if ($notExistVal === 'undefined') unset($params['param1']);
+                //条件符合+验证通过
+                Validation::validate($params, ['param2' => 'IfNotExist:param1|IntEq:0']);
+                $this->_assertThrowExpection(function () use ($params) {
+                    //条件符合+验证不通过
+                    Validation::validate($params, ['param2' => 'IfNotExist:param1|IntEq:1']);
+                }, 'line ' . __LINE__ . ": 应该抛出异常");
             }
         }
     }
