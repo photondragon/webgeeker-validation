@@ -259,10 +259,10 @@ class ValidationTest extends TestCase
                 $true = $trues[$i];
                 $false = $falses[$j];
 
-                $params = ['type' => $false,'state' => 0];
+                $params = ['type' => $false, 'state' => 0];
                 Validation::validate($params, ['state' => 'If:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
                 Validation::validate($params, ['state' => 'If:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
-                $params = ['type' => $true,'state' => 0];
+                $params = ['type' => $true, 'state' => 0];
                 Validation::validate($params, ['state' => 'If:type|IntEq:0']); //条件符合+验证通过
                 $this->_assertThrowExpection(function () use ($params) {
                     Validation::validate($params, ['state' => 'If:type|IntEq:1']); //条件符合+验证不通过
@@ -279,10 +279,10 @@ class ValidationTest extends TestCase
                 $true = $trues[$i];
                 $false = $falses[$j];
 
-                $params = ['type' => $true,'state' => 0];
+                $params = ['type' => $true, 'state' => 0];
                 Validation::validate($params, ['state' => 'IfNot:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
                 Validation::validate($params, ['state' => 'IfNot:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
-                $params = ['type' => $false,'state' => 0];
+                $params = ['type' => $false, 'state' => 0];
                 Validation::validate($params, ['state' => 'IfNot:type|IntEq:0']); //条件符合+验证通过
                 $this->_assertThrowExpection(function () use ($params) {
                     Validation::validate($params, ['state' => 'IfNot:type|IntEq:1']); //条件符合+验证不通过
@@ -299,10 +299,10 @@ class ValidationTest extends TestCase
                 $true = $trues[$i];
                 $false = $falses[$j];
 
-                $params = ['type' => $false,'state' => 0];
+                $params = ['type' => $false, 'state' => 0];
                 Validation::validate($params, ['state' => 'IfTrue:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
                 Validation::validate($params, ['state' => 'IfTrue:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
-                $params = ['type' => $true,'state' => 0];
+                $params = ['type' => $true, 'state' => 0];
                 Validation::validate($params, ['state' => 'IfTrue:type|IntEq:0']); //条件符合+验证通过
                 $this->_assertThrowExpection(function () use ($params) {
                     Validation::validate($params, ['state' => 'IfTrue:type|IntEq:1']); //条件符合+验证不通过
@@ -319,10 +319,10 @@ class ValidationTest extends TestCase
                 $true = $trues[$i];
                 $false = $falses[$j];
 
-                $params = ['type' => $true,'state' => 0];
+                $params = ['type' => $true, 'state' => 0];
                 Validation::validate($params, ['state' => 'IfFalse:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
                 Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
-                $params = ['type' => $false,'state' => 0];
+                $params = ['type' => $false, 'state' => 0];
                 Validation::validate($params, ['state' => 'IfFalse:type|IntEq:0']); //条件符合+验证通过
                 $this->_assertThrowExpection(function () use ($params) {
                     Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件符合+验证不通过
@@ -423,7 +423,7 @@ class ValidationTest extends TestCase
             'visitors[*]' => 'Object',
             'visitors[*].id' => 'Required|IntGt:0',
         ];
-        
+
         $this->assertNotNull(Validation::validate($params, []));
         $this->assertNotNull(Validation::validate($params, $validators));
 
