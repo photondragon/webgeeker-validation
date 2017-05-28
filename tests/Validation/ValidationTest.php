@@ -385,32 +385,300 @@ class ValidationTest extends TestCase
         }
     }
 
+    public function testValidateIfIntXx()
+    {
+        // 检测格式书写错误: IfIntXx:condition,abc
+        $this->_assertThrowExpection(function () {
+            $params = ['condition' => 1, 'param' => 1];
+        //抛出异常: “IfIntEq:condition,abc”中“condition”后面必须是整数，实际上却是“abc”
+            Validation::validate($params, ['param' => "IfIntEq:condition,abc|IntEq:1"]);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+    }
+
+    public function testValidateIfIntEq()
+    {
+        // IfIntEq
+        $intVals = [0, -1, 1, 100, -100, '0', '-1', '1', '100', '-100',];
+        for ($i = 0; $i < count($intVals); $i++) {
+            $intVal = $intVals[$i];
+
+            //条件不符合+验证通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 1];
+            $intVal2 = $intVal+1;
+            Validation::validate($params, ['param' => "IfIntEq:condition,$intVal2|IntEq:1"]);
+
+            //条件不符合+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal+1;
+            Validation::validate($params, ['param' => "IfIntEq:condition,$intVal2|IntEq:1"]);
+
+            //条件符合+验证通过
+            $params = ['condition' => $intVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntEq:condition,$intVal|IntEq:1"]);
+
+            //条件符合+验证不通过
+            $params = ['condition' => $intVal, 'param' => 0];
+            $this->_assertThrowExpection(function () use ($params, $intVal) {
+                Validation::validate($params, ['param' => "IfIntEq:condition,$intVal|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfIntEq 验证参数类型错误导致的条件不符合的情况
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        for ($i = 0; $i < count($notIntVals); $i++) {
+            $notIntVal = $notIntVals[$i];
+            //条件不符合+验证通过（此条检测会被忽略）
+            $params = ['condition' => $notIntVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntEq:condition,0|IntEq:1"]);
+
+            //条件不符合+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $notIntVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfIntEq:condition,1|IntEq:1"]);
+        }
+
+    }
+
+    public function testValidateIfIntNe()
+    {
+        // IfIntNe
+        $intVals = [0, -1, 1, 100, -100, '0', '-1', '1', '100', '-100',];
+        for ($i = 0; $i < count($intVals); $i++) {
+            $intVal = $intVals[$i];
+
+            //条件不符合+验证通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntNe:condition,$intVal|IntEq:1"]);
+
+            //条件不符合+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfIntNe:condition,$intVal|IntEq:1"]);
+
+            //条件符合+验证通过
+            $params = ['condition' => $intVal, 'param' => 1];
+            $intVal2 = $intVal+1;
+            Validation::validate($params, ['param' => "IfIntNe:condition,$intVal2|IntEq:1"]);
+
+            //条件符合+验证不通过
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal+1;
+            $this->_assertThrowExpection(function () use ($params, $intVal2) {
+                Validation::validate($params, ['param' => "IfIntNe:condition,$intVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfIntNe 验证参数类型错误导致的条件符合的情况
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        for ($i = 0; $i < count($notIntVals); $i++) {
+            $notIntVal = $notIntVals[$i];
+            //条件符合+验证通过
+            $params = ['condition' => $notIntVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntNe:condition,0|IntEq:1"]);
+
+            //条件符合+验证不通过
+            $params = ['condition' => $notIntVal, 'param' => 0];
+            $this->_assertThrowExpection(function () use ($params) {
+                Validation::validate($params, ['param' => "IfIntNe:condition,1|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+    }
+
+    public function testValidateIfIntGt()
+    {
+        // IfIntGt
+        $intVals = [0, -1, 1, 100, -100, '0', '-1', '1', '100', '-100',];
+        for ($i = 0; $i < count($intVals); $i++) {
+            $intVal = $intVals[$i];
+
+            //条件不符合+验证通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntGt:condition,$intVal|IntEq:1"]);
+
+            //条件不符合+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal + 1;
+            Validation::validate($params, ['param' => "IfIntGt:condition,$intVal2|IntEq:1"]);
+
+            //条件符合+验证通过
+            $params = ['condition' => $intVal, 'param' => 1];
+            $intVal2 = $intVal - 1;
+            Validation::validate($params, ['param' => "IfIntGt:condition,$intVal2|IntEq:1"]);
+
+            //条件符合+验证不通过
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal - 10;
+            $this->_assertThrowExpection(function () use ($params, $intVal2) {
+                Validation::validate($params, ['param' => "IfIntGt:condition,$intVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfIntGt 验证参数类型错误导致的条件不符合的情况
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        for ($i = 0; $i < count($notIntVals); $i++) {
+            $notIntVal = $notIntVals[$i];
+            //条件不符合+验证通过
+            $params = ['condition' => $notIntVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntGt:condition,0|IntEq:1"]);
+
+            //条件不符合+验证不通过
+            $params = ['condition' => $notIntVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfIntGt:condition,1|IntEq:1"]);
+        }
+    }
+
+    public function testValidateIfIntGe()
+    {
+        // IfIntGe
+        $intVals = [0, -1, 1, 100, -100, '0', '-1', '1', '100', '-100',];
+        for ($i = 0; $i < count($intVals); $i++) {
+            $intVal = $intVals[$i];
+
+            //条件不符合+验证通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 1];
+            $intVal2 = $intVal + 1;
+            Validation::validate($params, ['param' => "IfIntGe:condition,$intVal2|IntEq:1"]);
+
+            //条件不符合+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal + 2;
+            Validation::validate($params, ['param' => "IfIntGe:condition,$intVal2|IntEq:1"]);
+
+            //条件符合+验证通过
+            $params = ['condition' => $intVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntGe:condition,$intVal|IntEq:1"]);
+
+            //条件符合+验证不通过
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal - 1;
+            $this->_assertThrowExpection(function () use ($params, $intVal2) {
+                Validation::validate($params, ['param' => "IfIntGe:condition,$intVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfIntGe 验证参数类型错误导致的条件不符合的情况
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        for ($i = 0; $i < count($notIntVals); $i++) {
+            $notIntVal = $notIntVals[$i];
+            //条件不符合+验证通过
+            $params = ['condition' => $notIntVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntGe:condition,0|IntEq:1"]);
+
+            //条件不符合+验证不通过
+            $params = ['condition' => $notIntVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfIntGe:condition,1|IntEq:1"]);
+        }
+    }
+
+    public function testValidateIfIntLt()
+    {
+        // IfIntLt
+        $intVals = [0, -1, 1, 100, -100, '0', '-1', '1', '100', '-100',];
+        for ($i = 0; $i < count($intVals); $i++) {
+            $intVal = $intVals[$i];
+
+            //条件不符合+验证通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntLt:condition,$intVal|IntEq:1"]);
+
+            //条件不符合+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal - 1;
+            Validation::validate($params, ['param' => "IfIntLt:condition,$intVal2|IntEq:1"]);
+
+            //条件符合+验证通过
+            $params = ['condition' => $intVal, 'param' => 1];
+            $intVal2 = $intVal + 1;
+            Validation::validate($params, ['param' => "IfIntLt:condition,$intVal2|IntEq:1"]);
+
+            //条件符合+验证不通过
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal + 10;
+            $this->_assertThrowExpection(function () use ($params, $intVal2) {
+                Validation::validate($params, ['param' => "IfIntLt:condition,$intVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfIntLt 验证参数类型错误导致的条件不符合的情况
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        for ($i = 0; $i < count($notIntVals); $i++) {
+            $notIntVal = $notIntVals[$i];
+            //条件不符合+验证通过
+            $params = ['condition' => $notIntVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntLt:condition,0|IntEq:1"]);
+
+            //条件不符合+验证不通过
+            $params = ['condition' => $notIntVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfIntLt:condition,1|IntEq:1"]);
+        }
+    }
+
+    public function testValidateIfIntLe()
+    {
+        // IfIntLe
+        $intVals = [0, -1, 1, 100, -100, '0', '-1', '1', '100', '-100',];
+        for ($i = 0; $i < count($intVals); $i++) {
+            $intVal = $intVals[$i];
+
+            //条件不符合+验证通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 1];
+            $intVal2 = $intVal - 1;
+            Validation::validate($params, ['param' => "IfIntLe:condition,$intVal2|IntEq:1"]);
+
+            //条件不符合+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal - 2;
+            Validation::validate($params, ['param' => "IfIntLe:condition,$intVal2|IntEq:1"]);
+
+            //条件符合+验证通过
+            $params = ['condition' => $intVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntLe:condition,$intVal|IntEq:1"]);
+
+            //条件符合+验证不通过
+            $params = ['condition' => $intVal, 'param' => 0];
+            $intVal2 = $intVal + 1;
+            $this->_assertThrowExpection(function () use ($params, $intVal2) {
+                Validation::validate($params, ['param' => "IfIntLe:condition,$intVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfIntLe 验证参数类型错误导致的条件不符合的情况
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        for ($i = 0; $i < count($notIntVals); $i++) {
+            $notIntVal = $notIntVals[$i];
+            //条件不符合+验证通过
+            $params = ['condition' => $notIntVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntLe:condition,0|IntEq:1"]);
+
+            //条件不符合+验证不通过
+            $params = ['condition' => $notIntVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfIntLe:condition,1|IntEq:1"]);
+        }
+    }
+
     public function testValidateIf()
     {
-        $validations = [
-            'type' => 'Required|IntIn:1,2',
-            'title' => 'Required|LenGeLe:2,100',
-            'content' => 'Required|LenGe:1|LenLe:10000000',
-            'state' => [
-                'IfEq:type,1|IntEq:0',
-                'IfEq:type,2|Required|IntIn:0,1,2',
-            ],
-        ];
-
+        // 测试条件检测的应用
         $articleInfo = [
             'type' => 1, // 1-普通文章, 2-用户投诉
             'title' => 'WebGeeker Validation',
             'content' => 'WebGeeker Validation 是一个非常强大的参数验证工具, 能够验证无限嵌套的数据结构',
             'state' => 0,
         ];
-        Validation::validate($articleInfo, $validations);
-
         $complaintInfo = [
             'type' => 2, // 1-普通新闻, 2-用户投诉
             'title' => '客服（10000）的服务太差了',
             'content' => '客服（10000）的服务太差了, 我要投诉他, 砸他饭碗',
             'state' => 1, // 0-待处理, 1-处理中, 2-已处理
         ];
+        $validations = [
+            'type' => 'Required|IntIn:1,2',
+            'title' => 'Required|LenGeLe:2,100',
+            'content' => 'Required|LenGe:1|LenLe:10000000',
+            'state' => [
+                'IfIntEq:type,1|IntEq:0', // 检测 type===1 普通文章
+                'IfIntEq:type,2|Required|IntIn:0,1,2', // 检测 type===2 用户投诉
+            ],
+        ];
+        Validation::validate($articleInfo, $validations);
         Validation::validate($complaintInfo, $validations);
 
         // 嵌套的条件检测
@@ -419,8 +687,8 @@ class ValidationTest extends TestCase
             'article.title' => 'Required|LenGeLe:2,100',
             'article.content' => 'Required|LenGe:1|LenLe:10000000',
             'article.state' => [
-                'IfEq:.type,1|IntEq:0',
-                'IfEq:article.type,2|Required|IntIn:0,1,2',
+                'IfIntEq:.type,1|IntEq:0', // 条件参数采用相对路径
+                'IfIntEq:article.type,2|Required|IntIn:0,1,2', // 条件参数采用绝对路径
             ],
         ];
         Validation::validate(['article' => $articleInfo], $validations2);

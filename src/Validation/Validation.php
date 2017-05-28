@@ -1286,34 +1286,70 @@ class Validation
         return ($value === null);
     }
 
-    protected static function validateIfEq($value, $compareVal)
+    protected static function validateIfIntEq($value, $compareVal)
     {
-        return ($value == $compareVal);
+        return ($value === $compareVal || $value === "$compareVal");
     }
 
-    protected static function validateIfNe($value, $compareVal)
+    protected static function validateIfIntNe($value, $compareVal)
     {
-        return ($value != $compareVal);
+        return !($value === $compareVal || $value === "$compareVal");
     }
 
-    protected static function validateIfGt($value, $compareVal)
+    protected static function validateIfIntGt($value, $compareVal)
     {
-        return ($value > $compareVal);
+        if (is_string($value)) {
+
+            if (is_numeric($value) && strpos($value, '.') === false)
+                return (intval($value) > $compareVal);
+            else
+                return false;
+        } else if (is_integer($value)) {
+            return ($value > $compareVal);
+        }
+        return false;
     }
 
-    protected static function validateIfGe($value, $compareVal)
+    protected static function validateIfIntGe($value, $compareVal)
     {
-        return ($value >= $compareVal);
+        if (is_string($value)) {
+
+            if (is_numeric($value) && strpos($value, '.') === false)
+                return (intval($value) >= $compareVal);
+            else
+                return false;
+        } else if (is_integer($value)) {
+            return ($value >= $compareVal);
+        }
+        return false;
     }
 
-    protected static function validateIfLt($value, $compareVal)
+    protected static function validateIfIntLt($value, $compareVal)
     {
-        return ($value < $compareVal);
+        if (is_string($value)) {
+
+            if (is_numeric($value) && strpos($value, '.') === false)
+                return (intval($value) < $compareVal);
+            else
+                return false;
+        } else if (is_integer($value)) {
+            return ($value < $compareVal);
+        }
+        return false;
     }
 
-    protected static function validateIfLe($value, $compareVal)
+    protected static function validateIfIntLe($value, $compareVal)
     {
-        return ($value <= $compareVal);
+        if (is_string($value)) {
+
+            if (is_numeric($value) && strpos($value, '.') === false)
+                return (intval($value) <= $compareVal);
+            else
+                return false;
+        } else if (is_integer($value)) {
+            return ($value <= $compareVal);
+        }
+        return false;
     }
 
     protected static function validateIfIn($value, $valuesList)
@@ -1513,12 +1549,12 @@ class Validation
         'IfFalse' => 'IfFalse:selected', // 值是否等于 false 或 'false'(忽略大小写)
         'IfExist' => 'IfExist:var', // 参数 var 是否存在
         'IfNotExist' => 'IfNotExist:var', // 参数 var 是否不存在
-        'IfEq' => 'IfEq:type,1', // if (type == 1)
-        'IfNe' => 'IfNe:state,2', // if (state != 2)
-        'IfGt' => 'IfGt:var,0', // if (var > 0)
-        'IfLt' => 'IfLt:var,1', // if (var < 0)
-        'IfGe' => 'IfGe:var,6', // if (var >= 6)
-        'IfLe' => 'IfLe:var,8', // if (var <= 8)
+        'IfIntEq' => 'IfIntEq:var,1', // if (type === 1)
+        'IfIntNe' => 'IfIntNe:var,2', // if (state !== 2). 特别要注意的是如果条件参数var的数据类型不匹配, 那么If条件是成立的; 而其它几个IfIntXx当条件参数var的数据类型不匹配时, If条件不成立
+        'IfIntGt' => 'IfIntGt:var,0', // if (var > 0)
+        'IfIntLt' => 'IfIntLt:var,1', // if (var < 0)
+        'IfIntGe' => 'IfIntGe:var,6', // if (var >= 6)
+        'IfIntLe' => 'IfIntLe:var,8', // if (var <= 8)
         'IfIn' => 'IfIn:var,2,3,5,7', // if (in_array(var, [2,3,5,7]))
         'IfNotIn' => 'IfNotIn:var,2,3,5,7', // if (!in_array(var, [2,3,5,7]))
 //        'IfSame' => 'IfSame:AnotherParameter',
@@ -1719,15 +1755,15 @@ class Validation
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $strings];
                             break;
-                        case 'IfEq':
-                        case 'IfNe':
-                        case 'IfGt':
-                        case 'IfLt':
-                        case 'IfGe':
-                        case 'IfLe':
+                        case 'IfIntEq':
+                        case 'IfIntNe':
+                        case 'IfIntGt':
+                        case 'IfIntLt':
+                        case 'IfIntGe':
+                        case 'IfIntLe':
                             if(count($validatorUnits) > $countOfIfs)
                                 throw new \Exception("IfXxx只能出现在验证器的开头");
-                            $params = self::_parseIfXxxWith1Param1Value($p);
+                            $params = self::_parseIfXxxWith1Param1Int($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $params[0], $params[1]];
@@ -1872,18 +1908,20 @@ class Validation
     /**
      * 解析 IfXxx:varname,123 中的冒号后面的部分（1个条件参数后面带1个值）
      * @param $paramstr string
+     * @param $validatorName string 条件验证子'IfIntXx'
      * @return array|false 出错返回false, 否则返回 ['varname', 123]
      * @throws \Exception
      */
-    private static function _parseIfXxxWith1Param1Value($paramstr)
+    private static function _parseIfXxxWith1Param1Int($paramstr, $validatorName)
     {
         $params = explode(',', $paramstr);
         if (count($params) != 2)
             return false;
 
-//        $varName = $params[0];
-//        $value = $params[1];
-        return $params;
+        $varName = $params[0];
+        $value = $params[1];
+        self::validateInt($value, "“$validatorName:${paramstr}”中“${varName}”后面必须是整数，实际上却是“${value}”");
+        return [$varName, intval($value)];
     }
 
     /**
