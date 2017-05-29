@@ -1426,6 +1426,20 @@ class Validation
         return false;
     }
 
+    protected static function validateIfStrIn($value, $valuesList)
+    {
+        if (is_string($value) === false) // 不是字符串
+            return false;
+        return in_array($value, $valuesList, true);
+    }
+
+    protected static function validateIfStrNotIn($value, $valuesList)
+    {
+        if (is_string($value) === false) // 不是字符串
+            return true;
+        return !in_array($value, $valuesList, true);
+    }
+
     //endregion
 
     /**
@@ -1839,6 +1853,16 @@ class Validation
                             $validator = [$validatorName, $params[0], $params[1]];
                             $countOfIfs++;
                             break;
+                        case 'IfIntIn':
+                        case 'IfIntNotIn':
+                            if (count($validatorUnits) > $countOfIfs)
+                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                            $params = self::_parseIfXxxWith1ParamMultiInts($p, $validatorName);
+                            if ($params === false)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $params[0], $params[1]];
+                            $countOfIfs++;
+                            break;
                         case 'IfStrEq':
                         case 'IfStrNe':
                         case 'IfStrGt':
@@ -1853,11 +1877,11 @@ class Validation
                             $validator = [$validatorName, $params[0], $params[1]];
                             $countOfIfs++;
                             break;
-                        case 'IfIntIn':
-                        case 'IfIntNotIn':
+                        case 'IfStrIn':
+                        case 'IfStrNotIn':
                             if (count($validatorUnits) > $countOfIfs)
                                 throw new \Exception("IfXxx只能出现在验证器的开头");
-                            $params = self::_parseIfXxxWith1ParamMultiInts($p, $validatorName);
+                            $params = self::_parseIfXxxWith1ParamMultiStrings($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $params[0], $params[1]];
