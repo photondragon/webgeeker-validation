@@ -1360,6 +1360,30 @@ class Validation
         return false;
     }
 
+    protected static function validateIfIntIn($value, $valuesList)
+    {
+        if (is_string($value)) {
+            if (is_numeric($value) && strpos($value, '.') === false)
+                $value = intval($value);
+            else
+                return false;
+        } else if (is_integer($value) === false)
+            return false;
+        return in_array($value, $valuesList, true);
+    }
+
+    protected static function validateIfIntNotIn($value, $valuesList)
+    {
+        if (is_string($value)) {
+            if (is_numeric($value) && strpos($value, '.') === false)
+                $value = intval($value);
+            else
+                return true;
+        } else if (is_integer($value) === false)
+            return true;
+        return !in_array($value, $valuesList, true);
+    }
+
     protected static function validateIfStrEq($value, $compareVal)
     {
         return ($value === $compareVal);
@@ -1400,16 +1424,6 @@ class Validation
             return (strcmp($value, $compareVal) <= 0);
         }
         return false;
-    }
-
-    protected static function validateIfIn($value, $valuesList)
-    {
-        return in_array($value, $valuesList);
-    }
-
-    protected static function validateIfNotIn($value, $valuesList)
-    {
-        return !in_array($value, $valuesList);
     }
 
     //endregion
@@ -1605,8 +1619,14 @@ class Validation
         'IfIntLt' => 'IfIntLt:var,1', // if (var < 0)
         'IfIntGe' => 'IfIntGe:var,6', // if (var >= 6)
         'IfIntLe' => 'IfIntLe:var,8', // if (var <= 8)
-        'IfIn' => 'IfIn:var,2,3,5,7', // if (in_array(var, [2,3,5,7]))
-        'IfNotIn' => 'IfNotIn:var,2,3,5,7', // if (!in_array(var, [2,3,5,7]))
+        'IfIntIn' => 'IfIntIn:var,2,3,5,7', // if (in_array(var, [2,3,5,7]))
+        'IfIntNotIn' => 'IfIntNotIn:var,2,3,5,7', // if (!in_array(var, [2,3,5,7]))
+        'IfStrEq' => 'IfStrEq:var,waiting', // if (type === 'waiting')
+        'IfStrNe' => 'IfStrNe:var,editing', // if (state !== 'editing'). 特别要注意的是如果条件参数var的数据类型不匹配, 那么If条件是成立的; 而其它几个IfStrXx当条件参数var的数据类型不匹配时, If条件不成立
+        'IfStrGt' => 'IfStrGt:var,a', // if (var > 'a')
+        'IfStrLt' => 'IfStrLt:var,z', // if (var < 'z')
+        'IfStrGe' => 'IfStrGe:var,A', // if (var >= '0')
+        'IfStrLe' => 'IfStrLe:var,Z', // if (var <= '9')
 //        'IfSame' => 'IfSame:AnotherParameter',
 //        'IfNotSame' => 'IfNotSame:AnotherParameter',
 //        'IfAny' => 'IfAny:type,1,type,2', //待定
@@ -1833,11 +1853,11 @@ class Validation
                             $validator = [$validatorName, $params[0], $params[1]];
                             $countOfIfs++;
                             break;
-                        case 'IfIn':
-                        case 'IfNotIn':
+                        case 'IfIntIn':
+                        case 'IfIntNotIn':
                             if (count($validatorUnits) > $countOfIfs)
                                 throw new \Exception("IfXxx只能出现在验证器的开头");
-                            $params = self::_parseIfXxxWith1ParamMultiValue($p);
+                            $params = self::_parseIfXxxWith1ParamMultiInts($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $params[0], $params[1]];
@@ -2025,24 +2045,49 @@ class Validation
     }
 
     /**
-     * 解析 IfXxx:varname,1,2,3 中的冒号后面的部分（1个条件参数后面带多个变量）
+     * 解析 IfStrXxx:varname,a,b,abc 中的冒号后面的部分（1个条件参数后面带多个字符串）
      * @param $paramstr string
-     * @return array|false 出错返回false, 否则返回 ['varname', ['1','2','3']]
+     * @param $validatorName string 条件验证子'IfStrXxx'
+     * @return array|false 出错返回false, 否则返回 ['varname', ['a','b','abc']]
      * @throws \Exception
      */
-    private static function _parseIfXxxWith1ParamMultiValue($paramstr)
+    private static function _parseIfXxxWith1ParamMultiStrings($paramstr, $validatorName)
     {
         $params = explode(',', $paramstr);
         $c = count($params);
-        if ($c <= 2)
+        if ($c < 2)
             return false;
 
-//        $varName = $params[0];
+        $varName = $params[0];
         $vals = [];
         for ($i = 1; $i < $c; $i++) {
             $vals[] = $params[$i];
         }
-        return [$params[0], $vals];
+        return [$varName, $vals];
+    }
+
+    /**
+     * 解析 IfIntXxx:varname,1,2,3 中的冒号后面的部分（1个条件参数后面带多个整数）
+     * @param $paramstr string
+     * @param $validatorName string 条件验证子'IfIntXxx'
+     * @return array|false 出错返回false, 否则返回 ['varname', [1,2,3]]
+     * @throws \Exception
+     */
+    private static function _parseIfXxxWith1ParamMultiInts($paramstr, $validatorName)
+    {
+        $params = explode(',', $paramstr);
+        $c = count($params);
+        if ($c < 2)
+            return false;
+
+        $varName = $params[0];
+        $vals = [];
+        for ($i = 1; $i < $c; $i++) {
+            $intVal = $params[$i];
+            self::validateInt($intVal, "“$validatorName:${paramstr}”中“${varName}”后面必须全部是整数，实际上却包含了“${intVal}”");
+            $vals[] = intval($intVal);
+        }
+        return [$varName, $vals];
     }
 
     /**

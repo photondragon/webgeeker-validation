@@ -654,6 +654,102 @@ class ValidationTest extends TestCase
         }
     }
 
+    public function testValidateIfIntIn()
+    {
+        // IfIntIn 条件成立
+        $intInVals = [0, -1, 1, 100, -100, '0', '-1', '1', '100', '-100',];
+        for ($i = 0; $i < count($intInVals); $i++) {
+            $intInVal = $intInVals[$i];
+
+            //条件成立+验证通过
+            $params = ['condition' => $intInVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntIn:condition,-100,-1,0,1,100|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $params = ['condition' => $intInVal, 'param' => 0];
+            $this->_assertThrowExpection(function () use ($params) {
+                Validation::validate($params, ['param' => "IfIntIn:condition,-100,-1,0,1,100|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfIntIn 条件不成立
+        $intNotInVals = [-13, 13, -123, 123, '-13', '13', '-123', '123'];
+        for ($i = 0; $i < count($intNotInVals); $i++) {
+            $intNotInVal = $intNotInVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $intNotInVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntIn:condition,-100,-1,0,1,100|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $intNotInVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfIntIn:condition,-100,-1,0,1,100|IntEq:1"]);
+        }
+
+        // IfIntIn 条件参数类型错误导致的条件不成立的情况
+        $nonIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1, 2, 3]]; // 非整型值的数组
+        for ($i = 0; $i < count($nonIntVals); $i++) {
+            $nonIntVal = $nonIntVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $nonIntVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntIn:condition,-100,-1,0,1,100|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $nonIntVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfIntIn:condition,-100,-1,0,1,100|IntEq:1"]);
+        }
+    }
+
+    public function testValidateIfIntNotIn()
+    {
+        // IfIntNotIn 条件不成立
+        $intInVals = [0, -1, 1, 100, -100, '0', '-1', '1', '100', '-100',];
+        for ($i = 0; $i < count($intInVals); $i++) {
+            $intInVal = $intInVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $intInVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntNotIn:condition,-100,-1,0,1,100|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $intInVal, 'param' => 0];
+                Validation::validate($params, ['param' => "IfIntNotIn:condition,-100,-1,0,1,100|IntEq:1"]);
+        }
+
+        // IfIntNotIn 条件成立
+        $intNotInVals = [-13, 13, -123, 123, '-13', '13', '-123', '123'];
+        for ($i = 0; $i < count($intNotInVals); $i++) {
+            $intNotInVal = $intNotInVals[$i];
+
+            //条件成立+验证通过
+            $params = ['condition' => $intNotInVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntNotIn:condition,-100,-1,0,1,100|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $params = ['condition' => $intNotInVal, 'param' => 0];
+            $this->_assertThrowExpection(function () use ($params) {
+                Validation::validate($params, ['param' => "IfIntNotIn:condition,-100,-1,0,1,100|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfIntNotIn 条件参数类型错误导致的条件成立的情况
+        $nonIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1, 2, 3]]; // 非整型值的数组
+        for ($i = 0; $i < count($nonIntVals); $i++) {
+            $nonIntVal = $nonIntVals[$i];
+
+            //条件成立+验证通过
+            $params = ['condition' => $nonIntVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfIntNotIn:condition,-100,-1,0,1,100|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $params = ['condition' => $nonIntVal, 'param' => 0];
+            $this->_assertThrowExpection(function () use ($params) {
+                Validation::validate($params, ['param' => "IfIntNotIn:condition,-100,-1,0,1,100|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+    }
+
     public function testValidateIfStrEq()
     {
         // IfStrEq
