@@ -30,7 +30,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1)
+            if (is_numeric($value) && strpos($value, '.') === false)
                 return $value;
         } elseif ($type === 'integer') {
             return $value;
@@ -48,7 +48,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val == $equalVal)
                     return $value;
@@ -71,7 +71,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val > $min)
                     return $value;
@@ -94,7 +94,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val >= $min)
                     return $value;
@@ -117,7 +117,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val < $max)
                     return $value;
@@ -140,7 +140,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val <= $max)
                     return $value;
@@ -163,7 +163,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val > $min && $val < $max)
                     return $value;
@@ -187,7 +187,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val >= $min && $val <= $max)
                     return $value;
@@ -211,7 +211,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val > $min && $val <= $max)
                     return $value;
@@ -235,7 +235,7 @@ class Validation
     {
         $type = gettype($value);
         if ($type === 'string') {
-            if (preg_match('/^\-?[0-9]+$/', $value) === 1) {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $val = intval($value);
                 if ($val >= $min && $val < $max)
                     return $value;
@@ -260,8 +260,9 @@ class Validation
      * IntIn与in的区别:
      * 0123 -> IntIn:123 通过; 0123 -> In:123 不通过
      * @param $value string|int 参数值
-     * @param $alias string 参数别名, 用于错误提示
      * @param $valueList string[] 可取值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
      * @return string
      * @throws \Exception
      */
@@ -295,8 +296,9 @@ class Validation
     /**
      * 验证intNotIn: “{{param}}”不能取这些值: {{valueList}}
      * @param $value mixed 参数值
-     * @param $alias string 参数别名, 用于错误提示
      * @param $valueList array 不可取的值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
      */
@@ -693,6 +695,7 @@ class Validation
     /**
      * 验证: “{{param}}”只能包含字母
      * @param $value mixed 参数值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
@@ -716,6 +719,7 @@ class Validation
      * 验证: “{{param}}”只能包含字母
      * 同Letters
      * @param $value mixed 参数值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
@@ -738,6 +742,7 @@ class Validation
     /**
      * 验证: “{{param}}”只能是纯数字
      * @param $value mixed 参数值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
@@ -761,6 +766,7 @@ class Validation
      * 验证: “{{param}}”只能是纯数字
      * 同Numbers
      * @param $value mixed 参数值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
@@ -783,6 +789,7 @@ class Validation
     /**
      * 验证: “{{param}}”只能包含字母和数字
      * @param $value mixed 参数值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
@@ -807,6 +814,7 @@ class Validation
      * 一般用于大数处理（超过double表示范围的数,一般会用字符串来表示）
      * 如果是正常范围内的数, 可以使用'Int'或'Float'来检测
      * @param $value mixed 参数值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
@@ -815,10 +823,18 @@ class Validation
     {
         if (is_string($value)) {
             if (preg_match('/^\-?[0-9.]+$/', $value) === 1) {
-                $count = 0;
-                str_replace('.', '.', $value, $count);
-                if ($count <= 1)
+                $count = 0; //小数点的个数
+                $i = 0;
+                while (($i = strpos($value, '.', $i)) !== false) {
+                    $count++;
+                    $i += 1;
+                }
+                if ($count === 0)
                     return $value;
+                else if ($count === 1) {
+                    if ($value !== '.' && $value !== '-.')
+                        return $value;
+                }
             }
         }
 
@@ -833,6 +849,7 @@ class Validation
     /**
      * 验证: “{{param}}”只能包含字母、数字和下划线，并且以字母或下划线开头
      * @param $value mixed 参数值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
@@ -840,7 +857,7 @@ class Validation
     public static function validateVarName($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]+$/', $value) === 1)
+            if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value) === 1)
                 return $value;
         }
 
@@ -855,8 +872,9 @@ class Validation
     /**
      * 验证: “{{param}}”必须等于 {{equalsValue}}
      * @param $value string 参数值
-     * @param $alias string 参数别名, 用于错误提示
      * @param $equalsValue string 可取值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
      */
@@ -933,8 +951,9 @@ class Validation
     /**
      * 验证: “{{param}}”只能取这些值: {{valueList}}
      * @param $value string 参数值
-     * @param $alias string 参数别名, 用于错误提示
      * @param $valueList string[] 可取值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
      * @return string
      * @throws \Exception
      */
@@ -958,8 +977,9 @@ class Validation
     /**
      * 验证: “{{param}}”不能取这些值: {{valueList}}
      * @param $value mixed 参数值
-     * @param $alias string 参数别名, 用于错误提示
      * @param $valueList array 不可取的值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
      */
@@ -983,8 +1003,9 @@ class Validation
     /**
      * 验证: “{{param}}”只能取这些值: {{valueList}}（忽略大小写）
      * @param $value mixed 参数值
-     * @param $alias string 参数别名, 用于错误提示
      * @param $valueList array 可取值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
      */
@@ -1015,8 +1036,9 @@ class Validation
     /**
      * 验证: “{{param}}”不能取这些值: {{valueList}}（忽略大小写）
      * @param $value mixed 参数值
-     * @param $alias string 参数别名, 用于错误提示
      * @param $valueList array 不可取的值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
      */
@@ -1047,9 +1069,9 @@ class Validation
     /**
      * Perl正则表达式验证
      * @param $value string 参数值
-     * @param $alias string 参数别名, 用于错误提示
      * @param $regexp string Perl正则表达式. 正则表达式内的特殊字符需要转义（包括/）. 首尾无需加/
      * @param $reason null|string 原因（当不匹配时用于错误提示）. 如果为null, 当不匹配时会提示 “${alias}”不匹配正则表达式$regexp
+     * @param $alias string 参数别名, 用于错误提示
      * @return mixed
      * @throws \Exception
      */
@@ -1199,14 +1221,15 @@ class Validation
 
     //region others
 
-    /**
-     * 检测参数是否存在并且不为null
-     *
-     * @param $value mixed
-     * @param string $alias
-     * @return mixed
-     * @throws \Exception
-     */
+//    /**
+//     * 检测参数是否存在并且不为null
+//     *
+//     * @param $value mixed
+//     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+//     * @param string $alias
+//     * @return mixed
+//     * @throws \Exception
+//     */
 //    public static function validateRequired($value, $reason = null, $alias = 'Parameter')
 //    {
 //        if($value !== null) //参数不存在或参数值为null时, $value的值都是null
@@ -1620,7 +1643,7 @@ class Validation
         }
 
         $countOfIfs = 0; //Ifxxx的个数
-        $ifUnits = [];
+//        $ifUnits = [];
         $required = false;
         $validatorUnits = [];
 
@@ -1961,36 +1984,6 @@ class Validation
         return [$params[0], $vals];
     }
 
-//    /**
-//     * 检测是否“有值”
-//     *
-//     * 以下几种情况视为“没值”：
-//     * 1.参数不存在
-//     * 2.参数的值为null
-//     * 3.参数为空串''
-//     * 4.参数为空数组[]
-//     * 5.参数为空对象{}
-//     * 其它情况均视为“有值”
-//     *
-//     * @param $value mixed
-//     * @return bool “有值”返回true; “没值”返回false
-//     */
-//    private static function _hasValue($value)
-//    {
-//        if($value === null)
-//            return false;
-//        else if(is_string($value) && strlen($value) === 0)
-//            return false;
-//        else if(is_array($value) && count($value) === 0)
-//            return false;
-//        else
-//            return true;
-//    }
-
-    private static function _validateParam($params, $siblings, $key, $validators)
-    {
-    }
-
     /**
      * 验证一个值
      * @param $value mixed 要验证的值
@@ -2124,11 +2117,6 @@ class Validation
         if(isset($lastException))
             throw $lastException;
         throw new \Exception("“${alias}”验证失败"); // 这句应该不会执行
-    }
-
-    private static function validateValueWithValidatorUnits($validatorUnits)
-    {
-
     }
 
     /**
@@ -2406,9 +2394,10 @@ class Validation
 
     /**
      * 验证一条Validation
-     * @param $params
-     * @param $keys
-     * @param $validator
+     * @param $params array
+     * @param $keys array
+     * @param $keysCount int
+     * @param $validator string
      * @param string $keyPrefix
      * @param $cachedKeyValues array|null 缓存已取过的值. 存储格式为: ['key1' => val1, 'key2' => val2]
      * @param $ignoreRequired bool 是否忽略所有的Required检测子
