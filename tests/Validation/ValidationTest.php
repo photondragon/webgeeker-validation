@@ -390,7 +390,7 @@ class ValidationTest extends TestCase
         // 检测格式书写错误: IfIntXx:condition,abc
         $this->_assertThrowExpection(function () {
             $params = ['condition' => 1, 'param' => 1];
-        //抛出异常: “IfIntEq:condition,abc”中“condition”后面必须是整数，实际上却是“abc”
+            //抛出异常: “IfIntEq:condition,abc”中“condition”后面必须是整数，实际上却是“abc”
             Validation::validate($params, ['param' => "IfIntEq:condition,abc|IntEq:1"]);
         }, 'line ' . __LINE__ . ": 应该抛出异常");
     }
@@ -404,12 +404,12 @@ class ValidationTest extends TestCase
 
             //条件不成立+验证通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 1];
-            $intVal2 = $intVal+1;
+            $intVal2 = $intVal + 1;
             Validation::validate($params, ['param' => "IfIntEq:condition,$intVal2|IntEq:1"]);
 
             //条件不成立+验证不通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 0];
-            $intVal2 = $intVal+1;
+            $intVal2 = $intVal + 1;
             Validation::validate($params, ['param' => "IfIntEq:condition,$intVal2|IntEq:1"]);
 
             //条件成立+验证通过
@@ -424,7 +424,7 @@ class ValidationTest extends TestCase
         }
 
         // IfIntEq 验证参数类型错误导致的条件不成立的情况
-        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1, 2, 3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
             //条件不成立+验证通过（此条检测会被忽略）
@@ -455,19 +455,19 @@ class ValidationTest extends TestCase
 
             //条件成立+验证通过
             $params = ['condition' => $intVal, 'param' => 1];
-            $intVal2 = $intVal+1;
+            $intVal2 = $intVal + 1;
             Validation::validate($params, ['param' => "IfIntNe:condition,$intVal2|IntEq:1"]);
 
             //条件成立+验证不通过
             $params = ['condition' => $intVal, 'param' => 0];
-            $intVal2 = $intVal+1;
+            $intVal2 = $intVal + 1;
             $this->_assertThrowExpection(function () use ($params, $intVal2) {
                 Validation::validate($params, ['param' => "IfIntNe:condition,$intVal2|IntEq:1"]);
             }, 'line ' . __LINE__ . ": 应该抛出异常");
         }
 
         // IfIntNe 验证参数类型错误导致的条件成立的情况
-        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1, 2, 3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
             //条件成立+验证通过
@@ -512,7 +512,7 @@ class ValidationTest extends TestCase
         }
 
         // IfIntGt 验证参数类型错误导致的条件不成立的情况
-        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1, 2, 3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
             //条件不成立+验证通过
@@ -555,7 +555,7 @@ class ValidationTest extends TestCase
         }
 
         // IfIntGe 验证参数类型错误导致的条件不成立的情况
-        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1, 2, 3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
             //条件不成立+验证通过
@@ -598,7 +598,7 @@ class ValidationTest extends TestCase
         }
 
         // IfIntLt 验证参数类型错误导致的条件不成立的情况
-        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1, 2, 3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
             //条件不成立+验证通过
@@ -641,7 +641,7 @@ class ValidationTest extends TestCase
         }
 
         // IfIntLe 验证参数类型错误导致的条件不成立的情况
-        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
+        $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1, 2, 3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
             //条件不成立+验证通过
@@ -683,7 +683,7 @@ class ValidationTest extends TestCase
         }
 
         // IfStrEq 验证参数类型错误导致的条件不成立的情况
-        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1, 2, 3]]; // 不是字符串型
         for ($i = 0; $i < count($notStrVals); $i++) {
             $notStrVal = $notStrVals[$i];
             //条件不成立+验证通过（此条检测会被忽略）
@@ -726,7 +726,7 @@ class ValidationTest extends TestCase
         }
 
         // IfStrNe 验证参数类型错误导致的条件成立的情况
-        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1, 2, 3]]; // 不是字符串型
         for ($i = 0; $i < count($notStrVals); $i++) {
             $notStrVal = $notStrVals[$i];
             //条件成立+验证通过
@@ -773,7 +773,7 @@ class ValidationTest extends TestCase
         }
 
         // IfStrGt 验证参数类型错误导致的条件不成立的情况
-        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1, 2, 3]]; // 不是字符串型
         for ($i = 0; $i < count($notStrVals); $i++) {
             $notStrVal = $notStrVals[$i];
             //条件不成立+验证通过（此条检测会被忽略）
@@ -817,7 +817,7 @@ class ValidationTest extends TestCase
         }
 
         // IfStrGe 验证参数类型错误导致的条件不成立的情况
-        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1, 2, 3]]; // 不是字符串型
         for ($i = 0; $i < count($notStrVals); $i++) {
             $notStrVal = $notStrVals[$i];
             //条件不成立+验证通过（此条检测会被忽略）
@@ -861,7 +861,7 @@ class ValidationTest extends TestCase
         }
 
         // IfStrLt 验证参数类型错误导致的条件不成立的情况
-        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1, 2, 3]]; // 不是字符串型
         for ($i = 0; $i < count($notStrVals); $i++) {
             $notStrVal = $notStrVals[$i];
             //条件不成立+验证通过（此条检测会被忽略）
@@ -905,7 +905,7 @@ class ValidationTest extends TestCase
         }
 
         // IfStrLe 验证参数类型错误导致的条件不成立的情况
-        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1, 2, 3]]; // 不是字符串型
         for ($i = 0; $i < count($notStrVals); $i++) {
             $notStrVal = $notStrVals[$i];
             //条件不成立+验证通过（此条检测会被忽略）

@@ -36,7 +36,7 @@ class Validation
             return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Int'];
@@ -58,7 +58,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntEq'];
@@ -81,7 +81,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntGt'];
@@ -104,7 +104,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntGe'];
@@ -127,7 +127,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntLt'];
@@ -150,7 +150,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntLe'];
@@ -173,7 +173,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntGtLt'];
@@ -197,7 +197,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntGeLe'];
@@ -221,7 +221,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntGtLe'];
@@ -245,7 +245,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntGeLt'];
@@ -284,7 +284,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntIn'];
@@ -320,7 +320,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['IntNotIn'];
@@ -338,7 +338,7 @@ class Validation
         if (is_numeric($value))
             return $value;
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Float'];
@@ -354,7 +354,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['FloatGt'];
@@ -371,7 +371,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['FloatGe'];
@@ -388,7 +388,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['FloatLt'];
@@ -405,7 +405,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['FloatLe'];
@@ -422,7 +422,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['FloatGtLt'];
@@ -440,7 +440,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['FloatGeLe'];
@@ -458,7 +458,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['FloatGtLe'];
@@ -476,7 +476,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['FloatGeLt'];
@@ -496,11 +496,11 @@ class Validation
             return $value;
         } else if (is_string($value)) {
             $valuelc = strtolower($value);
-            if($valuelc === 'true' || $valuelc === 'false')
+            if ($valuelc === 'true' || $valuelc === 'false')
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Bool'];
@@ -513,14 +513,14 @@ class Validation
         if (is_bool($value)) {
             return $value;
         } else if (is_string($value)) {
-            if(in_array(strtolower($value), ['true', 'false', 'yes', 'no', '1', '0', 'y', 'n'], true))
+            if (in_array(strtolower($value), ['true', 'false', 'yes', 'no', '1', '0', 'y', 'n'], true))
                 return $value;
-        } else if(is_numeric($value)) {
-            if($value === 1 || $value === 0)
+        } else if (is_numeric($value)) {
+            if ($value === 1 || $value === 0)
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['BoolSmart'];
@@ -538,7 +538,7 @@ class Validation
             return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Len'];
@@ -554,7 +554,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Len'];
@@ -571,7 +571,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['LenGe'];
@@ -588,7 +588,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['LenLe'];
@@ -609,7 +609,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['LenGeLe'];
@@ -627,7 +627,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['ByteLen'];
@@ -644,7 +644,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['ByteLenGe'];
@@ -661,7 +661,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['ByteLenLe'];
@@ -682,7 +682,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['ByteLenGeLe'];
@@ -707,7 +707,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Letters'];
@@ -731,7 +731,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Alphabet'];
@@ -754,7 +754,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Numbers'];
@@ -778,7 +778,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Digits'];
@@ -801,7 +801,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['LettersNumbers'];
@@ -838,7 +838,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Numeric'];
@@ -861,7 +861,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['VarName'];
@@ -883,7 +883,7 @@ class Validation
         if (is_string($value) && $value === $equalsValue)
             return $value;
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Equals'];
@@ -898,7 +898,7 @@ class Validation
             return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Email'];
@@ -912,7 +912,7 @@ class Validation
             return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Url'];
@@ -926,7 +926,7 @@ class Validation
             return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Ip'];
@@ -940,7 +940,7 @@ class Validation
             return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Mac'];
@@ -965,7 +965,7 @@ class Validation
         if (in_array($value, $valueList, true))
             return $value;
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['In'];
@@ -991,7 +991,7 @@ class Validation
         if (in_array($value, $valueList, true) === false)
             return $value;
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['NotIn'];
@@ -1024,7 +1024,7 @@ class Validation
 
         VeriFailed:
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['InNoCase'];
@@ -1057,7 +1057,7 @@ class Validation
 
         VeriFailed:
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['NotInNoCase'];
@@ -1086,7 +1086,7 @@ class Validation
         else if ($result === false)
             throw new \Exception("“${alias}”参数的正则表达式验证失败, 请检查正则表达式是否合法");
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Regexp'];
@@ -1101,19 +1101,19 @@ class Validation
 
     public static function validateArray($value, $reason = null, $alias = 'Parameter')
     {
-        if(is_array($value)) {
+        if (is_array($value)) {
             $is = true;
             foreach ($value as $key => $val) {
-                if(!is_integer($key)) {
+                if (!is_integer($key)) {
                     $is = false;
                     break;
                 }
             }
-            if($is)
+            if ($is)
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Array'];
@@ -1123,19 +1123,19 @@ class Validation
 
     public static function validateArrayLen($value, $length, $reason = null, $alias = 'Parameter')
     {
-        if(is_array($value) && count($value) == $length) {
+        if (is_array($value) && count($value) == $length) {
             $is = true;
             foreach ($value as $key => $val) {
-                if(!is_integer($key)) {
+                if (!is_integer($key)) {
                     $is = false;
                     break;
                 }
             }
-            if($is)
+            if ($is)
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['ArrayLen'];
@@ -1146,19 +1146,19 @@ class Validation
 
     public static function validateArrayLenGe($value, $min, $reason = null, $alias = 'Parameter')
     {
-        if(is_array($value) && count($value) >= $min) {
+        if (is_array($value) && count($value) >= $min) {
             $is = true;
             foreach ($value as $key => $val) {
-                if(!is_integer($key)) {
+                if (!is_integer($key)) {
                     $is = false;
                     break;
                 }
             }
-            if($is)
+            if ($is)
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['ArrayLenGe'];
@@ -1169,19 +1169,19 @@ class Validation
 
     public static function validateArrayLenLe($value, $max, $reason = null, $alias = 'Parameter')
     {
-        if(is_array($value) && count($value) <= $max) {
+        if (is_array($value) && count($value) <= $max) {
             $is = true;
             foreach ($value as $key => $val) {
-                if(!is_integer($key)) {
+                if (!is_integer($key)) {
                     $is = false;
                     break;
                 }
             }
-            if($is)
+            if ($is)
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['ArrayLenLe'];
@@ -1192,9 +1192,9 @@ class Validation
 
     public static function validateArrayLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
-        if(is_array($value)) {
+        if (is_array($value)) {
             $c = count($value);
-            if($c >= $min && $c <= $max) {
+            if ($c >= $min && $c <= $max) {
                 $is = true;
                 foreach ($value as $key => $val) {
                     if (!is_integer($key)) {
@@ -1207,7 +1207,7 @@ class Validation
             }
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['ArrayLenGeLe'];
@@ -1230,7 +1230,7 @@ class Validation
      */
     public static function validateObject($value, $reason = null, $alias = 'Parameter')
     {
-        if(is_array($value)) {
+        if (is_array($value)) {
             $is = true;
             foreach ($value as $key => $val) {
                 if (!is_string($key)) {
@@ -1242,7 +1242,7 @@ class Validation
                 return $value;
         }
 
-        if($reason !== null)
+        if ($reason !== null)
             throw new \Exception($reason);
 
         $error = self::$errorTemplates['Object'];
@@ -1744,8 +1744,8 @@ class Validation
                 } else {
                     $validatorName = substr($segment, 0, $pos);
                     $p = substr($segment, $pos + 1);
-                    if (strlen($validatorName)===0 || strlen($p) === 0) {
-                        if($validatorName !== '>>>')
+                    if (strlen($validatorName) === 0 || strlen($p) === 0) {
+                        if ($validatorName !== '>>>')
                             throw new \Exception("无法识别的验证子“${segment}”");
                     }
                     switch ($validatorName) {
@@ -1792,7 +1792,7 @@ class Validation
                             break;
                         case 'equals':
                             $p = trim($p);
-                            if(strlen($p) === 0)
+                            if (strlen($p) === 0)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $p];
                             break;
@@ -1811,13 +1811,13 @@ class Validation
                         case 'IfIntLt':
                         case 'IfIntGe':
                         case 'IfIntLe':
-                            if(count($validatorUnits) > $countOfIfs)
+                            if (count($validatorUnits) > $countOfIfs)
                                 throw new \Exception("IfXxx只能出现在验证器的开头");
                             $params = self::_parseIfXxxWith1Param1Int($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $params[0], $params[1]];
-                            $countOfIfs ++;
+                            $countOfIfs++;
                             break;
                         case 'IfStrEq':
                         case 'IfStrNe':
@@ -1825,23 +1825,23 @@ class Validation
                         case 'IfStrLt':
                         case 'IfStrGe':
                         case 'IfStrLe':
-                            if(count($validatorUnits) > $countOfIfs)
+                            if (count($validatorUnits) > $countOfIfs)
                                 throw new \Exception("IfXxx只能出现在验证器的开头");
                             $params = self::_parseIfXxxWith1Param1Str($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $params[0], $params[1]];
-                            $countOfIfs ++;
+                            $countOfIfs++;
                             break;
                         case 'IfIn':
                         case 'IfNotIn':
-                            if(count($validatorUnits) > $countOfIfs)
+                            if (count($validatorUnits) > $countOfIfs)
                                 throw new \Exception("IfXxx只能出现在验证器的开头");
                             $params = self::_parseIfXxxWith1ParamMultiValue($p);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $params[0], $params[1]];
-                            $countOfIfs ++;
+                            $countOfIfs++;
                             break;
                         case 'If':
                         case 'IfNot':
@@ -1851,13 +1851,13 @@ class Validation
                         case 'IfFalse':
 //                        case 'IfSame':
 //                        case 'IfNotSame':
-                            if(count($validatorUnits) > $countOfIfs)
+                            if (count($validatorUnits) > $countOfIfs)
                                 throw new \Exception("IfXxx只能出现在验证器的开头");
                             $varname = self::_parseIfXxxWith1Param($p);
                             if ($varname === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $varname];
-                            $countOfIfs ++;
+                            $countOfIfs++;
                             break;
 //                        case 'IfAny':
 //                            break;
@@ -1891,22 +1891,22 @@ class Validation
                             $validator = null;
                             break;
                         case 'Alias':
-                            if(strlen($p))
+                            if (strlen($p))
                                 $alias = $p;
                             $validator = null;
                             break;
                         default:
                             throw new \Exception("无法识别的验证子“${segment}”");
                     }
-                    if($validator)
+                    if ($validator)
                         $validatorUnits[] = $validator;
                 } // end if 有冒号:分隔符
             } // end else 不是Regexp
         } // end for ($segments)
 
-        if(!is_string($alias) || strlen($alias) === 0)
+        if (!is_string($alias) || strlen($alias) === 0)
             $alias = 'UnknownParameter';
-        for ($i = count($validatorUnits) -1 ; $i >= 0; $i--) {
+        for ($i = count($validatorUnits) - 1; $i >= 0; $i--) {
             $validatorUnits[$i][] = $customReason;
             $validatorUnits[$i][] = $alias;
         }
@@ -1920,7 +1920,7 @@ class Validation
     private static function _throwFormatError($validatorName)
     {
         $sampleFormat = @self::$sampleFormats[$validatorName];
-        if($sampleFormat === null)
+        if ($sampleFormat === null)
             throw new \Exception("验证器${validatorName}格式错误");
         throw new \Exception("验证器${validatorName}格式错误, 正确的格式是: $sampleFormat");
     }
@@ -1940,11 +1940,11 @@ class Validation
         $vals = explode(',', $value);
         $ints = [];
         foreach ($vals as $val) {
-            if(is_numeric($val) === false || strpos($val, '.') !== false)
+            if (is_numeric($val) === false || strpos($val, '.') !== false)
                 return false; // 检测到了非int
             $ints[] = intval($val);
         }
-        if(count($ints)===0)
+        if (count($ints) === 0)
             return false;
         return $ints;
     }
@@ -1960,11 +1960,11 @@ class Validation
         $strings = [];
         foreach ($vals as $val) {
             $val = trim($val);
-            if(strlen($val) === 0)
+            if (strlen($val) === 0)
                 return false; // 检测到了非int
             $strings[] = $val;
         }
-        if(count($strings)===0)
+        if (count($strings) === 0)
             return false;
         return $strings;
     }
@@ -2058,9 +2058,9 @@ class Validation
      */
     public static function validateValue($value, $validator, $alias = 'Parameter', $ignoreRequired = false, $originParams = [], $siblings = [])
     {
-        if(is_array($validator)) {
+        if (is_array($validator)) {
             $validators = $validator;
-        } else if(is_string($validator)) {
+        } else if (is_string($validator)) {
             $validators = [$validator];
         } else
             throw new \Exception(self::class . '::' . __FUNCTION__ . "(): \$validator必须是字符串或字符串数组");
@@ -2088,7 +2088,7 @@ class Validation
 
                     $ifName = $validatorUnit[0];
                     $method = 'validate' . ucfirst($ifName);
-                    if(method_exists(self::class, $method)===false)
+                    if (method_exists(self::class, $method) === false)
                         throw new \Exception("找不到条件判断${$ifName}的验证方法");
 
                     $varkeypath = $validatorUnit[1]; // 条件参数的路径
@@ -2133,7 +2133,7 @@ class Validation
 //                } else if ($countOfIfs)
 //                    echo "\n满足条件\n";
 
-                if($value === null) //没有提供参数
+                if ($value === null) //没有提供参数
                 {
                     if (($validatorInfo['required'] === false) || $ignoreRequired)
                         continue; // 忽略本条validator
@@ -2152,7 +2152,7 @@ class Validation
 //                        echo "\n$method()\n";
 //                    }
 
-                    if(method_exists(self::class, $method)===false)
+                    if (method_exists(self::class, $method) === false)
                         throw new \Exception("找不到验证子${validatorUnitName}的验证方法");
 
                     $params = [$value];
@@ -2172,10 +2172,10 @@ class Validation
             }
         }
 
-        if($success || $failed === 0)
+        if ($success || $failed === 0)
             return $value;
 
-        if(isset($lastException))
+        if (isset($lastException))
             throw $lastException;
         throw new \Exception("“${alias}”验证失败"); // 这句应该不会执行
     }
@@ -2188,14 +2188,14 @@ class Validation
      */
     private static function _compileKeypath($keypath, &$asterisksCount)
     {
-        if(strlen($keypath) === 0)
+        if (strlen($keypath) === 0)
             throw new \Exception('$validations数组中包含空的字段名');
 
-        if(preg_match('/^[a-zA-Z0-9_.\[\]*]+$/', $keypath) !== 1)
+        if (preg_match('/^[a-zA-Z0-9_.\[\]*]+$/', $keypath) !== 1)
             throw new \Exception("非法的字段名“${keypath}”");
 
         $keys = explode('.', $keypath); // $keys中的数组还没有解析
-        if(count($keys)===0)
+        if (count($keys) === 0)
             throw new \Exception('$validations数组中包含空的字段名');
 
         $asterisksCount = 0;
@@ -2203,67 +2203,67 @@ class Validation
         $filteredKeys = [];
         // 尝试识别普通数组, 形如'varname[*]'
         foreach ($keys as $key) {
-            if(strlen($key)===0)
+            if (strlen($key) === 0)
                 throw new \Exception("“${keypath}”中包含空的字段名");
 
             $i = strpos($key, '[');
-            if($i === false) // 普通的key
+            if ($i === false) // 普通的key
             {
-                if(strpos($key, '*') !== false)
+                if (strpos($key, '*') !== false)
                     throw new \Exception("“${keypath}”中'*'号只能处于方括号[]中");
-                if(strpos($key, ']') !== false)
+                if (strpos($key, ']') !== false)
                     throw new \Exception("“${key}”中包含了非法的']'号");
-                if(preg_match('/^[0-9]/', $key)===1) {
-                    if(count($keys)===1)
+                if (preg_match('/^[0-9]/', $key) === 1) {
+                    if (count($keys) === 1)
                         throw new \Exception("字段名“${keypath}”不得以数字开头");
                     else
                         throw new \Exception("“${keypath}”中包含了以数字开头的字段名“${key}”");
                 }
                 $filteredKeys[] = $key;
                 continue;
-            } else if($i === 0) {
+            } else if ($i === 0) {
                 throw new \Exception("“${keypath}”中'['号前面没有变量名");
             } else {
                 $j = strpos($key, ']');
-                if($j === false)
+                if ($j === false)
                     throw new \Exception("“${key}”中的'['号之后缺少']'");
-                if($i>$j)
+                if ($i > $j)
                     throw new \Exception("“${key}”中'[', ']'顺序颠倒了");
 
                 // 识别普通数组的变量名（'[*]'之前的部分）
                 $varName = substr($key, 0, $i);
-                if(strpos($varName, '*') !== false)
+                if (strpos($varName, '*') !== false)
                     throw new \Exception("“${key}”中包含了非法的'*'号");
-                if(preg_match('/^[0-9]/', $varName)===1)
+                if (preg_match('/^[0-9]/', $varName) === 1)
                     throw new \Exception("“${keypath}”中包含了以数字开头的字段名“${varName}”");
                 $filteredKeys[] = $varName;
 
                 // 识别普通数组的索引值
-                $index = substr($key, $i+1, $j-$i-1);
-                if($index === '*') {
+                $index = substr($key, $i + 1, $j - $i - 1);
+                if ($index === '*') {
                     $filteredKeys[] = $index;
                     $asterisksCount++;
-                } else if(is_numeric($index))
+                } else if (is_numeric($index))
                     $filteredKeys[] = intval($index);
                 else
                     throw new \Exception("“${key}”中的方括号[]之间只能包含数字或'*'号");
 
                 // 尝试识别多维数组
                 $len = strlen($key);
-                while($j < $len - 1) {
+                while ($j < $len - 1) {
                     $j++;
                     $i = strpos($key, '[', $j);
-                    if($i !== $j)
+                    if ($i !== $j)
                         throw new \Exception("“${key}”中的“[$index]”之后包含非法字符");
                     $j = strpos($key, ']', $i);
-                    if($j === false)
+                    if ($j === false)
                         throw new \Exception("“${key}”中的'['号之后缺少']'");
 
-                    $index = substr($key, $i+1, $j-$i-1);
-                    if($index === '*') {
+                    $index = substr($key, $i + 1, $j - $i - 1);
+                    if ($index === '*') {
                         $filteredKeys[] = $index;
                         $asterisksCount++;
-                    } else if(is_numeric($index))
+                    } else if (is_numeric($index))
                         $filteredKeys[] = intval($index);
                     else
                         throw new \Exception("“${key}”中的方括号[]之间只能包含数字或'*'号");
@@ -2304,7 +2304,7 @@ class Validation
      */
     public static function validate($params, $validations, $ignoreRequired = false)
     {
-        if(is_array($params) === false)
+        if (is_array($params) === false)
             throw new \Exception(self::class . '::' . __FUNCTION__ . "(): \$params必须是数组");
 
         $cachedKeyValues = [];
@@ -2315,7 +2315,7 @@ class Validation
             $keys = self::_compileKeypath($keypath, $asterisksCount);
 
             $keysCount = count($keys);
-            if($keysCount>1 && $cachedKeyValues === null)
+            if ($keysCount > 1 && $cachedKeyValues === null)
                 $cachedKeyValues = [];
 
             self::_validate($params, $keys, $keysCount, $validator, '', $ignoreRequired, $cachedKeyValues);
@@ -2470,8 +2470,8 @@ class Validation
         $siblings = $params;
         $value = $params;
 
-        if($keysCount>1) {
-            if($cachedKeyValues !== null) {
+        if ($keysCount > 1) {
+            if ($cachedKeyValues !== null) {
                 $prefix = $keyPrefix;
                 for ($i = 0; $i < $keysCount - 1; $i++) {
                     $key = $keys[$i];
@@ -2494,7 +2494,7 @@ class Validation
             $keyPrefix = $keyPath;
 
             $key = $keys[$n];
-            if($key === '*') {
+            if ($key === '*') {
                 Validation::validateArray($siblings, null, $keyPrefix);
                 $c = count($siblings);
                 if ($c > 0) {
@@ -2503,49 +2503,46 @@ class Validation
                     for ($i = 0; $i < $c; $i++) {
                         $element = $siblings[$i];
                         $keyPath = $keyPrefix . "[$i]";
-                        if($subKeysCount)
+                        if ($subKeysCount)
                             self::_validate($element, $subKeys, $subKeysCount, $validator, $keyPath, $ignoreRequired, $cachedKeyValues);
                         else {
                             Validation::validateValue($element, $validator, $keyPath, $ignoreRequired, $params, $siblings);
 
                             // 缓存数组本身的没什么用, 因为提取不到.
-                            if($cachedKeyValues !== null && $keyPrefix) {
+                            if ($cachedKeyValues !== null && $keyPrefix) {
                                 $cachedKeyValues[$keyPrefix] = $siblings;
 //                                echo "\n缓存: keyPrefix=$keyPrefix, key=$keyPath" . ", value=$siblings\n";
                             }
                         }
                     }
                     return;
-                }
-                else // 'items[*]' => 'Required' 要求items至少有1个元素, 但上面的循环不检测items==[]的情况
+                } else // 'items[*]' => 'Required' 要求items至少有1个元素, 但上面的循环不检测items==[]的情况
                     $value = null; // 这里是针对$value==[]这种情况的特殊处理
-            }
-            else {
-                if(is_integer($key))
+            } else {
+                if (is_integer($key))
                     Validation::validateArray($siblings, null, $keyPrefix);
                 else
                     Validation::validateObject($siblings, null, $keyPrefix);
                 $value = @$siblings[$key];
             }
 
-            if($keyPrefix === '')
+            if ($keyPrefix === '')
                 $keyPath = $key;
-            else if(is_integer($key) || $key === '*')
-                $keyPath = $keyPrefix."[$key]";
+            else if (is_integer($key) || $key === '*')
+                $keyPath = $keyPrefix . "[$key]";
             else
                 $keyPath = "$keyPrefix.$key";
-            if($value === null) {
+            if ($value === null) {
                 $n++;
                 break;
             }
         }
 
         // 到这里$n表示当前的$value是第几层
-        if($n == $keysCount) {
+        if ($n == $keysCount) {
             Validation::validateValue($value, $validator, $keyPath, $ignoreRequired, $params, $siblings);
-        }
-        else {
-            if($cachedKeyValues !== null) {
+        } else {
+            if ($cachedKeyValues !== null) {
                 for (; $n < $keysCount; $n++) {
                     $keyPrefix = $keyPath;
 
@@ -2561,7 +2558,7 @@ class Validation
                 $siblings = null;
             }
         }
-        if($cachedKeyValues !== null && $keyPrefix) {
+        if ($cachedKeyValues !== null && $keyPrefix) {
             $cachedKeyValues[$keyPrefix] = $siblings;
 //            echo "\n缓存: keyPrefix=$keyPrefix, key=$keyPath" . ", value=$siblings\n";
         }
