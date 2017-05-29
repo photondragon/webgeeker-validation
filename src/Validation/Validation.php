@@ -1221,28 +1221,13 @@ class Validation
 
     //region others
 
-//    /**
-//     * 检测参数是否存在并且不为null
-//     *
-//     * @param $value mixed
-//     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
-//     * @param string $alias
-//     * @return mixed
-//     * @throws \Exception
-//     */
-//    public static function validateRequired($value, $reason = null, $alias = 'Parameter')
-//    {
-//        if($value !== null) //参数不存在或参数值为null时, $value的值都是null
-//            return $value;
-//
-//        if($reason !== null)
-//            throw new \Exception($reason);
-//
-//        $error = self::$errorTemplates['Required'];
-//        $error = str_replace('{{param}}', $alias, $error);
-//        throw new \Exception($error);
-//    }
-
+    /**
+     * @param $value mixed
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param string $alias
+     * @return mixed
+     * @throws \Exception
+     */
     public static function validateObject($value, $reason = null, $alias = 'Parameter')
     {
         if(is_array($value)) {
@@ -1371,6 +1356,48 @@ class Validation
                 return false;
         } else if (is_integer($value)) {
             return ($value <= $compareVal);
+        }
+        return false;
+    }
+
+    protected static function validateIfStrEq($value, $compareVal)
+    {
+        return ($value === $compareVal);
+    }
+
+    protected static function validateIfStrNe($value, $compareVal)
+    {
+        return ($value !== $compareVal);
+    }
+
+    protected static function validateIfStrGt($value, $compareVal)
+    {
+        if (is_string($value)) {
+            return (strcmp($value, $compareVal) > 0);
+        }
+        return false;
+    }
+
+    protected static function validateIfStrGe($value, $compareVal)
+    {
+        if (is_string($value)) {
+            return (strcmp($value, $compareVal) >= 0);
+        }
+        return false;
+    }
+
+    protected static function validateIfStrLt($value, $compareVal)
+    {
+        if (is_string($value)) {
+            return (strcmp($value, $compareVal) < 0);
+        }
+        return false;
+    }
+
+    protected static function validateIfStrLe($value, $compareVal)
+    {
+        if (is_string($value)) {
+            return (strcmp($value, $compareVal) <= 0);
         }
         return false;
     }
@@ -1792,6 +1819,20 @@ class Validation
                             $validator = [$validatorName, $params[0], $params[1]];
                             $countOfIfs ++;
                             break;
+                        case 'IfStrEq':
+                        case 'IfStrNe':
+                        case 'IfStrGt':
+                        case 'IfStrLt':
+                        case 'IfStrGe':
+                        case 'IfStrLe':
+                            if(count($validatorUnits) > $countOfIfs)
+                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                            $params = self::_parseIfXxxWith1Param1Str($p, $validatorName);
+                            if ($params === false)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $params[0], $params[1]];
+                            $countOfIfs ++;
+                            break;
                         case 'IfIn':
                         case 'IfNotIn':
                             if(count($validatorUnits) > $countOfIfs)
@@ -1929,7 +1970,7 @@ class Validation
     }
 
     /**
-     * 解析 IfXxx:varname,123 中的冒号后面的部分（1个条件参数后面带1个值）
+     * 解析 IfIntXx:varname,123 中的冒号后面的部分（1个条件参数后面带1个Int值）
      * @param $paramstr string
      * @param $validatorName string 条件验证子'IfIntXx'
      * @return array|false 出错返回false, 否则返回 ['varname', 123]
@@ -1945,6 +1986,26 @@ class Validation
         $value = $params[1];
         self::validateInt($value, "“$validatorName:${paramstr}”中“${varName}”后面必须是整数，实际上却是“${value}”");
         return [$varName, intval($value)];
+    }
+
+    /**
+     * 解析 IfStrXx:varname,abc 中的冒号后面的部分（1个条件参数后面带1个String值）
+     * @param $paramstr string
+     * @param $validatorName string 条件验证子'IfStrXx'
+     * @return array|false 出错返回false, 否则返回 ['varname', 'abc']
+     * @throws \Exception
+     */
+    private static function _parseIfXxxWith1Param1Str($paramstr, $validatorName)
+    {
+        $params = explode(',', $paramstr);
+        if (count($params) != 2)
+            return false;
+
+        $varName = $params[0];
+//        $value = $params[1];
+        if (strlen($varName) == 0) // 简单检测
+            throw new \Exception("“$validatorName:${paramstr}”中“${$validatorName}”后面必须是一个参数（变量）名，实际上却是空串");
+        return $params;
     }
 
     /**

@@ -260,12 +260,12 @@ class ValidationTest extends TestCase
                 $false = $falses[$j];
 
                 $params = ['type' => $false, 'state' => 0];
-                Validation::validate($params, ['state' => 'If:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
-                Validation::validate($params, ['state' => 'If:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
+                Validation::validate($params, ['state' => 'If:type|IntEq:0']); //条件不成立+验证通过（忽略这条）
+                Validation::validate($params, ['state' => 'If:type|IntEq:1']); //条件不成立+验证不通过（忽略这条）
                 $params = ['type' => $true, 'state' => 0];
-                Validation::validate($params, ['state' => 'If:type|IntEq:0']); //条件符合+验证通过
+                Validation::validate($params, ['state' => 'If:type|IntEq:0']); //条件成立+验证通过
                 $this->_assertThrowExpection(function () use ($params) {
-                    Validation::validate($params, ['state' => 'If:type|IntEq:1']); //条件符合+验证不通过
+                    Validation::validate($params, ['state' => 'If:type|IntEq:1']); //条件成立+验证不通过
                 }, 'line ' . __LINE__ . ": 应该抛出异常");
 
             }
@@ -280,12 +280,12 @@ class ValidationTest extends TestCase
                 $false = $falses[$j];
 
                 $params = ['type' => $true, 'state' => 0];
-                Validation::validate($params, ['state' => 'IfNot:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
-                Validation::validate($params, ['state' => 'IfNot:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfNot:type|IntEq:0']); //条件不成立+验证通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfNot:type|IntEq:1']); //条件不成立+验证不通过（忽略这条）
                 $params = ['type' => $false, 'state' => 0];
-                Validation::validate($params, ['state' => 'IfNot:type|IntEq:0']); //条件符合+验证通过
+                Validation::validate($params, ['state' => 'IfNot:type|IntEq:0']); //条件成立+验证通过
                 $this->_assertThrowExpection(function () use ($params) {
-                    Validation::validate($params, ['state' => 'IfNot:type|IntEq:1']); //条件符合+验证不通过
+                    Validation::validate($params, ['state' => 'IfNot:type|IntEq:1']); //条件成立+验证不通过
                 }, 'line ' . __LINE__ . ": 应该抛出异常");
 
             }
@@ -300,12 +300,12 @@ class ValidationTest extends TestCase
                 $false = $falses[$j];
 
                 $params = ['type' => $false, 'state' => 0];
-                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
-                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:0']); //条件不成立+验证通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:1']); //条件不成立+验证不通过（忽略这条）
                 $params = ['type' => $true, 'state' => 0];
-                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:0']); //条件符合+验证通过
+                Validation::validate($params, ['state' => 'IfTrue:type|IntEq:0']); //条件成立+验证通过
                 $this->_assertThrowExpection(function () use ($params) {
-                    Validation::validate($params, ['state' => 'IfTrue:type|IntEq:1']); //条件符合+验证不通过
+                    Validation::validate($params, ['state' => 'IfTrue:type|IntEq:1']); //条件成立+验证不通过
                 }, 'line ' . __LINE__ . ": 应该抛出异常");
 
             }
@@ -320,12 +320,12 @@ class ValidationTest extends TestCase
                 $false = $falses[$j];
 
                 $params = ['type' => $true, 'state' => 0];
-                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:0']); //条件不符合+验证通过（忽略这条）
-                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件不符合+验证不通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:0']); //条件不成立+验证通过（忽略这条）
+                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件不成立+验证不通过（忽略这条）
                 $params = ['type' => $false, 'state' => 0];
-                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:0']); //条件符合+验证通过
+                Validation::validate($params, ['state' => 'IfFalse:type|IntEq:0']); //条件成立+验证通过
                 $this->_assertThrowExpection(function () use ($params) {
-                    Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件符合+验证不通过
+                    Validation::validate($params, ['state' => 'IfFalse:type|IntEq:1']); //条件成立+验证不通过
                 }, 'line ' . __LINE__ . ": 应该抛出异常");
 
             }
@@ -344,16 +344,16 @@ class ValidationTest extends TestCase
 
                 $params = ['param1' => $notExistVal, 'param2' => 0];
                 if ($notExistVal === 'undefined') unset($params['param1']);
-                //条件不符合+验证通过（这条会被忽略）
+                //条件不成立+验证通过（这条会被忽略）
                 Validation::validate($params, ['param2' => 'IfExist:param1|IntEq:0']);
-                //条件不符合+验证不通过（这条会被忽略）
+                //条件不成立+验证不通过（这条会被忽略）
                 Validation::validate($params, ['param2' => 'IfExist:param1|IntEq:1']);
 
                 $params = ['param1' => $existVal, 'param2' => 0];
-                //条件符合+验证通过
+                //条件成立+验证通过
                 Validation::validate($params, ['param2' => 'IfExist:param1|IntEq:0']);
                 $this->_assertThrowExpection(function () use ($params) {
-                    //条件符合+验证不通过
+                    //条件成立+验证不通过
                     Validation::validate($params, ['param2' => 'IfExist:param1|IntEq:1']);
                 }, 'line ' . __LINE__ . ": 应该抛出异常");
             }
@@ -368,17 +368,17 @@ class ValidationTest extends TestCase
                 $notExistVal = $notExistVals[$j];
 
                 $params = ['param1' => $existVal, 'param2' => 0];
-                //条件不符合+验证通过（这条会被忽略）
+                //条件不成立+验证通过（这条会被忽略）
                 Validation::validate($params, ['param2' => 'IfNotExist:param1|IntEq:0']);
-                //条件不符合+验证不通过（这条会被忽略）
+                //条件不成立+验证不通过（这条会被忽略）
                 Validation::validate($params, ['param2' => 'IfNotExist:param1|IntEq:1']);
 
                 $params = ['param1' => $notExistVal, 'param2' => 0];
                 if ($notExistVal === 'undefined') unset($params['param1']);
-                //条件符合+验证通过
+                //条件成立+验证通过
                 Validation::validate($params, ['param2' => 'IfNotExist:param1|IntEq:0']);
                 $this->_assertThrowExpection(function () use ($params) {
-                    //条件符合+验证不通过
+                    //条件成立+验证不通过
                     Validation::validate($params, ['param2' => 'IfNotExist:param1|IntEq:1']);
                 }, 'line ' . __LINE__ . ": 应该抛出异常");
             }
@@ -402,36 +402,36 @@ class ValidationTest extends TestCase
         for ($i = 0; $i < count($intVals); $i++) {
             $intVal = $intVals[$i];
 
-            //条件不符合+验证通过（此条检测会被忽略）
+            //条件不成立+验证通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 1];
             $intVal2 = $intVal+1;
             Validation::validate($params, ['param' => "IfIntEq:condition,$intVal2|IntEq:1"]);
 
-            //条件不符合+验证不通过（此条检测会被忽略）
+            //条件不成立+验证不通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal+1;
             Validation::validate($params, ['param' => "IfIntEq:condition,$intVal2|IntEq:1"]);
 
-            //条件符合+验证通过
+            //条件成立+验证通过
             $params = ['condition' => $intVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntEq:condition,$intVal|IntEq:1"]);
 
-            //条件符合+验证不通过
+            //条件成立+验证不通过
             $params = ['condition' => $intVal, 'param' => 0];
             $this->_assertThrowExpection(function () use ($params, $intVal) {
                 Validation::validate($params, ['param' => "IfIntEq:condition,$intVal|IntEq:1"]);
             }, 'line ' . __LINE__ . ": 应该抛出异常");
         }
 
-        // IfIntEq 验证参数类型错误导致的条件不符合的情况
+        // IfIntEq 验证参数类型错误导致的条件不成立的情况
         $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
-            //条件不符合+验证通过（此条检测会被忽略）
+            //条件不成立+验证通过（此条检测会被忽略）
             $params = ['condition' => $notIntVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntEq:condition,0|IntEq:1"]);
 
-            //条件不符合+验证不通过（此条检测会被忽略）
+            //条件不成立+验证不通过（此条检测会被忽略）
             $params = ['condition' => $notIntVal, 'param' => 0];
             Validation::validate($params, ['param' => "IfIntEq:condition,1|IntEq:1"]);
         }
@@ -445,20 +445,20 @@ class ValidationTest extends TestCase
         for ($i = 0; $i < count($intVals); $i++) {
             $intVal = $intVals[$i];
 
-            //条件不符合+验证通过（此条检测会被忽略）
+            //条件不成立+验证通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntNe:condition,$intVal|IntEq:1"]);
 
-            //条件不符合+验证不通过（此条检测会被忽略）
+            //条件不成立+验证不通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 0];
             Validation::validate($params, ['param' => "IfIntNe:condition,$intVal|IntEq:1"]);
 
-            //条件符合+验证通过
+            //条件成立+验证通过
             $params = ['condition' => $intVal, 'param' => 1];
             $intVal2 = $intVal+1;
             Validation::validate($params, ['param' => "IfIntNe:condition,$intVal2|IntEq:1"]);
 
-            //条件符合+验证不通过
+            //条件成立+验证不通过
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal+1;
             $this->_assertThrowExpection(function () use ($params, $intVal2) {
@@ -466,15 +466,15 @@ class ValidationTest extends TestCase
             }, 'line ' . __LINE__ . ": 应该抛出异常");
         }
 
-        // IfIntNe 验证参数类型错误导致的条件符合的情况
+        // IfIntNe 验证参数类型错误导致的条件成立的情况
         $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
-            //条件符合+验证通过
+            //条件成立+验证通过
             $params = ['condition' => $notIntVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntNe:condition,0|IntEq:1"]);
 
-            //条件符合+验证不通过
+            //条件成立+验证不通过
             $params = ['condition' => $notIntVal, 'param' => 0];
             $this->_assertThrowExpection(function () use ($params) {
                 Validation::validate($params, ['param' => "IfIntNe:condition,1|IntEq:1"]);
@@ -489,21 +489,21 @@ class ValidationTest extends TestCase
         for ($i = 0; $i < count($intVals); $i++) {
             $intVal = $intVals[$i];
 
-            //条件不符合+验证通过（此条检测会被忽略）
+            //条件不成立+验证通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntGt:condition,$intVal|IntEq:1"]);
 
-            //条件不符合+验证不通过（此条检测会被忽略）
+            //条件不成立+验证不通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal + 1;
             Validation::validate($params, ['param' => "IfIntGt:condition,$intVal2|IntEq:1"]);
 
-            //条件符合+验证通过
+            //条件成立+验证通过
             $params = ['condition' => $intVal, 'param' => 1];
             $intVal2 = $intVal - 1;
             Validation::validate($params, ['param' => "IfIntGt:condition,$intVal2|IntEq:1"]);
 
-            //条件符合+验证不通过
+            //条件成立+验证不通过
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal - 10;
             $this->_assertThrowExpection(function () use ($params, $intVal2) {
@@ -511,15 +511,15 @@ class ValidationTest extends TestCase
             }, 'line ' . __LINE__ . ": 应该抛出异常");
         }
 
-        // IfIntGt 验证参数类型错误导致的条件不符合的情况
+        // IfIntGt 验证参数类型错误导致的条件不成立的情况
         $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
-            //条件不符合+验证通过
+            //条件不成立+验证通过
             $params = ['condition' => $notIntVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntGt:condition,0|IntEq:1"]);
 
-            //条件不符合+验证不通过
+            //条件不成立+验证不通过
             $params = ['condition' => $notIntVal, 'param' => 0];
             Validation::validate($params, ['param' => "IfIntGt:condition,1|IntEq:1"]);
         }
@@ -532,21 +532,21 @@ class ValidationTest extends TestCase
         for ($i = 0; $i < count($intVals); $i++) {
             $intVal = $intVals[$i];
 
-            //条件不符合+验证通过（此条检测会被忽略）
+            //条件不成立+验证通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 1];
             $intVal2 = $intVal + 1;
             Validation::validate($params, ['param' => "IfIntGe:condition,$intVal2|IntEq:1"]);
 
-            //条件不符合+验证不通过（此条检测会被忽略）
+            //条件不成立+验证不通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal + 2;
             Validation::validate($params, ['param' => "IfIntGe:condition,$intVal2|IntEq:1"]);
 
-            //条件符合+验证通过
+            //条件成立+验证通过
             $params = ['condition' => $intVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntGe:condition,$intVal|IntEq:1"]);
 
-            //条件符合+验证不通过
+            //条件成立+验证不通过
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal - 1;
             $this->_assertThrowExpection(function () use ($params, $intVal2) {
@@ -554,15 +554,15 @@ class ValidationTest extends TestCase
             }, 'line ' . __LINE__ . ": 应该抛出异常");
         }
 
-        // IfIntGe 验证参数类型错误导致的条件不符合的情况
+        // IfIntGe 验证参数类型错误导致的条件不成立的情况
         $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
-            //条件不符合+验证通过
+            //条件不成立+验证通过
             $params = ['condition' => $notIntVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntGe:condition,0|IntEq:1"]);
 
-            //条件不符合+验证不通过
+            //条件不成立+验证不通过
             $params = ['condition' => $notIntVal, 'param' => 0];
             Validation::validate($params, ['param' => "IfIntGe:condition,1|IntEq:1"]);
         }
@@ -575,21 +575,21 @@ class ValidationTest extends TestCase
         for ($i = 0; $i < count($intVals); $i++) {
             $intVal = $intVals[$i];
 
-            //条件不符合+验证通过（此条检测会被忽略）
+            //条件不成立+验证通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntLt:condition,$intVal|IntEq:1"]);
 
-            //条件不符合+验证不通过（此条检测会被忽略）
+            //条件不成立+验证不通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal - 1;
             Validation::validate($params, ['param' => "IfIntLt:condition,$intVal2|IntEq:1"]);
 
-            //条件符合+验证通过
+            //条件成立+验证通过
             $params = ['condition' => $intVal, 'param' => 1];
             $intVal2 = $intVal + 1;
             Validation::validate($params, ['param' => "IfIntLt:condition,$intVal2|IntEq:1"]);
 
-            //条件符合+验证不通过
+            //条件成立+验证不通过
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal + 10;
             $this->_assertThrowExpection(function () use ($params, $intVal2) {
@@ -597,15 +597,15 @@ class ValidationTest extends TestCase
             }, 'line ' . __LINE__ . ": 应该抛出异常");
         }
 
-        // IfIntLt 验证参数类型错误导致的条件不符合的情况
+        // IfIntLt 验证参数类型错误导致的条件不成立的情况
         $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
-            //条件不符合+验证通过
+            //条件不成立+验证通过
             $params = ['condition' => $notIntVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntLt:condition,0|IntEq:1"]);
 
-            //条件不符合+验证不通过
+            //条件不成立+验证不通过
             $params = ['condition' => $notIntVal, 'param' => 0];
             Validation::validate($params, ['param' => "IfIntLt:condition,1|IntEq:1"]);
         }
@@ -618,21 +618,21 @@ class ValidationTest extends TestCase
         for ($i = 0; $i < count($intVals); $i++) {
             $intVal = $intVals[$i];
 
-            //条件不符合+验证通过（此条检测会被忽略）
+            //条件不成立+验证通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 1];
             $intVal2 = $intVal - 1;
             Validation::validate($params, ['param' => "IfIntLe:condition,$intVal2|IntEq:1"]);
 
-            //条件不符合+验证不通过（此条检测会被忽略）
+            //条件不成立+验证不通过（此条检测会被忽略）
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal - 2;
             Validation::validate($params, ['param' => "IfIntLe:condition,$intVal2|IntEq:1"]);
 
-            //条件符合+验证通过
+            //条件成立+验证通过
             $params = ['condition' => $intVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntLe:condition,$intVal|IntEq:1"]);
 
-            //条件符合+验证不通过
+            //条件成立+验证不通过
             $params = ['condition' => $intVal, 'param' => 0];
             $intVal2 = $intVal + 1;
             $this->_assertThrowExpection(function () use ($params, $intVal2) {
@@ -640,18 +640,283 @@ class ValidationTest extends TestCase
             }, 'line ' . __LINE__ . ": 应该抛出异常");
         }
 
-        // IfIntLe 验证参数类型错误导致的条件不符合的情况
+        // IfIntLe 验证参数类型错误导致的条件不成立的情况
         $notIntVals = [true, false, 1.0, 0.0, '1.0', '0.0', '', 'abc', [], [1,2,3]]; // 不是整型也不是整型字符串
         for ($i = 0; $i < count($notIntVals); $i++) {
             $notIntVal = $notIntVals[$i];
-            //条件不符合+验证通过
+            //条件不成立+验证通过
             $params = ['condition' => $notIntVal, 'param' => 1];
             Validation::validate($params, ['param' => "IfIntLe:condition,0|IntEq:1"]);
 
-            //条件不符合+验证不通过
+            //条件不成立+验证不通过
             $params = ['condition' => $notIntVal, 'param' => 0];
             Validation::validate($params, ['param' => "IfIntLe:condition,1|IntEq:1"]);
         }
+    }
+
+    public function testValidateIfStrEq()
+    {
+        // IfStrEq
+        $strVals = ['', 'a', '0', '-1', '1', '100', '-100', 'abc', '1.0'];
+        for ($i = 0; $i < count($strVals); $i++) {
+            $strVal = $strVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 1];
+            $strVal2 = $strVal . 'p';
+            Validation::validate($params, ['param' => "IfStrEq:condition,$strVal2|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 0];
+            $strVal2 = $strVal . '0';
+            Validation::validate($params, ['param' => "IfStrEq:condition,$strVal2|IntEq:1"]);
+
+            //条件成立+验证通过
+            $params = ['condition' => $strVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrEq:condition,$strVal|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $params = ['condition' => $strVal, 'param' => 0];
+            $this->_assertThrowExpection(function () use ($params, $strVal) {
+                Validation::validate($params, ['param' => "IfStrEq:condition,$strVal|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfStrEq 验证参数类型错误导致的条件不成立的情况
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        for ($i = 0; $i < count($notStrVals); $i++) {
+            $notStrVal = $notStrVals[$i];
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrEq:condition,0|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfStrEq:condition,1|IntEq:1"]);
+        }
+
+    }
+
+    public function testValidateIfStrNe()
+    {
+        // IfStrNe
+        $strVals = ['', 'a', '0', '-1', '1', '100', '-100', 'abc', '1.0'];
+        for ($i = 0; $i < count($strVals); $i++) {
+            $strVal = $strVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrNe:condition,$strVal|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfStrNe:condition,$strVal|IntEq:1"]);
+
+            //条件成立+验证通过
+            $params = ['condition' => $strVal, 'param' => 1];
+            $strVal2 = $strVal . 'p';
+            Validation::validate($params, ['param' => "IfStrNe:condition,$strVal2|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $params = ['condition' => $strVal, 'param' => 0];
+            $strVal2 = $strVal . '0';
+            $this->_assertThrowExpection(function () use ($params, $strVal2) {
+                Validation::validate($params, ['param' => "IfStrNe:condition,$strVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfStrNe 验证参数类型错误导致的条件成立的情况
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        for ($i = 0; $i < count($notStrVals); $i++) {
+            $notStrVal = $notStrVals[$i];
+            //条件成立+验证通过
+            $params = ['condition' => $notStrVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrNe:condition,0|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $params = ['condition' => $notStrVal, 'param' => 0];
+            $notStrVal2 = $notStrVal . 'a';
+            $this->_assertThrowExpection(function () use ($params, $notStrVal2) {
+                Validation::validate($params, ['param' => "IfStrNe:condition,$notStrVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+    }
+
+    public function testValidateIfStrGt()
+    {
+        // IfStrGt
+        $strVals = ['', 'a', '0', '-1', '1', '100', '-100', 'abc', '1.0'];
+        for ($i = 0; $i < count($strVals); $i++) {
+            $strVal = $strVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrGt:condition,$strVal|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 0];
+            $strVal2 = $strVal . '0';
+            Validation::validate($params, ['param' => "IfStrGt:condition,$strVal2|IntEq:1"]);
+
+            //条件成立+验证通过
+            $strVal2 = $strVal . '0';
+            $params = ['condition' => $strVal2, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrGt:condition,$strVal|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $strVal2 = $strVal . 'a';
+            $params = ['condition' => $strVal2, 'param' => 0];
+            $this->_assertThrowExpection(function () use ($params, $strVal) {
+                Validation::validate($params, ['param' => "IfStrGt:condition,$strVal|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfStrGt 验证参数类型错误导致的条件不成立的情况
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        for ($i = 0; $i < count($notStrVals); $i++) {
+            $notStrVal = $notStrVals[$i];
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrGt:condition,0|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfStrGt:condition,1|IntEq:1"]);
+        }
+
+    }
+
+    public function testValidateIfStrGe()
+    {
+        // IfStrGe
+        $strVals = ['', 'a', '0', '-1', '1', '100', '-100', 'abc', '1.0'];
+        for ($i = 0; $i < count($strVals); $i++) {
+            $strVal = $strVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 1];
+            $strVal2 = $strVal . 'a';
+            Validation::validate($params, ['param' => "IfStrGe:condition,$strVal2|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 0];
+            $strVal2 = $strVal . '0';
+            Validation::validate($params, ['param' => "IfStrGe:condition,$strVal2|IntEq:1"]);
+
+            //条件成立+验证通过
+            $params = ['condition' => $strVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrGe:condition,$strVal|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $strVal2 = $strVal . 'a';
+            $params = ['condition' => $strVal2, 'param' => 0];
+            $this->_assertThrowExpection(function () use ($params, $strVal) {
+                Validation::validate($params, ['param' => "IfStrGe:condition,$strVal|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfStrGe 验证参数类型错误导致的条件不成立的情况
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        for ($i = 0; $i < count($notStrVals); $i++) {
+            $notStrVal = $notStrVals[$i];
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrGe:condition,0|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfStrGe:condition,1|IntEq:1"]);
+        }
+
+    }
+
+    public function testValidateIfStrLt()
+    {
+        // IfStrLt
+        $strVals = ['', 'a', '0', '-1', '1', '100', '-100', 'abc', '1.0'];
+        for ($i = 0; $i < count($strVals); $i++) {
+            $strVal = $strVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $strVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrLt:condition,$strVal|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $strVal2 = $strVal . '0';
+            $params = ['condition' => $strVal2, 'param' => 0];
+            Validation::validate($params, ['param' => "IfStrLt:condition,$strVal|IntEq:1"]);
+
+            //条件成立+验证通过
+            $params = ['condition' => $strVal, 'param' => 1];
+            $strVal2 = $strVal . '0';
+            Validation::validate($params, ['param' => "IfStrLt:condition,$strVal2|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $params = ['condition' => $strVal, 'param' => 0];
+            $strVal2 = $strVal . 'a';
+            $this->_assertThrowExpection(function () use ($params, $strVal2) {
+                Validation::validate($params, ['param' => "IfStrLt:condition,$strVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfStrLt 验证参数类型错误导致的条件不成立的情况
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        for ($i = 0; $i < count($notStrVals); $i++) {
+            $notStrVal = $notStrVals[$i];
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrLt:condition,0|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfStrLt:condition,1|IntEq:1"]);
+        }
+
+    }
+
+    public function testValidateIfStrLe()
+    {
+        // IfStrLe
+        $strVals = ['', 'a', '0', '-1', '1', '100', '-100', 'abc', '1.0'];
+        for ($i = 0; $i < count($strVals); $i++) {
+            $strVal = $strVals[$i];
+
+            //条件不成立+验证通过（此条检测会被忽略）
+            $strVal2 = $strVal . 'a';
+            $params = ['condition' => $strVal2, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrLe:condition,$strVal|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $strVal2 = $strVal . '0';
+            $params = ['condition' => $strVal2, 'param' => 0];
+            Validation::validate($params, ['param' => "IfStrLe:condition,$strVal|IntEq:1"]);
+
+            //条件成立+验证通过
+            $params = ['condition' => $strVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrLe:condition,$strVal|IntEq:1"]);
+
+            //条件成立+验证不通过
+            $params = ['condition' => $strVal, 'param' => 0];
+            $strVal2 = $strVal . 'a';
+            $this->_assertThrowExpection(function () use ($params, $strVal2) {
+                Validation::validate($params, ['param' => "IfStrLe:condition,$strVal2|IntEq:1"]);
+            }, 'line ' . __LINE__ . ": 应该抛出异常");
+        }
+
+        // IfStrLe 验证参数类型错误导致的条件不成立的情况
+        $notStrVals = [true, false, 1, 0, 1.0, 0.0, [], [1,2,3]]; // 不是字符串型
+        for ($i = 0; $i < count($notStrVals); $i++) {
+            $notStrVal = $notStrVals[$i];
+            //条件不成立+验证通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 1];
+            Validation::validate($params, ['param' => "IfStrLe:condition,0|IntEq:1"]);
+
+            //条件不成立+验证不通过（此条检测会被忽略）
+            $params = ['condition' => $notStrVal, 'param' => 0];
+            Validation::validate($params, ['param' => "IfStrLe:condition,1|IntEq:1"]);
+        }
+
     }
 
     public function testValidateIf()
