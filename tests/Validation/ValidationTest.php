@@ -140,8 +140,8 @@ class ValidationTest extends TestCase
 
     public function testValidateString()
     {
-        // String
-        $this->assertNotNull(Validation::validateValue('-12311112311111', 'String'));
+        // Str
+        $this->assertNotNull(Validation::validateValue('-12311112311111', 'Str'));
 
         // LenXXX
         $this->assertNotNull(Validation::validateValue('你好', 'Len:2'));
@@ -222,7 +222,7 @@ class ValidationTest extends TestCase
             $this->assertEquals('|>>>:ERROR: 您必须输入一个整数|Array', $errstr);
         }
         try {
-            Validation::validateValue(123, 'Int|String|>>>:对不起, 您必须输入一个包含数字的字符串');
+            Validation::validateValue(123, 'Int|Str|>>>:对不起, 您必须输入一个包含数字的字符串');
         } catch (\Exception $e) {
             $errstr = $e->getMessage();
             $this->assertEquals('对不起, 您必须输入一个包含数字的字符串', $errstr);

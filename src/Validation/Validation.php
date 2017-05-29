@@ -257,8 +257,8 @@ class Validation
 
     /**
      * 验证IntIn: “{{param}}”只能取这些值: {{valueList}}
-     * IntIn与in的区别:
-     * 0123 -> IntIn:123 通过; 0123 -> In:123 不通过
+     * IntIn与StrIn的区别:
+     * 0123 -> IntIn:123 通过; 0123 -> StrIn:123 不通过
      * @param $value string|int 参数值
      * @param $valueList string[] 可取值的列表
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
@@ -294,7 +294,7 @@ class Validation
     }
 
     /**
-     * 验证intNotIn: “{{param}}”不能取这些值: {{valueList}}
+     * 验证IntNotIn: “{{param}}”不能取这些值: {{valueList}}
      * @param $value mixed 参数值
      * @param $valueList array 不可取的值的列表
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
@@ -305,7 +305,7 @@ class Validation
     public static function validateIntNotIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(intNotIn:)格式错误, 必须提供可取值的列表");
+            throw new \Exception("“${alias}”参数的验证模版(IntNotIn:)格式错误, 必须提供可取值的列表");
 
         $type = gettype($value);
         if ($type === 'string') {
@@ -532,7 +532,7 @@ class Validation
 
     //region string
 
-    public static function validateString($value, $reason = null, $alias = 'Parameter')
+    public static function validateStr($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
             return $value;
@@ -878,7 +878,7 @@ class Validation
      * @return mixed
      * @throws \Exception
      */
-    public static function validateEquals($value, $equalsValue, $reason = null, $alias = 'Parameter')
+    public static function validateStrEq($value, $equalsValue, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value) && $value === $equalsValue)
             return $value;
@@ -886,7 +886,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Equals'];
+        $error = self::$errorTemplates['StrEq'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{value}}', $equalsValue, $error);
         throw new \Exception($error);
@@ -957,10 +957,10 @@ class Validation
      * @return string
      * @throws \Exception
      */
-    public static function validateIn($value, $valueList, $reason = null, $alias = 'Parameter')
+    public static function validateStrIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(In:)格式错误, 必须提供可取值的列表");
+            throw new \Exception("“${alias}”参数的验证模版(StrIn:)格式错误, 必须提供可取值的列表");
 
         if (in_array($value, $valueList, true))
             return $value;
@@ -968,7 +968,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['In'];
+        $error = self::$errorTemplates['StrIn'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         throw new \Exception($error);
@@ -983,10 +983,10 @@ class Validation
      * @return mixed
      * @throws \Exception
      */
-    public static function validateNotIn($value, $valueList, $reason = null, $alias = 'Parameter')
+    public static function validateStrNotIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(NotIn:)格式错误, 必须提供不可取的值的列表");
+            throw new \Exception("“${alias}”参数的验证模版(StrNotIn:)格式错误, 必须提供不可取的值的列表");
 
         if (in_array($value, $valueList, true) === false)
             return $value;
@@ -994,7 +994,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['NotIn'];
+        $error = self::$errorTemplates['StrNotIn'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         throw new \Exception($error);
@@ -1009,10 +1009,10 @@ class Validation
      * @return mixed
      * @throws \Exception
      */
-    public static function validateInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
+    public static function validateStrInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(InNoCase:)格式错误, 必须提供可取值的列表");
+            throw new \Exception("“${alias}”参数的验证模版(StrInNoCase:)格式错误, 必须提供可取值的列表");
 
         $lowerValue = strtolower($value);
         foreach ($valueList as $v) {
@@ -1027,7 +1027,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['InNoCase'];
+        $error = self::$errorTemplates['StrInNoCase'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         throw new \Exception($error);
@@ -1042,10 +1042,10 @@ class Validation
      * @return mixed
      * @throws \Exception
      */
-    public static function validateNotInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
+    public static function validateStrNotInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(NotInNoCase:)格式错误, 必须提供不可取的值的列表");
+            throw new \Exception("“${alias}”参数的验证模版(StrNotInNoCase:)格式错误, 必须提供不可取的值的列表");
 
         $lowerValue = strtolower($value);
         foreach ($valueList as $v) {
@@ -1060,7 +1060,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['NotInNoCase'];
+        $error = self::$errorTemplates['StrNotInNoCase'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         throw new \Exception($error);
@@ -1479,7 +1479,12 @@ class Validation
         'BoolSmart' => '“{{param}}”只能取这些值: true, false, yes, no, 1, 0, y, n（忽略大小写）',
 
         // 字符串
-        'String' => '“{{param}}”必须是字符串',
+        'Str' => '“{{param}}”必须是字符串',
+        'StrEq' => '“{{param}}”必须等于 {{value}}',
+        'StrIn' => '“{{param}}”只能取这些值: {{valueList}}',
+        'StrNotIn' => '“{{param}}”不能取这些值: {{valueList}}',
+        'StrInNoCase' => '“{{param}}”只能取这些值: {{valueList}}（忽略大小写）',
+        'StrNotInNoCase' => '“{{param}}”不能取这些值: {{valueList}}（忽略大小写）',
         'Len' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
         'LenGe' => '“{{param}}”长度必须大于等于 {{min}}',
         'LenLe' => '“{{param}}”长度必须小于等于 {{max}}',
@@ -1495,15 +1500,10 @@ class Validation
         'LettersNumbers' => '“{{param}}”只能包含字母和数字',
         'Numeric' => '“{{param}}”必须是数值', // 一般用于大数处理（超过double表示范围的数,一般会用字符串来表示）, 如果是正常范围内的数, 可以使用'Int'或'Float'来检测
         'VarName' => '“{{param}}”只能包含字母、数字和下划线，并且以字母或下划线开头',
-        'Equals' => '“{{param}}”必须等于 {{value}}',
         'Email' => '“{{param}}”不是合法的email',
         'Url' => '“{{param}}”不是合法的Url地址',
         'Ip' => '“{{param}}”不是合法的IP地址',
         'Mac' => '“{{param}}”不是合法的MAC地址',
-        'In' => '“{{param}}”只能取这些值: {{valueList}}',
-        'NotIn' => '“{{param}}”不能取这些值: {{valueList}}',
-        'InNoCase' => '“{{param}}”只能取这些值: {{valueList}}（忽略大小写）',
-        'NotInNoCase' => '“{{param}}”不能取这些值: {{valueList}}（忽略大小写）',
         'Regexp' => '“{{param}}”不匹配正则表达式“{{regexp}}”', // Perl正则表达式匹配
 
         // 数组. 如何检测数组长度为0
@@ -1573,7 +1573,12 @@ class Validation
         'BoolSmart' => 'BoolSmart',
 
         // 字符串
-        'String' => 'String',
+        'Str' => 'Str',
+        'StrEq' => 'StrEq:abc',
+        'StrIn' => 'StrIn:abc,def,g',
+        'StrNotIn' => 'StrNotIn:abc,def,g',
+        'StrInNoCase' => 'StrInNoCase:abc,def,g',
+        'StrNotInNoCase' => 'StrNotInNoCase:abc,def,g',
         'Len' => 'Len:8',
         'LenGe' => 'LenGe:8',
         'LenLe' => 'LenLe:8',
@@ -1589,15 +1594,10 @@ class Validation
         'LettersNumbers' => 'LettersNumbers',
         'Numeric' => 'Numeric',
         'VarName' => 'VarName',
-        'Equals' => 'Equals:abc',
         'Email' => 'Email',
         'Url' => 'Url',
         'Ip' => 'Ip',
         'Mac' => 'Mac',
-        'In' => 'In:abc,def,g',
-        'NotIn' => 'NotIn:abc,def,g',
-        'InNoCase' => 'InNoCase:abc,def,g',
-        'NotInNoCase' => 'NotInNoCase:abc,def,g',
         'Regexp' => 'Regexp:/^abc$/', // Perl正则表达式匹配
 
         // 数组. 如何检测数组长度为0
@@ -1641,6 +1641,8 @@ class Validation
         'IfStrLt' => 'IfStrLt:var,z', // if (var < 'z')
         'IfStrGe' => 'IfStrGe:var,A', // if (var >= '0')
         'IfStrLe' => 'IfStrLe:var,Z', // if (var <= '9')
+        'IfStrIn' => 'IfStrIn:var,normal,warning,error', // if (in_array(var, ['normal', 'warning', 'error'], true))
+        'IfStrNotIn' => 'IfStrNotIn:var,warning,error', // if (!in_array(var, ['warning', 'error'], true))
 //        'IfSame' => 'IfSame:AnotherParameter',
 //        'IfNotSame' => 'IfNotSame:AnotherParameter',
 //        'IfAny' => 'IfAny:type,1,type,2', //待定
@@ -1830,10 +1832,10 @@ class Validation
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $p];
                             break;
-                        case 'In':
-                        case 'NotIn':
-                        case 'InNoCase':
-                        case 'NotInNoCase':
+                        case 'StrIn':
+                        case 'StrNotIn':
+                        case 'StrInNoCase':
+                        case 'StrNotInNoCase':
                             $strings = self::_parseStringArray($p);
                             if ($strings === false)
                                 self::_throwFormatError($validatorName);
