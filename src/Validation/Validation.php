@@ -1219,7 +1219,7 @@ class Validation
 
     //endregion
 
-    //region others
+    //region object
 
     /**
      * @param $value mixed
@@ -1247,6 +1247,260 @@ class Validation
 
         $error = self::$errorTemplates['Obj'];
         $error = str_replace('{{param}}', $alias, $error);
+        throw new \Exception($error);
+    }
+
+    //endregion
+
+    //region file
+
+    private static function _throwFileUploadError($err, $isFilesArray, $alias, $fileIndex)
+    {
+        if ($isFilesArray)
+            throw new \Exception("“${alias}[$fileIndex]”上传失败(ERR=$err)");
+        else
+            throw new \Exception("“${alias}”上传失败(ERR=$err)");
+    }
+
+    public static function validateFile($value, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($value)) {
+            if (isset($value['name']) && isset($value['type']) &&
+                isset($value['tmp_name']) && isset($value['error']) &&
+                isset($value['size'])
+            ) {
+
+                if (is_array($value['error'])) {
+                    $errors = $value['error'];
+                    $isFilesArray = true;
+                } else {
+                    $errors = [$value['error']];
+                    $isFilesArray = false;
+                }
+
+                for ($i = 0, $count = count($errors); $i < $count; $i++) {
+                    $error = $errors[$i];
+                    if ($error !== UPLOAD_ERR_OK) {
+                        self::_throwFileUploadError($error, $isFilesArray, $alias, $i);
+                    }
+                }
+                return $value;
+            }
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['File'];
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateFileImage($value, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($value)) {
+            if (isset($value['name']) && isset($value['type']) &&
+                isset($value['tmp_name']) && isset($value['error']) &&
+                isset($value['size'])
+            ) {
+
+                if (is_array($value['error'])) {
+                    $errors = $value['error'];
+                    $types = $value['type'];
+                    $isFilesArray = true;
+                } else {
+                    $errors = [$value['error']];
+                    $types = [$value['type']];
+                    $isFilesArray = false;
+                }
+
+                $hasError = false;
+                for ($i = 0, $count = count($errors); $i < $count; $i++) {
+                    $error = $errors[$i];
+                    $type = $types[$i];
+                    if ($error === UPLOAD_ERR_OK) {
+                        if (strpos($type, 'image/') !== 0) {
+                            if ($isFilesArray)
+                                $alias = "${alias}[$i]";
+                            $hasError = true;
+                            break;
+                        }
+                    } else {
+                        self::_throwFileUploadError($error, $isFilesArray, $alias, $i);
+                    }
+                }
+                if ($hasError === false)
+                    return $value;
+            }
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['FileImage'];
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateFileVideo($value, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($value)) {
+            if (isset($value['name']) && isset($value['type']) &&
+                isset($value['tmp_name']) && isset($value['error']) &&
+                isset($value['size'])
+            ) {
+
+                if (is_array($value['error'])) {
+                    $errors = $value['error'];
+                    $types = $value['type'];
+                    $isFilesArray = true;
+                } else {
+                    $errors = [$value['error']];
+                    $types = [$value['type']];
+                    $isFilesArray = false;
+                }
+
+                $hasError = false;
+                for ($i = 0, $count = count($errors); $i < $count; $i++) {
+                    $error = $errors[$i];
+                    $type = $types[$i];
+                    if ($error === UPLOAD_ERR_OK) {
+                        if (strpos($type, 'video/') !== 0) {
+                            if ($isFilesArray)
+                                $alias = "${alias}[$i]";
+                            $hasError = true;
+                            break;
+                        }
+                    } else {
+                        self::_throwFileUploadError($error, $isFilesArray, $alias, $i);
+                    }
+                }
+                if ($hasError === false)
+                    return $value;
+            }
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['FileVideo'];
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateFileAudio($value, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($value)) {
+            if (isset($value['name']) && isset($value['type']) &&
+                isset($value['tmp_name']) && isset($value['error']) &&
+                isset($value['size'])
+            ) {
+
+                if (is_array($value['error'])) {
+                    $errors = $value['error'];
+                    $types = $value['type'];
+                    $isFilesArray = true;
+                } else {
+                    $errors = [$value['error']];
+                    $types = [$value['type']];
+                    $isFilesArray = false;
+                }
+
+                $hasError = false;
+                for ($i = 0, $count = count($errors); $i < $count; $i++) {
+                    $error = $errors[$i];
+                    $type = $types[$i];
+                    if ($error === UPLOAD_ERR_OK) {
+                        if (strpos($type, 'audio/') !== 0) {
+                            if ($isFilesArray)
+                                $alias = "${alias}[$i]";
+                            $hasError = true;
+                            break;
+                        }
+                    } else {
+                        self::_throwFileUploadError($error, $isFilesArray, $alias, $i);
+                    }
+                }
+                if ($hasError === false)
+                    return $value;
+            }
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['FileAudio'];
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateFileMimes($value, $mimes, $originMimesString = null, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($value)) {
+            if (isset($value['name']) && isset($value['type']) &&
+                isset($value['tmp_name']) && isset($value['error']) &&
+                isset($value['size'])
+            ) {
+
+                if (is_array($value['error'])) {
+                    $errors = $value['error'];
+                    $types = $value['type'];
+                    $isFilesArray = true;
+                } else {
+                    $errors = [$value['error']];
+                    $types = [$value['type']];
+                    $isFilesArray = false;
+                }
+
+                $hasError = false;
+                for ($i = 0, $count = count($errors); $i < $count; $i++) {
+                    $error = $errors[$i];
+                    $type = $types[$i];
+                    if ($error === UPLOAD_ERR_OK) {
+                        $match = false;
+                        foreach ($mimes as $mime) {
+                            // mime中必定有斜杠
+                            if (strpos($mime, '/') === 0) // 斜杠在开头, 需要完全尾部匹配
+                            {
+                                if (($pos = strpos($type, $mime)) !== false && $pos + strlen($mime) === strlen($type)) // 匹配mime
+                                {
+                                    $match = true;
+                                    break;
+                                }
+                            } else // 斜杠不在开头, 需要头部完全匹配
+                            {
+                                if (strpos($type, $mime) === 0) // 匹配mime
+                                {
+                                    $match = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if ($match === false) {
+                            if ($isFilesArray)
+                                $alias = "${alias}[$i]";
+                            $hasError = true;
+                            break;
+                        }
+                    } else {
+                        self::_throwFileUploadError($error, $isFilesArray, $alias, $i);
+                    }
+                }
+                if ($hasError === false)
+                    return $value;
+            }
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if (strlen($originMimesString) === 0)
+            $originMimesString = implode(',', $mimes);
+
+        $error = self::$errorTemplates['FileMimes'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{mimes}}', $originMimesString, $error);
         throw new \Exception($error);
     }
 
@@ -1520,9 +1774,10 @@ class Validation
         'File' => '“{{param}}”必须是文件',
         'FileSize' => '“{{param}}”必须是文件, 且大小不超过{{size}}',
         'FileExt' => '“{{param}}”必须是.{{ext}}文件',
-        'FileImage' => '“{{param}}”必须是图像文件(jpg,png,bmp,gif,ico,tiff)',
-        'FileVideo' => '“{{param}}”必须是视频文件(mp4,rm,mov,avi)',
-        'FileAudio' => '“{{param}}”必须是音频文件(mp3,wav,aac)',
+        'FileImage' => '“{{param}}”必须是图片',
+        'FileVideo' => '“{{param}}”必须是视频文件',
+        'FileAudio' => '“{{param}}”必须是音频文件',
+        'FileMimes' => '“{{param}}”必须是这些MIME类型的文件:{{mimes}}',
 
 //        // 关系型（似乎没有存在的必要）
 //        'or' => '', // 或关系
@@ -1784,6 +2039,7 @@ class Validation
                 } else {
                     $validatorName = substr($segment, 0, $pos);
                     $p = substr($segment, $pos + 1);
+                    // todo 应该允许 strlen($p) === 0 这种情况
                     if (strlen($validatorName) === 0 || strlen($p) === 0) {
                         if ($validatorName !== '>>>')
                             throw new \Exception("无法识别的验证子“${segment}”");
@@ -1932,6 +2188,12 @@ class Validation
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, doubleval($p1), doubleval($p2)];
                             break;
+                        case 'FileMimes':
+                            $mimes = self::_parseMimesArray($p);
+                            if ($mimes === false)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $mimes, $p];
+                            break;
                         case '>>>':
                             $customReason = $p;
                             // >>>:之后的所有字符都属于错误提示字符串
@@ -2013,6 +2275,48 @@ class Validation
             if (strlen($val) === 0)
                 return false; // 检测到了非int
             $strings[] = $val;
+        }
+        if (count($strings) === 0)
+            return false;
+        return $strings;
+    }
+
+    /**
+     * 将Mimes字符串转为Mimes数组（逗号分隔）
+     * @param $value
+     * @return string[]|bool 如果至少有1个有效字符串, 返回字符串数组; 否则返回false
+     * @throws \Exception
+     */
+    private static function _parseMimesArray($value)
+    {
+        $mimes = explode(',', $value);
+        $strings = [];
+        foreach ($mimes as $mime) {
+            $mime = trim($mime);
+            if (strlen($mime) === 0)
+                continue;
+
+            if (($pos = strpos($mime, '/')) === false) // 没有斜杠'/'. 例: jpg 或 avi
+            {
+                if ($mime === '*')
+                    throw new \Exception("无效的MIME“${mime}”");
+                $mime = "/$mime";
+            } else // 有斜杠'/'. 例: image/jpeg 或 video/*
+            {
+                $parts = explode('/', $mime);
+                if (count($parts) !== 2)
+                    throw new \Exception("无效的MIME“${mime}”");
+                $type = $parts[0];
+                $ext = $parts[1];
+                if (strlen($type) === 0 || strlen($ext) === 0 || $type === '*')
+                    throw new \Exception("无效的MIME“${mime}”");
+
+                // 将形如"video/*"的转化为"video/"以方便后续处理
+                if ($ext === '*')
+                    $mime = "$type/";
+            }
+
+            $strings[] = $mime;
         }
         if (count($strings) === 0)
             return false;
@@ -2196,7 +2500,8 @@ class Validation
                         if ($value !== null) // 如果参数存在，则其依赖的条件参数也必须存在
                         {
                             if ($actualValue === null // 依赖的条件参数不存在
-                                && $ifName !== 'IfExist' && $ifName !== 'IfNotExist')
+                                && $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
+                            )
                                 throw new \Exception("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
                         } else // 如果参数不存在，则该参数不检测
                         {
@@ -2206,7 +2511,8 @@ class Validation
                     {
                         // 无论参数是否存在，则其依赖的条件参数都必须存在
                         if ($actualValue === null // 依赖的条件参数不存在
-                            && $ifName !== 'IfExist' && $ifName !== 'IfNotExist')
+                            && $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
+                        )
                             throw new \Exception("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
                     }
 

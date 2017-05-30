@@ -200,6 +200,280 @@ class ValidationTest extends TestCase
 
     public function testValidateFile()
     {
+        // 缺少某些字段
+        $params = [
+            'file' => [
+//                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'File']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // 正常的文件
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        Validation::validate($params, ['file' => 'File']);
+
+        // 文件上传错误
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 1, // 文件上传错误
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'File']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // 文件数组
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.mp4"],
+                "type" => ["video/mp4"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [0],
+                "size" => [2873551]
+            ],
+        ];
+        Validation::validate($params, ['file' => 'File']);
+
+        // 文件数组上传错误
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.mp4"],
+                "type" => ["video/mp4"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [1], // 文件上传错误
+                "size" => [2873551]
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'File']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+    }
+
+    public function testValidateFileTypes()
+    {
+        // 图片
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.jpg",
+                "type" => "image/jpeg",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileImage']);
+
+        // 不是图片
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileImage']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // 图片数组
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.jpg"],
+                "type" => ["image/jpeg"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [0],
+                "size" => [2873551]
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileImage']);
+
+        // 不是图片数组
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.mp4"],
+                "type" => ["video/mp4"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [0],
+                "size" => [2873551]
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileImage']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // 视频
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileVideo']);
+
+        // 不是视频
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.jpg",
+                "type" => "image/jpeg",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileVideo']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // 音频
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp3",
+                "type" => "audio/mp3",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileAudio']);
+
+        // 不是音频
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.jpg",
+                "type" => "image/jpeg",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileAudio']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+    }
+
+    public function testValidateFileMimes()
+    {
+        // FileMimes格式书写错误
+        $this->_assertThrowExpection(function () {
+            Validation::validate([], ['file' => 'FileMimes:video/']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+        $this->_assertThrowExpection(function () {
+            Validation::validate([], ['file' => 'FileMimes:/']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+        $this->_assertThrowExpection(function () {
+            Validation::validate([], ['file' => 'FileMimes:*/png']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+        $this->_assertThrowExpection(function () {
+            Validation::validate([], ['file' => 'FileMimes:/png']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+        $this->_assertThrowExpection(function () {
+            Validation::validate([], ['file' => 'FileMimes:*']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+        $this->_assertThrowExpection(function () {
+            Validation::validate([], ['file' => 'FileMimes:*/*']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // mp3检测为音频
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp3",
+                "type" => "audio/mp3",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4|>>>:file必须是音频文件']);
+        // mp4也可被当作音频
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4|>>>:file必须是音频文件']);
+
+        // xaudio/mp3 不会匹配 audio/*
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp3",
+                "type" => "xaudio/mp3",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4|>>>:file必须是音频文件']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+        // audio/mp3 不会匹配 xaudio/*
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp3",
+                "type" => "audio/mp3",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileMimes:xaudio/*,mp4|>>>:file必须是音频文件']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+        // "video/mp4x" 不会匹配 mp4
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4x",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4|>>>:file必须是音频文件']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+        // "video/mp4" 不会匹配 mp4x
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 2873551
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4x|>>>:file必须是音频文件']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
     }
 
     public function testValidateOthers()
@@ -1125,7 +1399,8 @@ class ValidationTest extends TestCase
     public function testIfConditionParamExistance()
     {
         // 非增量更新 + 条件参数不存在 + 参数存在 -> 应该抛出异常
-        $params = [/*'condition' => 1, */'param' => 1];
+        $params = [/*'condition' => 1, */
+            'param' => 1];
         $this->_assertThrowExpection(function () use ($params) {
             Validation::validate($params, ['param' => "IfIntEq:condition,1|IntEq:1"], false);
         }, 'line ' . __LINE__ . ": 应该抛出异常");
@@ -1137,7 +1412,8 @@ class ValidationTest extends TestCase
         }, 'line ' . __LINE__ . ": 应该抛出异常");
 
         // 增量更新 + 条件参数不存在 + 参数存在 -> 应该抛出异常
-        $params = [/*'condition' => 1, */'param' => 1];
+        $params = [/*'condition' => 1, */
+            'param' => 1];
         $this->_assertThrowExpection(function () use ($params) {
             Validation::validate($params, ['param' => "IfIntEq:condition,1|IntEq:1"], true);
         }, 'line ' . __LINE__ . ": 应该抛出异常");
