@@ -169,33 +169,33 @@ class ValidationTest extends TestCase
         $this->assertNotNull(Validation::validateRegexp('10/abcd', '/^[0-9]+\/abcd$/'));
     }
 
-    public function testValidateArray()
+    public function testValidateArr()
     {
-        $this->assertNotNull(Validation::validateArray([]));
-        $this->assertNotNull(Validation::validateArray([1, 2, 3]));
+        $this->assertNotNull(Validation::validateArr([]));
+        $this->assertNotNull(Validation::validateArr([1, 2, 3]));
         $this->_assertThrowExpection(function () {
-            Validation::validateArray(1);
-        }, 'line ' . __LINE__ . ": Validation::validateArray(1)应该抛出异常");
+            Validation::validateArr(1);
+        }, 'line ' . __LINE__ . ": Validation::validateArr(1)应该抛出异常");
         $this->_assertThrowExpection(function () {
-            Validation::validateArray(['a' => 1]);
-        }, 'line ' . __LINE__ . ": Validation::validateArray(['a'=>1])应该抛出异常");
+            Validation::validateArr(['a' => 1]);
+        }, 'line ' . __LINE__ . ": Validation::validateArr(['a'=>1])应该抛出异常");
 
-        $this->assertNotNull(Validation::validateArrayLen([1, 2, 3], 3));
-        $this->assertNotNull(Validation::validateArrayLenGe([1, 2, 3], 3));
-        $this->assertNotNull(Validation::validateArrayLenLe([1, 2, 3], 3));
-        $this->assertNotNull(Validation::validateArrayLenGeLe([1, 2, 3], 3, 3));
+        $this->assertNotNull(Validation::validateArrLen([1, 2, 3], 3));
+        $this->assertNotNull(Validation::validateArrLenGe([1, 2, 3], 3));
+        $this->assertNotNull(Validation::validateArrLenLe([1, 2, 3], 3));
+        $this->assertNotNull(Validation::validateArrLenGeLe([1, 2, 3], 3, 3));
     }
 
-    public function testValidateObject()
+    public function testValidateObj()
     {
-        $this->assertNotNull(Validation::validateObject([]));
-        $this->assertNotNull(Validation::validateObject(['a' => 1]));
+        $this->assertNotNull(Validation::validateObj([]));
+        $this->assertNotNull(Validation::validateObj(['a' => 1]));
         $this->_assertThrowExpection(function () {
-            Validation::validateObject(1.23);
-        }, 'line ' . __LINE__ . ": Validation::validateObject(1.23)应该抛出异常");
+            Validation::validateObj(1.23);
+        }, 'line ' . __LINE__ . ": Validation::validateObj(1.23)应该抛出异常");
         $this->_assertThrowExpection(function () {
-            Validation::validateObject([1, 2, 3]);
-        }, 'line ' . __LINE__ . ": Validation::validateObject([1,2,3])应该抛出异常");
+            Validation::validateObj([1, 2, 3]);
+        }, 'line ' . __LINE__ . ": Validation::validateObj([1,2,3])应该抛出异常");
     }
 
     public function testValidateFile()
@@ -216,10 +216,10 @@ class ValidationTest extends TestCase
             $this->assertEquals('对不起, 您必须输入一个整数', $errstr);
         }
         try {
-            Validation::validateValue([1, 2, 3], 'Int|>>>:|>>>:ERROR: 您必须输入一个整数|Array');
+            Validation::validateValue([1, 2, 3], 'Int|>>>:|>>>:ERROR: 您必须输入一个整数|Arr');
         } catch (\Exception $e) {
             $errstr = $e->getMessage();
-            $this->assertEquals('|>>>:ERROR: 您必须输入一个整数|Array', $errstr);
+            $this->assertEquals('|>>>:ERROR: 您必须输入一个整数|Arr', $errstr);
         }
         try {
             Validation::validateValue(123, 'Int|Str|>>>:对不起, 您必须输入一个包含数字的字符串');
@@ -1121,6 +1121,33 @@ class ValidationTest extends TestCase
         }
     }
 
+    // 测试对条件参数不存在的情况的处理
+    public function testIfConditionParamExistance()
+    {
+        // 非增量更新 + 条件参数不存在 + 参数存在 -> 应该抛出异常
+        $params = [/*'condition' => 1, */'param' => 1];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['param' => "IfIntEq:condition,1|IntEq:1"], false);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // 非增量更新 + 条件参数不存在 + 参数不存在 -> 应该抛出异常
+        $params = [/*'condition' => 1, 'param' => 1*/];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['param' => "IfIntEq:condition,1|IntEq:1"], false);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // 增量更新 + 条件参数不存在 + 参数存在 -> 应该抛出异常
+        $params = [/*'condition' => 1, */'param' => 1];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['param' => "IfIntEq:condition,1|IntEq:1"], true);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // 增量更新 + 条件参数不存在 + 参数不存在 -> 无需检测该参数
+        $params = [/*'condition' => 1, 'param' => 1*/];
+        Validation::validate($params, ['param' => "IfIntEq:condition,1|IntEq:1"], true);
+
+    }
+
     public function testValidateIf()
     {
         // 测试条件检测的应用
@@ -1196,19 +1223,19 @@ class ValidationTest extends TestCase
             'content' => 'Required|LenGe:1|LenLe:10000000',
             'timestamp' => 'FloatGt:0',
             'contentType' => 'Required|IntIn:0,1,2',
-            'author' => 'Required|Object',
+            'author' => 'Required|Obj',
             'author.id' => 'Required|IntGt:0',
             'author.username' => 'Required|LenGe:4|Regexp:/^[a-zA-Z0-9]+$/',
             'author.nickname' => 'LenGe:0',
             'author.email' => 'Regexp:/^[a-zA-Z0-9]+@[a-zA-Z0-9-]+.[a-z]+$/',
-            'comments' => 'Array',
-            'comments[*]' => 'Object',
+            'comments' => 'Arr',
+            'comments[*]' => 'Obj',
             'comments[*].content' => 'Required|LenGe:8',
-            'comments[*].author' => 'Object',
+            'comments[*].author' => 'Obj',
             'comments[*].author.email' => 'Regexp:/^[a-zA-Z0-9]+@[a-zA-Z0-9-]+.[a-z]+$/',
             'comments[*].author.nickname' => 'LenGe:0',
-            'visitors' => 'Array',
-            'visitors[*]' => 'Object',
+            'visitors' => 'Arr',
+            'visitors[*]' => 'Obj',
             'visitors[*].id' => 'Required|IntGt:0',
         ];
 

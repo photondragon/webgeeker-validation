@@ -1099,7 +1099,7 @@ class Validation
 
     //region array
 
-    public static function validateArray($value, $reason = null, $alias = 'Parameter')
+    public static function validateArr($value, $reason = null, $alias = 'Parameter')
     {
         if (is_array($value)) {
             $is = true;
@@ -1116,12 +1116,12 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Array'];
+        $error = self::$errorTemplates['Arr'];
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
 
-    public static function validateArrayLen($value, $length, $reason = null, $alias = 'Parameter')
+    public static function validateArrLen($value, $length, $reason = null, $alias = 'Parameter')
     {
         if (is_array($value) && count($value) == $length) {
             $is = true;
@@ -1138,13 +1138,13 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ArrayLen'];
+        $error = self::$errorTemplates['ArrLen'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{length}}', $length, $error);
         throw new \Exception($error);
     }
 
-    public static function validateArrayLenGe($value, $min, $reason = null, $alias = 'Parameter')
+    public static function validateArrLenGe($value, $min, $reason = null, $alias = 'Parameter')
     {
         if (is_array($value) && count($value) >= $min) {
             $is = true;
@@ -1161,13 +1161,13 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ArrayLenGe'];
+        $error = self::$errorTemplates['ArrLenGe'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{min}}', $min, $error);
         throw new \Exception($error);
     }
 
-    public static function validateArrayLenLe($value, $max, $reason = null, $alias = 'Parameter')
+    public static function validateArrLenLe($value, $max, $reason = null, $alias = 'Parameter')
     {
         if (is_array($value) && count($value) <= $max) {
             $is = true;
@@ -1184,13 +1184,13 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ArrayLenLe'];
+        $error = self::$errorTemplates['ArrLenLe'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{max}}', $max, $error);
         throw new \Exception($error);
     }
 
-    public static function validateArrayLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
+    public static function validateArrLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
         if (is_array($value)) {
             $c = count($value);
@@ -1210,7 +1210,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ArrayLenGeLe'];
+        $error = self::$errorTemplates['ArrLenGeLe'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{min}}', $min, $error);
         $error = str_replace('{{max}}', $max, $error);
@@ -1228,7 +1228,7 @@ class Validation
      * @return mixed
      * @throws \Exception
      */
-    public static function validateObject($value, $reason = null, $alias = 'Parameter')
+    public static function validateObj($value, $reason = null, $alias = 'Parameter')
     {
         if (is_array($value)) {
             $is = true;
@@ -1245,7 +1245,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Object'];
+        $error = self::$errorTemplates['Obj'];
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -1507,11 +1507,14 @@ class Validation
         'Regexp' => '“{{param}}”不匹配正则表达式“{{regexp}}”', // Perl正则表达式匹配
 
         // 数组. 如何检测数组长度为0
-        'Array' => '“{{param}}”必须是数组',
-        'ArrayLen' => '“{{param}}”必须是长度为 {{length}} 的数组',
-        'ArrayLenGe' => '“{{param}}”必须是长度大于等于 {{min}} 的数组',
-        'ArrayLenLe' => '“{{param}}”必须是长度小于等于 {{max}} 的数组',
-        'ArrayLenGeLe' => '“{{param}}”必须是长度在 {{min}} ~ {{max}} 之间的数组',
+        'Arr' => '“{{param}}”必须是数组',
+        'ArrLen' => '“{{param}}”必须是长度为 {{length}} 的数组',
+        'ArrLenGe' => '“{{param}}”必须是长度大于等于 {{min}} 的数组',
+        'ArrLenLe' => '“{{param}}”必须是长度小于等于 {{max}} 的数组',
+        'ArrLenGeLe' => '“{{param}}”必须是长度在 {{min}} ~ {{max}} 之间的数组',
+
+        // 对象
+        'Obj' => '“{{param}}”必须是对象',
 
         // 文件
         'File' => '“{{param}}”必须是文件',
@@ -1526,7 +1529,6 @@ class Validation
         'Required' => '必须提供参数{{param}}',
 
 //        // 其它
-        'Object' => '“{{param}}”必须是对象',
         'Date' => '“{{param}}”必须符合日期格式YYYY-MM-DD',
         'Datetime' => '“{{param}}”必须符合日期时间格式YYYY-MM-DD HH:mm:ss',
         'Time' => '“{{param}}”必须符合时间格式HH:mm:ss或HH:mm',
@@ -1601,11 +1603,14 @@ class Validation
         'Regexp' => 'Regexp:/^abc$/', // Perl正则表达式匹配
 
         // 数组. 如何检测数组长度为0
-        'Array' => 'Array',
-        'ArrayLen' => 'ArrayLen:5',
-        'ArrayLenGe' => 'ArrayLenGe:1',
-        'ArrayLenLe' => 'ArrayLenLe:9',
-        'ArrayLenGeLe' => 'ArrayLenGeLe:1,9',
+        'Arr' => 'Arr',
+        'ArrLen' => 'ArrLen:5',
+        'ArrLenGe' => 'ArrLenGe:1',
+        'ArrLenLe' => 'ArrLenLe:9',
+        'ArrLenGeLe' => 'ArrLenGeLe:1,9',
+
+        // 对象
+        'Obj' => 'Obj',
 
         // 文件
         'File' => 'File',
@@ -1648,7 +1653,6 @@ class Validation
 //        'IfAny' => 'IfAny:type,1,type,2', //待定
 
 //        // 其它
-        'Object' => 'Object',
         'Date' => 'Date',
         'DateFormat' => 'DateFormat:yyyy-dd-mm',
         'DateFrom' => 'DateFrom:2017-04-13',
@@ -1796,9 +1800,9 @@ class Validation
                         case 'ByteLen':
                         case 'ByteLenGe':
                         case 'ByteLenLe':
-                        case 'ArrayLen':
-                        case 'ArrayLenGe':
-                        case 'ArrayLenLe':
+                        case 'ArrLen':
+                        case 'ArrLenGe':
+                        case 'ArrLenLe':
                             if (self::_isIntOrIntString($p) === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, intval($p)];
@@ -1809,7 +1813,7 @@ class Validation
                         case 'IntGeLt':
                         case 'LenGeLe':
                         case 'ByteLenGeLe':
-                        case 'ArrayLenGeLe':
+                        case 'ArrLenGeLe':
                             $vals = explode(',', $p);
                             if (count($vals) !== 2)
                                 self::_throwFormatError($validatorName);
@@ -2163,33 +2167,49 @@ class Validation
                         throw new \Exception("找不到条件判断${$ifName}的验证方法");
 
                     $varkeypath = $validatorUnit[1]; // 条件参数的路径
+
                     // 提取条件参数的值
-                    // todo 如果条件参数不存在, 应该视为忽略还是检测不通过?
                     if (strpos($varkeypath, '.') === 0) // 以.开头, 是相对路径
                     {
                         $key = substr($varkeypath, 1); // 去掉开头的.号
-                        self::validateVarName($key, 'IfXxx中的条件参数不是合法的变量名');
+                        self::validateVarName($key, "IfXxx中的条件参数“${key}”不是合法的变量名");
                         $actualValue = @$siblings[$key];
-                        $ancestorExist = true;
                     } else // 绝对路径
                     {
                         // 解析路径
                         $asterisksCount = 0;
                         $keys = self::_compileKeypath($varkeypath, $asterisksCount);
                         if ($asterisksCount > 0) {
-                            throw new \Exception("IfXxx中的变量path不得包含*号");
+                            throw new \Exception("IfXxx中的条件参数“${varkeypath}”中不得包含*号");
                         }
 
                         $keysCount = count($keys);
-                        $ancestorExist = false;
                         $actualValue = self::_getValue($originParams, $keys, $keysCount, $ancestorExist);
                     }
 
 //                    echo "\n\$actualValue = $actualValue\n";
 //                    echo "\n\$compareVal = $compareVal\n";
 
-                    if ($ancestorExist == false) // 条件参数的父级不存在
-                        break;
+                    // 处理条件参数不存在的情况
+                    if ($ignoreRequired) // 这是增量更新
+                    {
+                        if ($value !== null) // 如果参数存在，则其依赖的条件参数也必须存在
+                        {
+                            if ($actualValue === null // 依赖的条件参数不存在
+                                && $ifName !== 'IfExist' && $ifName !== 'IfNotExist')
+                                throw new \Exception("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
+                        } else // 如果参数不存在，则该参数不检测
+                        {
+                            return $value;
+                        }
+                    } else // 不是增量更新
+                    {
+                        // 无论参数是否存在，则其依赖的条件参数都必须存在
+                        if ($actualValue === null // 依赖的条件参数不存在
+                            && $ifName !== 'IfExist' && $ifName !== 'IfNotExist')
+                            throw new \Exception("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
+                    }
+
                     $compareVal = $validatorUnit[2];
                     $params = [$actualValue, $compareVal];
                     $trueOfFalse = call_user_func_array([self::class, $method], $params);
@@ -2364,8 +2384,8 @@ class Validation
      *     'keypath1' => 'validator string',
      *     'bookname' => 'Len:2',
      *     'summary' => 'Len:0',
-     *     'authors' => 'Required|Array',
-     *     'authors[*]' => 'Required|Object',
+     *     'authors' => 'Required|Arr',
+     *     'authors[*]' => 'Required|Obj',
      *     'authors[*].name' => 'Len:2',
      *     'authors[*].email' => 'Regexp:/^[a-zA-Z0-9]+@[a-zA-Z0-9-]+.[a-z]+$/',
      * ]
@@ -2441,7 +2461,7 @@ class Validation
 
             $key = $keys[$n];
             if ($key === '*') {
-                Validation::validateArray($siblings, null, $keyPrefix);
+                Validation::validateArr($siblings, null, $keyPrefix);
                 $c = count($siblings);
                 if ($c > 0) {
                     $subKeys = array_slice($keys, $n + 1);
@@ -2477,9 +2497,9 @@ class Validation
                     $value = null; // 这里是针对$value==[]这种情况的特殊处理
             } else {
                 if (is_integer($key))
-                    Validation::validateArray($siblings, null, $keyPrefix);
+                    Validation::validateArr($siblings, null, $keyPrefix);
                 else
-                    Validation::validateObject($siblings, null, $keyPrefix);
+                    Validation::validateObj($siblings, null, $keyPrefix);
                 $value = @$siblings[$key];
             }
 
@@ -2566,7 +2586,7 @@ class Validation
 
             $key = $keys[$n];
             if ($key === '*') {
-                Validation::validateArray($siblings, null, $keyPrefix);
+                Validation::validateArr($siblings, null, $keyPrefix);
                 $c = count($siblings);
                 if ($c > 0) {
                     $subKeys = array_slice($keys, $n + 1);
@@ -2591,9 +2611,9 @@ class Validation
                     $value = null; // 这里是针对$value==[]这种情况的特殊处理
             } else {
                 if (is_integer($key))
-                    Validation::validateArray($siblings, null, $keyPrefix);
+                    Validation::validateArr($siblings, null, $keyPrefix);
                 else
-                    Validation::validateObject($siblings, null, $keyPrefix);
+                    Validation::validateObj($siblings, null, $keyPrefix);
                 $value = @$siblings[$key];
             }
 
