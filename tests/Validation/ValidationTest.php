@@ -476,6 +476,73 @@ class ValidationTest extends TestCase
 
     }
 
+    public function testValidateFileSize()
+    {
+        // 文件大小为0
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 0
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileMinSize:0|FileMaxSize:0']);
+
+        // FileMaxSize 检测通过
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 1048576
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileMaxSize:1m']);
+
+        // FileMaxSize 检测不通过
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 1025
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileMaxSize:1k']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        // FileMinSize 检测通过
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 100
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileMinSize:100']);
+
+        // FileMinSize 检测不通过
+        $params = [
+            'file' => [
+                "name" => "audio_爱情买卖.mp4",
+                "type" => "video/mp4",
+                "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
+                "error" => 0,
+                "size" => 999999
+            ],
+        ];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['file' => 'FileMinSize:1000000']);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+    }
     public function testValidateOthers()
     {
         // 验证器为空时

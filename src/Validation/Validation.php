@@ -1504,6 +1504,108 @@ class Validation
         throw new \Exception($error);
     }
 
+    public static function validateFileMaxSize($value, $maxSize, $originSizeString = null, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($value)) {
+            if (isset($value['name']) && isset($value['type']) &&
+                isset($value['tmp_name']) && isset($value['error']) &&
+                isset($value['size'])
+            ) {
+
+                if (is_array($value['error'])) {
+                    $errors = $value['error'];
+                    $sizes = $value['size'];
+                    $isFilesArray = true;
+                } else {
+                    $errors = [$value['error']];
+                    $sizes = [$value['size']];
+                    $isFilesArray = false;
+                }
+
+                $hasError = false;
+                for ($i = 0, $count = count($errors); $i < $count; $i++) {
+                    $error = $errors[$i];
+                    $size = $sizes[$i];
+                    if ($error === UPLOAD_ERR_OK) {
+                        if ($size > $maxSize) // 超过上限
+                        {
+                            if ($isFilesArray)
+                                $alias = "${alias}[$i]";
+                            $hasError = true;
+                            break;
+                        }
+                    } else {
+                        self::_throwFileUploadError($error, $isFilesArray, $alias, $i);
+                    }
+                }
+                if ($hasError === false)
+                    return $value;
+            }
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if (strlen($originSizeString) === 0)
+            $originSizeString = (string)$maxSize;
+
+        $error = self::$errorTemplates['FileMaxSize'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{size}}', $originSizeString, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateFileMinSize($value, $minSize, $originSizeString = null, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($value)) {
+            if (isset($value['name']) && isset($value['type']) &&
+                isset($value['tmp_name']) && isset($value['error']) &&
+                isset($value['size'])
+            ) {
+
+                if (is_array($value['error'])) {
+                    $errors = $value['error'];
+                    $sizes = $value['size'];
+                    $isFilesArray = true;
+                } else {
+                    $errors = [$value['error']];
+                    $sizes = [$value['size']];
+                    $isFilesArray = false;
+                }
+
+                $hasError = false;
+                for ($i = 0, $count = count($errors); $i < $count; $i++) {
+                    $error = $errors[$i];
+                    $size = $sizes[$i];
+                    if ($error === UPLOAD_ERR_OK) {
+                        if ($size < $minSize) // 没到下限
+                        {
+                            if ($isFilesArray)
+                                $alias = "${alias}[$i]";
+                            $hasError = true;
+                            break;
+                        }
+                    } else {
+                        self::_throwFileUploadError($error, $isFilesArray, $alias, $i);
+                    }
+                }
+                if ($hasError === false)
+                    return $value;
+            }
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if (strlen($originSizeString) === 0)
+            $originSizeString = (string)$minSize;
+
+        $error = self::$errorTemplates['FileMinSize'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{size}}', $originSizeString, $error);
+        throw new \Exception($error);
+    }
+
     //endregion
 
     //region ifs
@@ -1772,8 +1874,8 @@ class Validation
 
         // 文件
         'File' => '“{{param}}”必须是文件',
-        'FileSize' => '“{{param}}”必须是文件, 且大小不超过{{size}}',
-        'FileExt' => '“{{param}}”必须是.{{ext}}文件',
+        'FileMaxSize' => '“{{param}}”必须是文件, 且文件大小不超过{{size}}',
+        'FileMinSize' => '“{{param}}”必须是文件, 且文件大小不小于{{size}}',
         'FileImage' => '“{{param}}”必须是图片',
         'FileVideo' => '“{{param}}”必须是视频文件',
         'FileAudio' => '“{{param}}”必须是音频文件',
@@ -1869,8 +1971,8 @@ class Validation
 
         // 文件
         'File' => 'File',
-        'FileSize' => 'FileSize:100kb',
-        'FileExt' => 'FileExt',
+        'FileMaxSize' => 'FileMaxSize:10mb',
+        'FileMinSize' => 'FileMinSize:100kb',
         'FileImage' => 'FileImage',
         'FileVideo' => 'FileVideo',
         'FileAudio' => 'FileAudio',
@@ -2194,6 +2296,13 @@ class Validation
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $mimes, $p];
                             break;
+                        case 'FileMaxSize':
+                        case 'FileMinSize':
+                            $size = self::_parseSizeString($p);
+                            if ($size === null)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $size, $p];
+                            break;
                         case '>>>':
                             $customReason = $p;
                             // >>>:之后的所有字符都属于错误提示字符串
@@ -2279,6 +2388,26 @@ class Validation
         if (count($strings) === 0)
             return false;
         return $strings;
+    }
+
+    private static function _parseSizeString($value)
+    {
+        $value = strtolower($value);
+        $matches = [];
+        if (preg_match('/^([0-9]+)(kb|k|mb|m)*$/', strtolower($value), $matches) !== 1)
+            return null;
+
+        $size = intval($matches[1]);
+        if (count($matches) === 3) {
+            $unit = $matches[2]; // 单位
+            if ($unit === 'kb' || $unit === 'k')
+                $size *= 1024;
+            else if ($unit === 'mb' || $unit === 'm')
+                $size *= 1048576;
+//            else if ($unit === 'gb' || $unit === 'g')
+//                $size *= 1048576*1024;
+        }
+        return $size;
     }
 
     /**
@@ -2554,8 +2683,8 @@ class Validation
 
                     $params = [$value];
                     $paramsCount = count($validatorUnit);
-                    for ($i = 1; $i < $paramsCount; $i++) {
-                        $params[] = $validatorUnit[$i];
+                    for ($j = 1; $j < $paramsCount; $j++) {
+                        $params[] = $validatorUnit[$j];
                     }
 
                     $value = call_user_func_array([self::class, $method], $params);
