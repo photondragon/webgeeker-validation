@@ -40,6 +40,27 @@ class ValidationTest extends TestCase
         $this->assertFalse($ret, $message);
     }
 
+    private function _assertThrowExpectionContainErrorString(callable $callback, $containedErroString = '')
+    {
+        try {
+            throw new \Exception("这里抛出异常, 然后捕获它, 以便在调用栈中找出当前函数的调用代码所在的行");
+        } catch (\Exception $e) {
+            $callLine = $e->getTrace()[0]['line'];
+        }
+
+        if (is_callable($callback) === false)
+            throw new \Exception("\$callback不是可执行函数");
+        try {
+            $callback();
+        } catch (\Exception $e) {
+            $errstr = $e->getMessage();
+            if (strpos($errstr, $containedErroString) === false)
+                throw new \Exception("Line: $callLine, 这里抛出的异常中应该包含字符串“${containedErroString}”\n\t实际抛出的异常是“${errstr}”");
+            return;
+        }
+        throw new \Exception("Line: $callLine, 这里应该抛出异常");
+    }
+
     public function testValidateInt()
     {
         // Int
@@ -543,6 +564,152 @@ class ValidationTest extends TestCase
         }, 'line ' . __LINE__ . ": 应该抛出异常");
 
     }
+
+    public function testValidateDate()
+    {
+        // Date
+        Validation::validate(['date' => '2017-06-01'], ['date' => 'Date']);
+        Validation::validate(['date' => '2017-6-1'], ['date' => 'Date']);
+        Validation::validate(['date' => '2017-6-01'], ['date' => 'Date']);
+        Validation::validate(['date' => '2017-06-1'], ['date' => 'Date']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['date' => '17-6-1'], ['date' => 'Date']);
+        }, '必须符合日期格式YYYY-MM-DD');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['date' => '2017 6 1'], ['date' => 'Date']);
+        }, '必须符合日期格式YYYY-MM-DD');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['date' => '2017/6/1'], ['date' => 'Date']);
+        }, '必须符合日期格式YYYY-MM-DD');
+
+        // DateFrom
+        Validation::validate(['date' => '2017-06-15'], ['date' => 'DateFrom:2017-06-15']);
+        Validation::validate(['date' => '2017-06-16'], ['date' => 'DateFrom:2017-06-15']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期范围错误
+            Validation::validate(['date' => '2017-06-14'], ['date' => 'DateFrom:2017-06-15']);
+        }, '不得早于');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期格式错误
+            Validation::validate(['date' => 'aaaa-06-15'], ['date' => 'DateFrom:2017-06-15']);
+        }, '必须符合日期格式YYYY-MM-DD');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期验证器格式错误
+            Validation::validate(['date' => '2017-06-15'], ['date' => 'DateFrom:2017/06\15']);
+        }, 'DateFrom格式错误');
+
+        // DateTo
+        Validation::validate(['date' => '2017-06-15'], ['date' => 'DateTo:2017-06-15']);
+        Validation::validate(['date' => '2017-06-14'], ['date' => 'DateTo:2017-06-15']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期范围错误
+            Validation::validate(['date' => '2017-06-16'], ['date' => 'DateTo:2017-06-15']);
+        }, '不得晚于');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期格式错误
+            Validation::validate(['date' => 'aaaa-06-15'], ['date' => 'DateTo:2017-06-15']);
+        }, '必须符合日期格式YYYY-MM-DD');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期验证器格式错误
+            Validation::validate(['date' => '2017-06-15'], ['date' => 'DateTo:2017/06\15']);
+        }, 'DateTo格式错误');
+
+        // DateFromTo
+        Validation::validate(['date' => '2017-06-15'], ['date' => 'DateFromTo:2017-06-15,2017-06-15']);
+        Validation::validate(['date' => '2017-06-15'], ['date' => 'DateFromTo:2017-06-10,2017-06-20']);
+        Validation::validate(['date' => '2017-06-10'], ['date' => 'DateFromTo:2017-06-10,2017-06-20']);
+        Validation::validate(['date' => '2017-06-20'], ['date' => 'DateFromTo:2017-06-10,2017-06-20']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期范围错误
+            Validation::validate(['date' => '2017-06-09'], ['date' => 'DateFromTo:2017-06-10,2017-06-20']);
+        }, '必须在');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期范围错误
+            Validation::validate(['date' => '2017-06-21'], ['date' => 'DateFromTo:2017-06-10,2017-06-20']);
+        }, '必须在');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期格式错误
+            Validation::validate(['date' => 'aaaa-06-15'], ['date' => 'DateFromTo:2017-06-10,2017-06-20']);
+        }, '必须符合日期格式YYYY-MM-DD');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期验证器格式错误
+            Validation::validate(['date' => '2017-06-15'], ['date' => 'DateFromTo:2017-06-15']);
+        }, 'DateFromTo格式错误');
+
+    }
+
+    public function testValidateDateTime()
+    {
+        // DateTime
+        Validation::validate(['datetime' => '2017-06-01 12:00:00'], ['datetime' => 'DateTime']);
+        Validation::validate(['datetime' => '2017-6-1 12:00:00'], ['datetime' => 'DateTime']);
+        Validation::validate(['datetime' => '2017-6-01 12:00:00'], ['datetime' => 'DateTime']);
+        Validation::validate(['datetime' => '2017-06-1 12:00:00'], ['datetime' => 'DateTime']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['datetime' => '2017-06-01 12:00:aa'], ['datetime' => 'DateTime']);
+        }, '必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['datetime' => '2017-06-01 12 00 00'], ['datetime' => 'DateTime']);
+        }, '必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['datetime' => '2017-06-01 12/00/00'], ['datetime' => 'DateTime']);
+        }, '必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
+
+        // DateTimeFrom
+        Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFrom:2017-06-15 12:00:00']);
+        Validation::validate(['datetime' => '2017-06-15 12:00:01'], ['datetime' => 'DateTimeFrom:2017-06-15 12:00:00']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间范围错误
+            Validation::validate(['datetime' => '2017-06-15 11:59:59'], ['datetime' => 'DateTimeFrom:2017-06-15 12:00:00']);
+        }, '不得早于');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式错误
+            Validation::validate(['datetime' => '2017-06-15 11:59:aa'], ['datetime' => 'DateTimeFrom:2017-06-15 12:00:00']);
+        }, '必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间验证器格式错误
+            Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFrom:2017-06-15 12/00/00']);
+        }, 'DateTimeFrom格式错误');
+
+        // DateTo
+        Validation::validate(['datetime' => '2017-06-15 11:59:59'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
+        Validation::validate(['datetime' => '2017-06-15 11:59:58'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间范围错误
+            Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
+        }, '必须早于');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式错误
+            Validation::validate(['datetime' => '2017-06-15 12:00:aa'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
+        }, '必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间验证器格式错误
+            Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeTo:2017-06-15 12/00/00']);
+        }, 'DateTimeTo格式错误');
+
+        // DateTimeFromTo
+        Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00,2017-06-15 13:00:00']);
+        Validation::validate(['datetime' => '2017-06-15 12:30:00'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00,2017-06-15 13:00:00']);
+        Validation::validate(['datetime' => '2017-06-15 12:59:59'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00,2017-06-15 13:00:00']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间范围错误
+            Validation::validate(['datetime' => '2017-06-15 11:59:59'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00,2017-06-15 13:00:00']);
+        }, '必须在');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间范围错误
+            Validation::validate(['datetime' => '2017-06-15 13:00:00'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00,2017-06-15 13:00:00']);
+        }, '必须在');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式错误
+            Validation::validate(['datetime' => '2017-06-15 12:00:aa'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00,2017-06-15 13:00:00']);
+        }, '必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间验证器格式错误
+            Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00']);
+        }, 'DateTimeFromTo格式错误');
+
+    }
+
     public function testValidateOthers()
     {
         // 验证器为空时

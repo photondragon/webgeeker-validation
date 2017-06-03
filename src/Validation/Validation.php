@@ -1608,6 +1608,242 @@ class Validation
 
     //endregion
 
+    //region date & time
+
+    public static function validateDate($value, $reason = null, $alias = 'Parameter')
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d$/', $value);
+        if ($result === 1) {
+            if (strtotime($value) !== false)
+                return $value;
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['Date'];
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateDateFrom($value, $fromTimestamp, $reason = null, $alias = 'Parameter')
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d$/', $value);
+
+        if ($result === 1) {
+
+            $timestamp = strtotime($value);
+            if ($timestamp !== false) {
+                if ($timestamp >= $fromTimestamp)
+                    return $value;
+
+                $isFormatError = false;
+            } else {
+                $isFormatError = true;
+            }
+        } else {
+            $isFormatError = true;
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isFormatError) {
+            $error = self::$errorTemplates['Date'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['DateFrom'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{from}}', date('Y-m-d', $fromTimestamp), $error);
+        }
+        throw new \Exception($error);
+    }
+
+    public static function validateDateTo($value, $toTimestamp, $reason = null, $alias = 'Parameter')
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d$/', $value);
+
+        if ($result === 1) {
+
+            $timestamp = strtotime($value);
+            if ($timestamp !== false) {
+                if ($timestamp <= $toTimestamp)
+                    return $value;
+
+                $isFormatError = false;
+            } else {
+                $isFormatError = true;
+            }
+        } else {
+            $isFormatError = true;
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isFormatError) {
+            $error = self::$errorTemplates['Date'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['DateTo'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{to}}', date('Y-m-d', $toTimestamp), $error);
+        }
+        throw new \Exception($error);
+    }
+
+    public static function validateDateFromTo($value, $fromTimestamp, $toTimestamp, $reason = null, $alias = 'Parameter')
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d$/', $value);
+
+        if ($result === 1) {
+
+            $timestamp = strtotime($value);
+            if ($timestamp !== false) {
+                if ($timestamp >= $fromTimestamp && $timestamp <= $toTimestamp)
+                    return $value;
+
+                $isFormatError = false;
+            } else {
+                $isFormatError = true;
+            }
+        } else {
+            $isFormatError = true;
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isFormatError) {
+            $error = self::$errorTemplates['Date'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['DateFromTo'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{from}}', date('Y-m-d', $fromTimestamp), $error);
+            $error = str_replace('{{to}}', date('Y-m-d', $toTimestamp), $error);
+        }
+        throw new \Exception($error);
+    }
+
+    public static function validateDateTime($value, $reason = null, $alias = 'Parameter')
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d \d\d:\d\d:\d\d$/', $value);
+        if ($result === 1) {
+            if (strtotime($value) !== false)
+                return $value;
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['DateTime'];
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateDateTimeFrom($value, $fromTimestamp, $reason = null, $alias = 'Parameter')
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d \d\d:\d\d:\d\d$/', $value);
+
+        if ($result === 1) {
+
+            $timestamp = strtotime($value);
+            if ($timestamp !== false) {
+                if ($timestamp >= $fromTimestamp)
+                    return $value;
+
+                $isFormatError = false;
+            } else {
+                $isFormatError = true;
+            }
+        } else {
+            $isFormatError = true;
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isFormatError) {
+            $error = self::$errorTemplates['DateTime'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['DateTimeFrom'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{from}}', date('Y-m-d H:i:s', $fromTimestamp), $error);
+        }
+        throw new \Exception($error);
+    }
+
+    public static function validateDateTimeTo($value, $toTimestamp, $reason = null, $alias = 'Parameter')
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d \d\d:\d\d:\d\d$/', $value);
+
+        if ($result === 1) {
+
+            $timestamp = strtotime($value);
+            if ($timestamp !== false) {
+                if ($timestamp < $toTimestamp)
+                    return $value;
+
+                $isFormatError = false;
+            } else {
+                $isFormatError = true;
+            }
+        } else {
+            $isFormatError = true;
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isFormatError) {
+            $error = self::$errorTemplates['DateTime'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['DateTimeTo'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{to}}', date('Y-m-d H:i:s', $toTimestamp), $error);
+        }
+        throw new \Exception($error);
+    }
+
+    public static function validateDateTimeFromTo($value, $fromTimestamp, $toTimestamp, $reason = null, $alias = 'Parameter')
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d \d\d:\d\d:\d\d$/', $value);
+
+        if ($result === 1) {
+
+            $timestamp = strtotime($value);
+            if ($timestamp !== false) {
+                if ($timestamp >= $fromTimestamp && $timestamp < $toTimestamp)
+                    return $value;
+
+                $isFormatError = false;
+            } else {
+                $isFormatError = true;
+            }
+        } else {
+            $isFormatError = true;
+        }
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isFormatError) {
+            $error = self::$errorTemplates['DateTime'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['DateTimeFromTo'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{from}}', date('Y-m-d H:i:s', $fromTimestamp), $error);
+            $error = str_replace('{{to}}', date('Y-m-d H:i:s', $toTimestamp), $error);
+        }
+        throw new \Exception($error);
+    }
+
+    //endregion
+
     //region ifs
 
     protected static function validateIf($value)
@@ -1885,11 +2121,17 @@ class Validation
 //        'or' => '', // 或关系
         'Required' => '必须提供参数{{param}}',
 
-//        // 其它
+        // Date & Time
         'Date' => '“{{param}}”必须符合日期格式YYYY-MM-DD',
-        'Datetime' => '“{{param}}”必须符合日期时间格式YYYY-MM-DD HH:mm:ss',
-        'Time' => '“{{param}}”必须符合时间格式HH:mm:ss或HH:mm',
-        'Timestamp' => '“{{param}}”不是合法的时间戳',
+        'DateFrom' => '“{{param}}”不得早于 {{from}}',
+        'DateTo' => '“{{param}}”不得晚于 {{to}}',
+        'DateFromTo' => '“{{param}}”必须在 {{from}} ~ {{to}} 之间',
+        'DateTime' => '“{{param}}”必须符合日期时间格式YYYY-MM-DD HH:mm:ss',
+        'DateTimeFrom' => '“{{param}}”不得早于 {{from}}',
+        'DateTimeTo' => '“{{param}}”必须早于 {{to}}',
+        'DateTimeFromTo' => '“{{param}}”必须在 {{from}} ~ {{to}} 之间',
+//        'Time' => '“{{param}}”必须符合时间格式HH:mm:ss或HH:mm',
+//        'TimeZone' => 'TimeZone:timezone_identifiers_list()',
 
         // 预处理（只处理字符串类型, 如果是其它类型, 则原值返回）
         'Trim' => '', // 对要检测的值先作一个trim操作, 后续的检测是针对trim后的值进行检测
@@ -1978,6 +2220,18 @@ class Validation
         'FileAudio' => 'FileAudio',
         'FileMimes' => 'FileMimes:mpeg,jpeg,png',
 
+        // Date & Time
+        'Date' => 'Date',
+        'DateFrom' => 'DateFrom:2017-04-13',
+        'DateTo' => 'DateTo:2017-04-13',
+        'DateFromTo' => 'DateFromTo:2017-04-13,2017-04-13',
+        'DateTime' => 'DateTime',
+        'DateTimeFrom' => 'DateTimeFrom:2017-04-13 12:00:00',
+        'DateTimeTo' => 'DateTimeTo:2017-04-13 12:00:00',
+        'DateTimeFromTo' => 'DateTimeFromTo:2017-04-13 12:00:00,2017-04-13 12:00:00',
+//        'Time' => 'Time',
+//        'TimeZone' => 'TimeZone:timezone_identifiers_list()',
+
 //        // 关系型（似乎没有存在的必要）
 //        'or' => '', // 或关系
         'Required' => 'Required',
@@ -2008,17 +2262,6 @@ class Validation
 //        'IfSame' => 'IfSame:AnotherParameter',
 //        'IfNotSame' => 'IfNotSame:AnotherParameter',
 //        'IfAny' => 'IfAny:type,1,type,2', //待定
-
-//        // 其它
-        'Date' => 'Date',
-        'DateFormat' => 'DateFormat:yyyy-dd-mm',
-        'DateFrom' => 'DateFrom:2017-04-13',
-        'DateTo' => 'DateTo:2017-04-13',
-        'DateFromTo' => 'DateFromTo:2017-04-13,2017-04-13',
-        'Datetime' => 'Datetime',
-        'Time' => 'Time',
-//        'Timestamp' => 'Timestamp',
-        'TimeZone' => 'TimeZone:timezone_identifiers_list()',
 
         // 预处理（只处理字符串类型, 如果是其它类型, 则原值返回）
         'Trim' => 'Trim',
@@ -2188,7 +2431,7 @@ class Validation
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, $ints];
                             break;
-                        case 'equals':
+                        case 'StrEq':
                             $p = trim($p);
                             if (strlen($p) === 0)
                                 self::_throwFormatError($validatorName);
@@ -2289,6 +2532,36 @@ class Validation
                             if (is_numeric($p1) === false || is_numeric($p2) === false)
                                 self::_throwFormatError($validatorName);
                             $validator = [$validatorName, doubleval($p1), doubleval($p2)];
+                            break;
+                        case 'DateFrom':
+                        case 'DateTo':
+                            $p = trim($p);
+                            $timestamp = self::_parseDateString($p);
+                            if ($timestamp === null)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $timestamp];
+                            break;
+                        case 'DateFromTo':
+                            $p = trim($p);
+                            $timestamps = self::_parseTwoDateStrings($p);
+                            if ($timestamps === null)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $timestamps[0], $timestamps[1]];
+                            break;
+                        case 'DateTimeFrom':
+                        case 'DateTimeTo':
+                            $p = trim($p);
+                            $timestamp = self::_parseDateTimeString($p);
+                            if ($timestamp === null)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $timestamp];
+                            break;
+                        case 'DateTimeFromTo':
+                            $p = trim($p);
+                            $timestamps = self::_parseTwoDateTimeStrings($p);
+                            if ($timestamps === null)
+                                self::_throwFormatError($validatorName);
+                            $validator = [$validatorName, $timestamps[0], $timestamps[1]];
                             break;
                         case 'FileMimes':
                             $mimes = self::_parseMimesArray($p);
@@ -2408,6 +2681,92 @@ class Validation
 //                $size *= 1048576*1024;
         }
         return $size;
+    }
+
+    /**
+     * 解析日期字符串
+     * @param $value string 日期字符串, 格式为YYYY-MM-DD
+     * @return int|null 时间戳. 日期格式错误返回null
+     */
+    private static function _parseDateString($value)
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d$/', $value);
+        if ($result !== 1)
+            return null;
+        $timestamp = strtotime($value);
+        if ($timestamp === false)
+            return null;
+
+        return $timestamp;
+    }
+
+    /**
+     * 解析两个日期字符串
+     * @param $value string 两个日期字符串, 以逗号‘,’分隔, 格式为YYYY-MM-DD,YYYY-MM-DD
+     * @return int[]|null 时间戳的数组. 日期格式错误返回null
+     */
+    private static function _parseTwoDateStrings($value)
+    {
+        $dateStrings = explode(',', $value);
+        if (count($dateStrings) !== 2)
+            return null;
+
+        $timestamps = [];
+
+        foreach ($dateStrings as $dateString) {
+            $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d$/', $dateString);
+            if ($result !== 1)
+                return null;
+            $timestamp = strtotime($dateString);
+            if ($timestamp === false)
+                return null;
+
+            $timestamps[] = $timestamp;
+        }
+        return $timestamps;
+    }
+
+    /**
+     * 解析日期时间字符串
+     * @param $value string 日期字符串, 格式为YYYY-MM-DD HH:mm:ss
+     * @return int|null 时间戳. 日期时间格式错误返回null
+     */
+    private static function _parseDateTimeString($value)
+    {
+        $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d \d\d:\d\d:\d\d$/', $value);
+        if ($result !== 1)
+            return null;
+        $timestamp = strtotime($value);
+        if ($timestamp === false)
+            return null;
+
+        return $timestamp;
+    }
+
+    /**
+     * 解析两个日期时间字符串
+     * @param $value string 两个日期字符串, 以逗号‘,’分隔, 格式为YYYY-MM-DD HH:mm:ss,YYYY-MM-DD HH:mm:ss
+     * @return int[]|null 时间戳的数组. 日期时间格式错误返回null
+     */
+    private static function _parseTwoDateTimeStrings($value)
+    {
+        $dateStrings = explode(',', $value);
+        if (count($dateStrings) !== 2)
+            return null;
+
+        $timestamps = [];
+
+        foreach ($dateStrings as $dateString) {
+            $result = @preg_match('/^\d\d\d\d-\d?\d-\d?\d \d\d:\d\d:\d\d$/', $dateString);
+            if ($result !== 1)
+                return null;
+            $timestamp = strtotime($dateString);
+            if ($timestamp === false)
+                return null;
+
+            $timestamps[] = $timestamp;
+        }
+        return $timestamps;
     }
 
     /**
