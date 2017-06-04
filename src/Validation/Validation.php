@@ -2117,10 +2117,6 @@ class Validation
         'FileAudio' => '“{{param}}”必须是音频文件',
         'FileMimes' => '“{{param}}”必须是这些MIME类型的文件:{{mimes}}',
 
-//        // 关系型（似乎没有存在的必要）
-//        'or' => '', // 或关系
-        'Required' => '必须提供参数{{param}}',
-
         // Date & Time
         'Date' => '“{{param}}”必须符合日期格式YYYY-MM-DD',
         'DateFrom' => '“{{param}}”不得早于 {{from}}',
@@ -2133,12 +2129,15 @@ class Validation
 //        'Time' => '“{{param}}”必须符合时间格式HH:mm:ss或HH:mm',
 //        'TimeZone' => 'TimeZone:timezone_identifiers_list()',
 
-        // 预处理（只处理字符串类型, 如果是其它类型, 则原值返回）
-        'Trim' => '', // 对要检测的值先作一个trim操作, 后续的检测是针对trim后的值进行检测
-        'Lowercase' => '', // 将要检测的值转为小写, 后续的检测是针对转换后的值进行检测
-        'Uppercase' => '', // 将要检测的值转为大写, 后续的检测是针对转换后的值进行检测
-        'ToInt' => '', // 预处理为int型
-        'ToString' => '', // 预处理为string型（这个一般用不到）
+        // 其它
+        'Required' => '必须提供参数{{param}}',
+
+//        // 预处理（只处理字符串类型, 如果是其它类型, 则原值返回）
+//        'Trim' => '', // 对要检测的值先作一个trim操作, 后续的检测是针对trim后的值进行检测
+//        'Lowercase' => '', // 将要检测的值转为小写, 后续的检测是针对转换后的值进行检测
+//        'Uppercase' => '', // 将要检测的值转为大写, 后续的检测是针对转换后的值进行检测
+//        'ToInt' => '', // 预处理为int型
+//        'ToString' => '', // 预处理为string型（这个一般用不到）
     ];
 
     // 所有验证器格式示例
@@ -2232,8 +2231,7 @@ class Validation
 //        'Time' => 'Time',
 //        'TimeZone' => 'TimeZone:timezone_identifiers_list()',
 
-//        // 关系型（似乎没有存在的必要）
-//        'or' => '', // 或关系
+        // 其它
         'Required' => 'Required',
 
         // 条件判断
@@ -2263,12 +2261,12 @@ class Validation
 //        'IfNotSame' => 'IfNotSame:AnotherParameter',
 //        'IfAny' => 'IfAny:type,1,type,2', //待定
 
-        // 预处理（只处理字符串类型, 如果是其它类型, 则原值返回）
-        'Trim' => 'Trim',
-        'Lowercase' => 'Lowercase',
-        'Uppercase' => 'Uppercase',
-        'ToInt' => 'ToInt',
-        'ToString' => 'ToString',
+//        // 预处理（只处理字符串类型, 如果是其它类型, 则原值返回）
+//        'Trim' => 'Trim',
+//        'Lowercase' => 'Lowercase',
+//        'Uppercase' => 'Uppercase',
+//        'ToInt' => 'ToInt',
+//        'ToString' => 'ToString',
     ];
 
     /**
