@@ -55,101 +55,252 @@ class ValidationTest extends TestCase
         } catch (\Exception $e) {
             $errstr = $e->getMessage();
             if (strpos($errstr, $containedErroString) === false)
-                throw new \Exception("Line: $callLine, 这里抛出的异常中应该包含字符串“${containedErroString}”\n\t实际抛出的异常是“${errstr}”");
+                throw new \Exception("Line $callLine: 这里抛出的异常中应该包含字符串“${containedErroString}”\n\t实际抛出的异常是“${errstr}”");
             return;
         }
-        throw new \Exception("Line: $callLine, 这里应该抛出异常");
+        throw new \Exception("Line $callLine: 这里应该抛出异常");
     }
 
     public function testValidateInt()
     {
         // Int
-        $this->assertNotNull(Validation::validateInt('-1'));
-        $this->assertNotNull(Validation::validateInt('0'));
-        $this->assertNotNull(Validation::validateInt('1'));
-        $this->assertNotNull(Validation::validateInt(-1));
-        $this->assertNotNull(Validation::validateInt(0));
-        $this->assertNotNull(Validation::validateInt(1));
-        $this->_assertThrowExpection(function () {
-            Validation::validateInt(true);
-        }, 'line ' . __LINE__ . ": Validation::validateInt(true)应该抛出异常");
-        $this->_assertThrowExpection(function () {
-            Validation::validateInt([]);
-        }, 'line ' . __LINE__ . ": Validation::validateInt([])应该抛出异常");
-        $this->_assertThrowExpection(function () {
-            Validation::validateInt(0.0);
-        }, 'line ' . __LINE__ . ": Validation::validateInt(0.0)应该抛出异常");
-        $this->_assertThrowExpection(function () {
-            Validation::validateInt('abc');
-        }, 'line ' . __LINE__ . ": Validation::validateInt('abc')应该抛出异常");
+        Validation::validate(['varInt' => '-1'], ['varInt' => 'Int']);
+        Validation::validate(['varInt' => '0'], ['varInt' => 'Int']);
+        Validation::validate(['varInt' => '1'], ['varInt' => 'Int']);
+        Validation::validate(['varInt' => -1], ['varInt' => 'Int']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'Int']);
+        Validation::validate(['varInt' => 1], ['varInt' => 'Int']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => true], ['varInt' => 'Int']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => []], ['varInt' => 'Int']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 0.0], ['varInt' => 'Int']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'Int']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => ''], ['varInt' => 'Int']);
+        }, '必须是整数');
 
         // IntEq
-        $this->assertNotNull(Validation::validateIntEq('-1', -1));
+        Validation::validate(['varInt' => '-1'], ['varInt' => 'IntEq:-1']);
+        Validation::validate(['varInt' => -1], ['varInt' => 'IntEq:-1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntEq:-1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => true], ['varInt' => 'IntEq:-1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '0'], ['varInt' => 'IntEq:-1']);
+        }, '必须等于 -1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 0], ['varInt' => 'IntEq:-1']);
+        }, '必须等于 -1');
 
         // IntGt
-        $this->assertNotNull(Validation::validateIntGt('1', 0));
-        $this->_assertThrowExpection(function () {
-            Validation::validateIntGt('0', 0);
-        }, 'line ' . __LINE__ . ": Validation::validateIntGt('0', 0)应该抛出异常");
-        $this->assertNotNull(Validation::validateIntGt(1, 0));
-        $this->_assertThrowExpection(function () {
-            Validation::validateIntGt(0, 0);
-        }, 'line: ' . __LINE__ . ": Validation::validateIntGt(0, 0)应该抛出异常");
-        $this->_assertThrowExpection(function () {
-            Validation::validateIntGt(false, 0);
-        }, 'line: ' . __LINE__ . ": Validation::validateIntGt(false, 0)应该抛出异常");
+        Validation::validate(['varInt' => '1'], ['varInt' => 'IntGt:0']);
+        Validation::validate(['varInt' => 1], ['varInt' => 'IntGt:0']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntGt:0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => 1.0], ['varInt' => 'IntGt:0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '0'], ['varInt' => 'IntGt:0']);
+        }, '必须大于 0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 0], ['varInt' => 'IntGt:0']);
+        }, '必须大于 0');
 
         // IntGe
-        $this->assertNotNull(Validation::validateIntGe('1', 0));
-        $this->assertNotNull(Validation::validateIntGe('0', 0));
-        $this->assertNotNull(Validation::validateIntGe(1, 0));
-        $this->assertNotNull(Validation::validateIntGe(0, 0));
+        Validation::validate(['varInt' => '1'], ['varInt' => 'IntGe:0']);
+        Validation::validate(['varInt' => 1], ['varInt' => 'IntGe:0']);
+        Validation::validate(['varInt' => '0'], ['varInt' => 'IntGe:0']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'IntGe:0']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntGe:0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => []], ['varInt' => 'IntGe:0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '-1'], ['varInt' => 'IntGe:0']);
+        }, '必须大于等于 0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => -1], ['varInt' => 'IntGe:0']);
+        }, '必须大于等于 0');
 
         // IntLt
-        $this->assertNotNull(Validation::validateIntLt('-1', 0));
-        $this->_assertThrowExpection(function () {
-            Validation::validateIntLt('0', 0);
-        }, 'line ' . __LINE__ . ": Validation::validateIntLt('0', 0)应该抛出异常");
-        $this->assertNotNull(Validation::validateIntLt(-1, 0));
-        $this->_assertThrowExpection(function () {
-            Validation::validateIntLt(0, 0);
-        }, 'line: ' . __LINE__ . ": Validation::validateIntLt(0, 0)应该抛出异常");
-        $this->_assertThrowExpection(function () {
-            Validation::validateIntLt(false, 0);
-        }, 'line: ' . __LINE__ . ": Validation::validateIntLt(false, 0)应该抛出异常");
+        Validation::validate(['varInt' => '-1'], ['varInt' => 'IntLt:0']);
+        Validation::validate(['varInt' => -1], ['varInt' => 'IntLt:0']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntLt:0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => 1.0], ['varInt' => 'IntLt:0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '0'], ['varInt' => 'IntLt:0']);
+        }, '必须小于 0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 0], ['varInt' => 'IntLt:0']);
+        }, '必须小于 0');
 
         // IntLe
-        $this->assertNotNull(Validation::validateIntLe('-1', 0));
-        $this->assertNotNull(Validation::validateIntLe(-1, 0));
-        $this->assertNotNull(Validation::validateIntLe('0', 0));
-        $this->assertNotNull(Validation::validateIntLe(0, 0));
+        Validation::validate(['varInt' => '-1'], ['varInt' => 'IntLe:0']);
+        Validation::validate(['varInt' => -1], ['varInt' => 'IntLe:0']);
+        Validation::validate(['varInt' => '0'], ['varInt' => 'IntLe:0']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'IntLe:0']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntLe:0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => false], ['varInt' => 'IntLe:0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '1'], ['varInt' => 'IntLe:0']);
+        }, '必须小于等于 0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 1], ['varInt' => 'IntLe:0']);
+        }, '必须小于等于 0');
 
         // IntGeLe
-        $this->assertNotNull(Validation::validateIntGeLe('0', 0, 0));
-        $this->assertNotNull(Validation::validateIntGeLe(0, 0, 0));
-        $this->assertNotNull(Validation::validateIntGeLe('11', -100, 100));
-        $this->assertNotNull(Validation::validateIntGeLe(11, -100, 100));
-        $this->assertNotNull(Validation::validateIntGeLe('00123', 123, 123));
+        Validation::validate(['varInt' => '0'], ['varInt' => 'IntGeLe:0,0']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'IntGeLe:0,0']);
+        Validation::validate(['varInt' => '11'], ['varInt' => 'IntGeLe:-100,100']);
+        Validation::validate(['varInt' => 11], ['varInt' => 'IntGeLe:-100,100']);
+        Validation::validate(['varInt' => '0123'], ['varInt' => 'IntGeLe:123,123']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntGeLe:0,0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => 1.0], ['varInt' => 'IntGeLe:0,0']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '-1'], ['varInt' => 'IntGeLe:0,10']);
+        }, '必须大于等于 0 小于等于 10');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => -1], ['varInt' => 'IntGeLe:0,10']);
+        }, '必须大于等于 0 小于等于 10');
 
         // IntGtLt
-        $this->assertNotNull(Validation::validateIntGtLt('0', -1, 1));
-        $this->assertNotNull(Validation::validateIntGtLt(0, -1, 1));
+        Validation::validate(['varInt' => '0'], ['varInt' => 'IntGtLt:-1,1']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'IntGtLt:-1,1']);
+        Validation::validate(['varInt' => '000'], ['varInt' => 'IntGtLt:-1,1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntGtLt:-1,1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => 1.0], ['varInt' => 'IntGtLt:-1,1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '-1'], ['varInt' => 'IntGtLt:-1,1']);
+        }, '必须大于 -1 小于 1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 1], ['varInt' => 'IntGtLt:-1,1']);
+        }, '必须大于 -1 小于 1');
 
         // IntGtLe
-        $this->assertNotNull(Validation::validateIntGtLe('0', -1, 0));
-        $this->assertNotNull(Validation::validateIntGtLe(0, -1, 0));
+        Validation::validate(['varInt' => '0'], ['varInt' => 'IntGtLe:-1,1']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'IntGtLe:-1,1']);
+        Validation::validate(['varInt' => '1'], ['varInt' => 'IntGtLe:-1,1']);
+        Validation::validate(['varInt' => 1], ['varInt' => 'IntGtLe:-1,1']);
+        Validation::validate(['varInt' => '001'], ['varInt' => 'IntGtLe:-1,1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntGtLe:-1,1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => 1.0], ['varInt' => 'IntGtLe:-1,1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '-1'], ['varInt' => 'IntGtLe:-1,1']);
+        }, '必须大于 -1 小于等于 1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 2], ['varInt' => 'IntGtLe:-1,1']);
+        }, '必须大于 -1 小于等于 1');
 
         // IntGeLt
-        $this->assertNotNull(Validation::validateIntGeLt('0', 0, 1));
-        $this->assertNotNull(Validation::validateIntGeLt(0, 0, 1));
+        Validation::validate(['varInt' => '0'], ['varInt' => 'IntGeLt:-1,1']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'IntGeLt:-1,1']);
+        Validation::validate(['varInt' => '-1'], ['varInt' => 'IntGeLt:-1,1']);
+        Validation::validate(['varInt' => -1], ['varInt' => 'IntGeLt:-1,1']);
+        Validation::validate(['varInt' => '-001'], ['varInt' => 'IntGeLt:-1,1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntGeLt:-1,1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => -1.0], ['varInt' => 'IntGeLt:-1,1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '-2'], ['varInt' => 'IntGeLt:-1,1']);
+        }, '必须大于等于 -1 小于 1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 1], ['varInt' => 'IntGeLt:-1,1']);
+        }, '必须大于等于 -1 小于 1');
 
         // IntIn
-        $this->assertNotNull(Validation::validateIntIn('0', [0, 1]));
-        $this->assertNotNull(Validation::validateIntIn(0, [0, 1]));
+        Validation::validate(['varInt' => '1'], ['varInt' => 'IntIn:1,2,3']);
+        Validation::validate(['varInt' => 1], ['varInt' => 'IntIn:1,2,3']);
+        Validation::validate(['varInt' => '02'], ['varInt' => 'IntIn:1,2,3']);
+        Validation::validate(['varInt' => 2], ['varInt' => 'IntIn:1,2,3']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntIn:1,2,3']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => -1.0], ['varInt' => 'IntIn:1,2,3']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '0'], ['varInt' => 'IntIn:1,2,3']);
+        }, '只能取这些值: 1, 2, 3');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 5], ['varInt' => 'IntIn:1,2,3']);
+        }, '只能取这些值: 1, 2, 3');
 
         // IntNotIn
-        $this->assertNotNull(Validation::validateIntNotIn('-1', [0, 1]));
-        $this->assertNotNull(Validation::validateIntNotIn(-1, [0, 1]));
+        Validation::validate(['varInt' => '0'], ['varInt' => 'IntNotIn:1,2,3']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'IntNotIn:1,2,3']);
+        Validation::validate(['varInt' => '04'], ['varInt' => 'IntNotIn:1,2,3']);
+        Validation::validate(['varInt' => 4], ['varInt' => 'IntNotIn:1,2,3']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntNotIn:1,2,3']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => -1.0], ['varInt' => 'IntNotIn:1,2,3']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '1'], ['varInt' => 'IntNotIn:1,2,3']);
+        }, '不能取这些值: 1, 2, 3');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => 2], ['varInt' => 'IntNotIn:1,2,3']);
+        }, '不能取这些值: 1, 2, 3');
 
     }
 

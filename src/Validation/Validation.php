@@ -52,18 +52,27 @@ class Validation
                 $val = intval($value);
                 if ($val == $equalVal)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value == $equalVal)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntEq'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{value}}', $equalVal, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntEq'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $equalVal, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -75,18 +84,27 @@ class Validation
                 $val = intval($value);
                 if ($val > $min)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value > $min)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntGt'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntGt'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -98,18 +116,27 @@ class Validation
                 $val = intval($value);
                 if ($val >= $min)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value >= $min)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntGe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntGe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -121,18 +148,27 @@ class Validation
                 $val = intval($value);
                 if ($val < $max)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value < $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntLt'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntLt'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -144,18 +180,27 @@ class Validation
                 $val = intval($value);
                 if ($val <= $max)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value <= $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -167,19 +212,28 @@ class Validation
                 $val = intval($value);
                 if ($val > $min && $val < $max)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value > $min && $value < $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntGtLt'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntGtLt'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -191,19 +245,28 @@ class Validation
                 $val = intval($value);
                 if ($val >= $min && $val <= $max)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value >= $min && $value <= $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntGeLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntGeLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -215,19 +278,28 @@ class Validation
                 $val = intval($value);
                 if ($val > $min && $val <= $max)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value > $min && $value <= $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntGtLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntGtLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -239,26 +311,35 @@ class Validation
                 $val = intval($value);
                 if ($val >= $min && $val < $max)
                     return $value;
-            }
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
         } elseif ($type === 'integer') {
             if ($value >= $min && $value < $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntGeLt'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntGeLt'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
     /**
      * 验证IntIn: “{{param}}”只能取这些值: {{valueList}}
      * IntIn与StrIn的区别:
-     * 0123 -> IntIn:123 通过; 0123 -> StrIn:123 不通过
+     * '0123' -> IntIn:123 通过; '0123' -> StrIn:123 不通过
      * @param $value string|int 参数值
      * @param $valueList string[] 可取值的列表
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
@@ -273,23 +354,31 @@ class Validation
 
         $type = gettype($value);
         if ($type === 'string') {
-            if (is_numeric($value) && strpos($value, '.') === false) // 是数字并且没有小数点
-            {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $intValue = intval($value);
                 if (in_array($intValue, $valueList, true))
                     return $value;
-            }
-        } else if ($type === 'integer') {
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'integer') {
             if (in_array($value, $valueList, true))
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntIn'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntIn'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        }
         throw new \Exception($error);
     }
 
@@ -309,23 +398,31 @@ class Validation
 
         $type = gettype($value);
         if ($type === 'string') {
-            if (is_numeric($value) && strpos($value, '.') === false) // 是数字并且没有小数点
-            {
+            if (is_numeric($value) && strpos($value, '.') === false) {
                 $intValue = intval($value);
-                if (in_array($intValue, $valueList, true) === false)
+                if (!in_array($intValue, $valueList, true))
                     return $value;
-            }
-        } else if ($type === 'integer') {
-            if (in_array($value, $valueList, true) === false)
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'integer') {
+            if (!in_array($value, $valueList, true))
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['IntNotIn'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Int'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['IntNotIn'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        }
         throw new \Exception($error);
     }
 
@@ -2042,17 +2139,17 @@ class Validation
     static protected $errorTemplates = [
         // 整型（不提供length检测,因为负数的符号位会让人混乱, 可以用大于小于比较来做到这一点）
         'Int' => '“{{param}}”必须是整数',
-        'IntEq' => '“{{param}}”必须是等于 {{value}} 的整数',
-        'IntGt' => '“{{param}}”必须是大于 {{min}} 的整数',
-        'IntGe' => '“{{param}}”必须是大于等于 {{min}} 的整数',
-        'IntLt' => '“{{param}}”必须是小于 {{max}} 的整数',
-        'IntLe' => '“{{param}}”必须是小于等于 {{max}} 的整数',
-        'IntGtLt' => '“{{param}}”必须是整数，取值大于 {{min}} 且小于 {{max}} 的整数',
-        'IntGeLe' => '“{{param}}”必须是整数，取值大于等于 {{min}} 且小于等于 {{max}} 的整数',
-        'IntGtLe' => '“{{param}}”必须是整数，取值大于 {{min}} 且小于等于 {{max}} 的整数',
-        'IntGeLt' => '“{{param}}”必须是整数，取值大于等于 {{min}} 且小于 {{max}} 的整数',
-        'IntIn' => '“{{param}}”必须是整数，并且只能取这些值: {{valueList}}',
-        'IntNotIn' => '“{{param}}”必须是整数，并且不能取这些值: {{valueList}}',
+        'IntEq' => '“{{param}}”必须等于 {{value}}',
+        'IntGt' => '“{{param}}”必须大于 {{min}}',
+        'IntGe' => '“{{param}}”必须大于等于 {{min}}',
+        'IntLt' => '“{{param}}”必须小于 {{max}}',
+        'IntLe' => '“{{param}}”必须小于等于 {{max}}',
+        'IntGtLt' => '“{{param}}”必须大于 {{min}} 小于 {{max}}',
+        'IntGeLe' => '“{{param}}”必须大于等于 {{min}} 小于等于 {{max}}',
+        'IntGtLe' => '“{{param}}”必须大于 {{min}} 小于等于 {{max}}',
+        'IntGeLt' => '“{{param}}”必须大于等于 {{min}} 小于 {{max}}',
+        'IntIn' => '“{{param}}”只能取这些值: {{valueList}}',
+        'IntNotIn' => '“{{param}}”不能取这些值: {{valueList}}',
 
         // 浮点型（内部一律使用double来处理）
         'Float' => '“{{param}}”必须是浮点数',
