@@ -432,7 +432,11 @@ class Validation
 
     public static function validateFloat($value, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value))
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value))
+                return $value;
+        } elseif ($type === 'double')
             return $value;
 
         if ($reason !== null)
@@ -445,141 +449,261 @@ class Validation
 
     public static function validateFloatGt($value, $min, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value)) {
-            $f = floatval($value);
-            if ($f > $min)
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val > $min)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double') {
+            if ($value > $min)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FloatGt'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Float'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['FloatGt'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateFloatGe($value, $min, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value)) {
-            $f = floatval($value);
-            if ($f >= $min)
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val >= $min)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double') {
+            if ($value >= $min)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FloatGe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Float'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['FloatGe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateFloatLt($value, $max, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value)) {
-            $f = floatval($value);
-            if ($f < $max)
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val < $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double') {
+            if ($value < $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FloatLt'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Float'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['FloatLt'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateFloatLe($value, $max, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value)) {
-            $f = floatval($value);
-            if ($f <= $max)
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val <= $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double') {
+            if ($value <= $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FloatLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Float'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['FloatLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateFloatGtLt($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value)) {
-            $f = floatval($value);
-            if ($f > $min && $f < $max)
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val > $min && $val < $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double') {
+            if ($value > $min && $value < $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FloatGtLt'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Float'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['FloatGtLt'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateFloatGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value)) {
-            $f = floatval($value);
-            if ($f >= $min && $f <= $max)
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val >= $min && $val <= $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double') {
+            if ($value >= $min && $value <= $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FloatGeLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Float'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['FloatGeLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateFloatGtLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value)) {
-            $f = floatval($value);
-            if ($f > $min && $f <= $max)
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val > $min && $val <= $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double') {
+            if ($value > $min && $value <= $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FloatGtLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Float'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['FloatGtLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateFloatGeLt($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
-        if (is_numeric($value)) {
-            $f = floatval($value);
-            if ($f >= $min && $f < $max)
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val >= $min && $val < $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double') {
+            if ($value >= $min && $value < $max)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FloatGeLt'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Float'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['FloatGeLt'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -2153,15 +2277,14 @@ class Validation
 
         // 浮点型（内部一律使用double来处理）
         'Float' => '“{{param}}”必须是浮点数',
-        'Double' => '“{{param}}”必须是浮点数', // 同float
-        'FloatGt' => '“{{param}}”必须是大于 {{min}} 的浮点数',
-        'FloatGe' => '“{{param}}”必须是大于等于 {{min}} 的浮点数',
-        'FloatLt' => '“{{param}}”必须是小于 {{max}} 的浮点数',
-        'FloatLe' => '“{{param}}”必须是小于等于 {{max}} 的浮点数',
-        'FloatGtLt' => '“{{param}}”必须是大于 {{min}} 小于 {{max}} 的浮点数',
-        'FloatGeLe' => '“{{param}}”必须是大于等于 {{min}} 小于等于 {{max}} 的浮点数',
-        'FloatGtLe' => '“{{param}}”必须是大于 {{min}} 小于等于 {{max}} 的浮点数',
-        'FloatGeLt' => '“{{param}}”必须是大于等于 {{min}} 小于 {{max}} 的浮点数',
+        'FloatGt' => '“{{param}}”必须大于 {{min}}',
+        'FloatGe' => '“{{param}}”必须大于等于 {{min}}',
+        'FloatLt' => '“{{param}}”必须小于 {{max}}',
+        'FloatLe' => '“{{param}}”必须小于等于 {{max}}',
+        'FloatGtLt' => '“{{param}}”必须大于 {{min}} 小于 {{max}}',
+        'FloatGeLe' => '“{{param}}”必须大于等于 {{min}} 小于等于 {{max}}',
+        'FloatGtLe' => '“{{param}}”必须大于 {{min}} 小于等于 {{max}}',
+        'FloatGeLt' => '“{{param}}”必须大于等于 {{min}} 小于 {{max}}',
 
         // bool型
         'Bool' => '“{{param}}”必须是bool型(true or false)', // 忽略大小写
@@ -2255,7 +2378,6 @@ class Validation
 
         // 浮点型（内部一律使用double来处理）
         'Float' => 'Float',
-        'Double' => 'Double', // 同float
         'FloatGt' => 'FloatGt:1.0',
         'FloatGe' => 'FloatGe:1.0',
         'FloatLt' => 'FloatLt:1.0',

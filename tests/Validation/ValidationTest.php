@@ -306,8 +306,208 @@ class ValidationTest extends TestCase
 
     public function testValidateFloat()
     {
-        $this->assertNotNull(Validation::validateFloat('-12311112311111'));
-        $this->assertNotNull(Validation::validateFloatGtLt('10.', -100, 100));
+        // Float
+        Validation::validate(['varFloat' => '-1'], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => '0'], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => '1'], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => '-1.0'], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => '1.0'], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => -1.0], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => 0.0], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => 1.0], ['varFloat' => 'Float']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => true], ['varFloat' => 'Float']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => []], ['varFloat' => 'Float']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 整型不能算字符串（但整型字符串可以视为Float）
+            Validation::validate(['varFloat' => 1], ['varFloat' => 'Float']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'Float']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => ''], ['varFloat' => 'Float']);
+        }, '必须是浮点数');
+
+        // FloatGt
+        Validation::validate(['varFloat' => '1'], ['varFloat' => 'FloatGt:0.0']);
+        Validation::validate(['varFloat' => '1.0'], ['varFloat' => 'FloatGt:0.0']);
+        Validation::validate(['varFloat' => 1.0], ['varFloat' => 'FloatGt:0']);
+        Validation::validate(['varFloat' => 0.1], ['varFloat' => 'FloatGt:0.0']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGt:0.0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varFloat' => 1], ['varFloat' => 'FloatGt:0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGt:0.0']);
+        }, '必须大于 0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGt:0']);
+        }, '必须大于 0');
+
+        // FloatGe
+        Validation::validate(['varFloat' => '1'], ['varFloat' => 'FloatGe:0.0']);
+        Validation::validate(['varFloat' => '1.0'], ['varFloat' => 'FloatGe:0.0']);
+        Validation::validate(['varFloat' => 1.0], ['varFloat' => 'FloatGe:0']);
+        Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGe:0.0']);
+        Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGe:0.0']);
+        Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGe:0']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGe:0.0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varFloat' => []], ['varFloat' => 'FloatGe:0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => '-1'], ['varFloat' => 'FloatGe:0.0']);
+        }, '必须大于等于 0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => -0.1], ['varFloat' => 'FloatGe:0']);
+        }, '必须大于等于 0');
+
+        // FloatLt
+        Validation::validate(['varFloat' => '-1'], ['varFloat' => 'FloatLt:0.0']);
+        Validation::validate(['varFloat' => '-0.1'], ['varFloat' => 'FloatLt:0.0']);
+        Validation::validate(['varFloat' => -0.1], ['varFloat' => 'FloatLt:0']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatLt:0.0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varFloat' => true], ['varFloat' => 'FloatLt:0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatLt:0.0']);
+        }, '必须小于 0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatLt:0']);
+        }, '必须小于 0');
+
+        // FloatLe
+        Validation::validate(['varFloat' => '-1'], ['varFloat' => 'FloatLe:0.0']);
+        Validation::validate(['varFloat' => '-0.1'], ['varFloat' => 'FloatLe:0.0']);
+        Validation::validate(['varFloat' => -0.1], ['varFloat' => 'FloatLe:0']);
+        Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatLe:0.0']);
+        Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatLe:0.0']);
+        Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatLe:0']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatLe:0.0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varFloat' => false], ['varFloat' => 'FloatLe:0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => '0.1'], ['varFloat' => 'FloatLe:0.0']);
+        }, '必须小于等于 0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => 0.1], ['varFloat' => 'FloatLe:0']);
+        }, '必须小于等于 0');
+
+        // FloatGeLe
+        Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGeLe:0.0,0']);
+        Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGeLe:0.0,0']);
+        Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGeLe:0,0.0']);
+        Validation::validate(['varFloat' => '11'], ['varFloat' => 'FloatGeLe:-100.0,100']);
+        Validation::validate(['varFloat' => '11.0'], ['varFloat' => 'FloatGeLe:-100.0,100']);
+        Validation::validate(['varFloat' => 11.0], ['varFloat' => 'FloatGeLe:-100,100.0']);
+        Validation::validate(['varFloat' => '0123'], ['varFloat' => 'FloatGeLe:123.0,123']);
+        Validation::validate(['varFloat' => '0123.0'], ['varFloat' => 'FloatGeLe:123.0,123']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGeLe:0,0.0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varFloat' => ''], ['varFloat' => 'FloatGeLe:0.0,0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => '-0.1'], ['varFloat' => 'FloatGeLe:0,10.0']);
+        }, '必须大于等于 0 小于等于 10');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => -0.1], ['varFloat' => 'FloatGeLe:0.0,10.5']);
+        }, '必须大于等于 0 小于等于 10.5');
+
+        // FloatGtLt
+        Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGtLt:-1.0,1']);
+        Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGtLt:-1.0,1']);
+        Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGtLt:-1,1.0']);
+        Validation::validate(['varFloat' => '000'], ['varFloat' => 'FloatGtLt:-1.0,1']);
+        Validation::validate(['varFloat' => '00.0'], ['varFloat' => 'FloatGtLt:-1.0,1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGtLt:-1,1.0']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varFloat' => 1], ['varFloat' => 'FloatGtLt:-1.0,1']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => '-1'], ['varFloat' => 'FloatGtLt:-1,1.0']);
+        }, '必须大于 -1 小于 1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => 1.0], ['varFloat' => 'FloatGtLt:-1.0,1']);
+        }, '必须大于 -1 小于 1');
+
+        // FloatGtLe
+        Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGtLe:-1,1.5']);
+        Validation::validate(['varFloat' => '1'], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        Validation::validate(['varFloat' => '1.0'], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        Validation::validate(['varFloat' => 1.5], ['varFloat' => 'FloatGtLe:-1,1.5']);
+        Validation::validate(['varFloat' => '001'], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        Validation::validate(['varFloat' => '00.1'], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varFloat' => ''], ['varFloat' => 'FloatGtLe:-1,1.5']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varFloat' => true], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => '-1.0'], ['varFloat' => 'FloatGtLe:-1,1.5']);
+        }, '必须大于 -1 小于等于 1.5');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => -1.5], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        }, '必须大于 -1.5 小于等于 1');
+
+        // FloatGeLt
+        Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGeLt:-1.5,1']);
+        Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGeLt:-1.5,1']);
+        Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGeLt:-1,1.5']);
+        Validation::validate(['varFloat' => '-1.5'], ['varFloat' => 'FloatGeLt:-1.5,1']);
+        Validation::validate(['varFloat' => -1.0], ['varFloat' => 'FloatGeLt:-1,1.5']);
+        Validation::validate(['varFloat' => '-001'], ['varFloat' => 'FloatGeLt:-1.5,1']);
+        Validation::validate(['varFloat' => '-001.5'], ['varFloat' => 'FloatGeLt:-1.5,1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGeLt:-1.5,1']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varFloat' => -1], ['varFloat' => 'FloatGeLt:-1,1.5']);
+        }, '必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => '-1.6'], ['varFloat' => 'FloatGeLt:-1.5,1']);
+        }, '必须大于等于 -1.5 小于 1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varFloat' => 1.5], ['varFloat' => 'FloatGeLt:-1,1.5']);
+        }, '必须大于等于 -1 小于 1.5');
+
     }
 
     public function testValidateString()
