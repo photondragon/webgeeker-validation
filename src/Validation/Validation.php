@@ -731,13 +731,14 @@ class Validation
 
     public static function validateBoolSmart($value, $reason = null, $alias = 'Parameter')
     {
-        if (is_bool($value)) {
+        $type = gettype($value);
+        if ($type === 'boolean')
             return $value;
-        } else if (is_string($value)) {
-            if (in_array(strtolower($value), ['true', 'false', 'yes', 'no', '1', '0', 'y', 'n'], true))
+        else if ($type === 'string') {
+            if (in_array(strtolower($value), ['true', 'false', '1', '0', 'yes', 'no', 'y', 'n'], true))
                 return $value;
-        } else if (is_numeric($value)) {
-            if ($value === 1 || $value === 0)
+        } else if ($type === 'integer') {
+            if ($value === 0 || $value === 1)
                 return $value;
         }
 
@@ -2288,7 +2289,7 @@ class Validation
 
         // bool型
         'Bool' => '“{{param}}”必须是bool型(true or false)', // 忽略大小写
-        'BoolSmart' => '“{{param}}”只能取这些值: true, false, yes, no, 1, 0, y, n（忽略大小写）',
+        'BoolSmart' => '“{{param}}”只能取这些值: true, false, 1, 0, yes, no, y, n（忽略大小写）',
 
         // 字符串
         'Str' => '“{{param}}”必须是字符串',
