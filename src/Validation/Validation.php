@@ -762,12 +762,153 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Len'];
+        $error = self::$errorTemplates['Str'];
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
 
-    public static function validateLen($value, $length, $reason = null, $alias = 'Parameter')
+    /**
+     * 验证: “{{param}}”必须等于 {{equalsValue}}
+     * @param $value string 参数值
+     * @param $equalsValue string 可取值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function validateStrEq($value, $equalsValue, $reason = null, $alias = 'Parameter')
+    {
+        if (is_string($value) && $value === $equalsValue)
+            return $value;
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['StrEq'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{value}}', $equalsValue, $error);
+        throw new \Exception($error);
+    }
+
+    /**
+     * 验证: “{{param}}”只能取这些值: {{valueList}}
+     * @param $value string 参数值
+     * @param $valueList string[] 可取值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
+     * @return string
+     * @throws \Exception
+     */
+    public static function validateStrIn($value, $valueList, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($valueList) === false || count($valueList) === 0)
+            throw new \Exception("“${alias}”参数的验证模版(StrIn:)格式错误, 必须提供可取值的列表");
+
+        if (in_array($value, $valueList, true))
+            return $value;
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['StrIn'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        throw new \Exception($error);
+    }
+
+    /**
+     * 验证: “{{param}}”不能取这些值: {{valueList}}
+     * @param $value mixed 参数值
+     * @param $valueList array 不可取的值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function validateStrNotIn($value, $valueList, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($valueList) === false || count($valueList) === 0)
+            throw new \Exception("“${alias}”参数的验证模版(StrNotIn:)格式错误, 必须提供不可取的值的列表");
+
+        if (in_array($value, $valueList, true) === false)
+            return $value;
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['StrNotIn'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        throw new \Exception($error);
+    }
+
+    /**
+     * 验证: “{{param}}”只能取这些值: {{valueList}}（忽略大小写）
+     * @param $value mixed 参数值
+     * @param $valueList array 可取值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function validateStrInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($valueList) === false || count($valueList) === 0)
+            throw new \Exception("“${alias}”参数的验证模版(StrInNoCase:)格式错误, 必须提供可取值的列表");
+
+        $lowerValue = strtolower($value);
+        foreach ($valueList as $v) {
+            if (is_string($v) && strtolower($v) === $lowerValue)
+                continue;
+            goto VeriFailed;
+        }
+        return $value;
+
+        VeriFailed:
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['StrInNoCase'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        throw new \Exception($error);
+    }
+
+    /**
+     * 验证: “{{param}}”不能取这些值: {{valueList}}（忽略大小写）
+     * @param $value mixed 参数值
+     * @param $valueList array 不可取的值的列表
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function validateStrNotInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
+    {
+        if (is_array($valueList) === false || count($valueList) === 0)
+            throw new \Exception("“${alias}”参数的验证模版(StrNotInNoCase:)格式错误, 必须提供不可取的值的列表");
+
+        $lowerValue = strtolower($value);
+        foreach ($valueList as $v) {
+            if (is_string($v) && strtolower($v) === $lowerValue)
+                continue;
+            goto VeriFailed;
+        }
+        return $value;
+
+        VeriFailed:
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        $error = self::$errorTemplates['StrNotInNoCase'];
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        throw new \Exception($error);
+    }
+
+    public static function validateStrLen($value, $length, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
             if (mb_strlen($value) == $length) {
@@ -778,13 +919,13 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Len'];
+        $error = self::$errorTemplates['StrLen'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{length}}', $length, $error);
         throw new \Exception($error);
     }
 
-    public static function validateLenGe($value, $min, $reason = null, $alias = 'Parameter')
+    public static function validateStrLenGe($value, $min, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
             if (mb_strlen($value) >= $min) {
@@ -795,13 +936,13 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['LenGe'];
+        $error = self::$errorTemplates['StrLenGe'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{min}}', $min, $error);
         throw new \Exception($error);
     }
 
-    public static function validateLenLe($value, $max, $reason = null, $alias = 'Parameter')
+    public static function validateStrLenLe($value, $max, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
             if (mb_strlen($value) <= $max) {
@@ -812,16 +953,16 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['LenLe'];
+        $error = self::$errorTemplates['StrLenLe'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{max}}', $max, $error);
         throw new \Exception($error);
     }
 
-    public static function validateLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
+    public static function validateStrLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
         if ($min > $max)
-            throw new \Exception("“${alias}”参数的验证模版LenGeLe格式错误, min不应该大于max");
+            throw new \Exception("“${alias}”参数的验证模版StrLenGeLe格式错误, min不应该大于max");
 
         if (is_string($value)) {
             $len = mb_strlen($value);
@@ -833,7 +974,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['LenGeLe'];
+        $error = self::$errorTemplates['StrLenGeLe'];
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{min}}', $min, $error);
         $error = str_replace('{{max}}', $max, $error);
@@ -894,7 +1035,7 @@ class Validation
     public static function validateByteLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
         if ($min > $max)
-            throw new \Exception("“${alias}”参数的验证模版LenGeLe格式错误, min不应该大于max");
+            throw new \Exception("“${alias}”参数的验证模版ByteLenGeLe格式错误, min不应该大于max");
 
         if (is_string($value)) {
             $len = strlen($value);
@@ -1090,29 +1231,6 @@ class Validation
         throw new \Exception($error);
     }
 
-    /**
-     * 验证: “{{param}}”必须等于 {{equalsValue}}
-     * @param $value string 参数值
-     * @param $equalsValue string 可取值的列表
-     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
-     * @param $alias string 参数别名, 用于错误提示
-     * @return mixed
-     * @throws \Exception
-     */
-    public static function validateStrEq($value, $equalsValue, $reason = null, $alias = 'Parameter')
-    {
-        if (is_string($value) && $value === $equalsValue)
-            return $value;
-
-        if ($reason !== null)
-            throw new \Exception($reason);
-
-        $error = self::$errorTemplates['StrEq'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{value}}', $equalsValue, $error);
-        throw new \Exception($error);
-    }
-
     public static function validateEmail($value, $reason = null, $alias = 'Parameter')
     {
         if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
@@ -1166,124 +1284,6 @@ class Validation
 
         $error = self::$errorTemplates['Mac'];
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
-    }
-
-    /**
-     * 验证: “{{param}}”只能取这些值: {{valueList}}
-     * @param $value string 参数值
-     * @param $valueList string[] 可取值的列表
-     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
-     * @param $alias string 参数别名, 用于错误提示
-     * @return string
-     * @throws \Exception
-     */
-    public static function validateStrIn($value, $valueList, $reason = null, $alias = 'Parameter')
-    {
-        if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrIn:)格式错误, 必须提供可取值的列表");
-
-        if (in_array($value, $valueList, true))
-            return $value;
-
-        if ($reason !== null)
-            throw new \Exception($reason);
-
-        $error = self::$errorTemplates['StrIn'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
-        throw new \Exception($error);
-    }
-
-    /**
-     * 验证: “{{param}}”不能取这些值: {{valueList}}
-     * @param $value mixed 参数值
-     * @param $valueList array 不可取的值的列表
-     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
-     * @param $alias string 参数别名, 用于错误提示
-     * @return mixed
-     * @throws \Exception
-     */
-    public static function validateStrNotIn($value, $valueList, $reason = null, $alias = 'Parameter')
-    {
-        if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrNotIn:)格式错误, 必须提供不可取的值的列表");
-
-        if (in_array($value, $valueList, true) === false)
-            return $value;
-
-        if ($reason !== null)
-            throw new \Exception($reason);
-
-        $error = self::$errorTemplates['StrNotIn'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
-        throw new \Exception($error);
-    }
-
-    /**
-     * 验证: “{{param}}”只能取这些值: {{valueList}}（忽略大小写）
-     * @param $value mixed 参数值
-     * @param $valueList array 可取值的列表
-     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
-     * @param $alias string 参数别名, 用于错误提示
-     * @return mixed
-     * @throws \Exception
-     */
-    public static function validateStrInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
-    {
-        if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrInNoCase:)格式错误, 必须提供可取值的列表");
-
-        $lowerValue = strtolower($value);
-        foreach ($valueList as $v) {
-            if (is_string($v) && strtolower($v) === $lowerValue)
-                continue;
-            goto VeriFailed;
-        }
-        return $value;
-
-        VeriFailed:
-
-        if ($reason !== null)
-            throw new \Exception($reason);
-
-        $error = self::$errorTemplates['StrInNoCase'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
-        throw new \Exception($error);
-    }
-
-    /**
-     * 验证: “{{param}}”不能取这些值: {{valueList}}（忽略大小写）
-     * @param $value mixed 参数值
-     * @param $valueList array 不可取的值的列表
-     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
-     * @param $alias string 参数别名, 用于错误提示
-     * @return mixed
-     * @throws \Exception
-     */
-    public static function validateStrNotInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
-    {
-        if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrNotInNoCase:)格式错误, 必须提供不可取的值的列表");
-
-        $lowerValue = strtolower($value);
-        foreach ($valueList as $v) {
-            if (is_string($v) && strtolower($v) === $lowerValue)
-                continue;
-            goto VeriFailed;
-        }
-        return $value;
-
-        VeriFailed:
-
-        if ($reason !== null)
-            throw new \Exception($reason);
-
-        $error = self::$errorTemplates['StrNotInNoCase'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         throw new \Exception($error);
     }
 
@@ -2297,10 +2297,10 @@ class Validation
         'StrNotIn' => '“{{param}}”不能取这些值: {{valueList}}',
         'StrInNoCase' => '“{{param}}”只能取这些值: {{valueList}}（忽略大小写）',
         'StrNotInNoCase' => '“{{param}}”不能取这些值: {{valueList}}（忽略大小写）',
-        'Len' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
-        'LenGe' => '“{{param}}”长度必须大于等于 {{min}}',
-        'LenLe' => '“{{param}}”长度必须小于等于 {{max}}',
-        'LenGeLe' => '“{{param}}”长度必须在 {{min}} - {{max}} 之间', // 字符串长度
+        'StrLen' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
+        'StrLenGe' => '“{{param}}”长度必须大于等于 {{min}}',
+        'StrLenLe' => '“{{param}}”长度必须小于等于 {{max}}',
+        'StrLenGeLe' => '“{{param}}”长度必须在 {{min}} - {{max}} 之间', // 字符串长度
         'ByteLen' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
         'ByteLenGe' => '“{{param}}”长度必须大于等于 {{min}}',
         'ByteLenLe' => '“{{param}}”长度必须小于等于 {{max}}',
@@ -2316,7 +2316,7 @@ class Validation
         'Url' => '“{{param}}”不是合法的Url地址',
         'Ip' => '“{{param}}”不是合法的IP地址',
         'Mac' => '“{{param}}”不是合法的MAC地址',
-        'Regexp' => '“{{param}}”不匹配正则表达式“{{regexp}}”', // Perl正则表达式匹配
+        'Regexp' => '“{{param}}”不匹配正则表达式“{{regexp}}”', // Perl正则表达式匹配. 目前不支持modifiers. http://www.rexegg.com/regex-modifiers.html
 
         // 数组. 如何检测数组长度为0
         'Arr' => '“{{param}}”必须是数组',
@@ -2398,10 +2398,10 @@ class Validation
         'StrNotIn' => 'StrNotIn:abc,def,g',
         'StrInNoCase' => 'StrInNoCase:abc,def,g',
         'StrNotInNoCase' => 'StrNotInNoCase:abc,def,g',
-        'Len' => 'Len:8',
-        'LenGe' => 'LenGe:8',
-        'LenLe' => 'LenLe:8',
-        'LenGeLe' => 'LenGeLe:6,8',
+        'StrLen' => 'StrLen:8',
+        'StrLenGe' => 'StrLenGe:8',
+        'StrLenLe' => 'StrLenLe:8',
+        'StrLenGeLe' => 'StrLenGeLe:6,8',
         'ByteLen' => 'ByteLen:8',
         'ByteLenGe' => 'ByteLenGe:8',
         'ByteLenLe' => 'ByteLenLe:8',
@@ -2492,19 +2492,19 @@ class Validation
      * 将验证器(Validator)编译为验证子(Validator Unit)的数组
      *
      * 示例1:
-     * 输入: $validator = 'Len:6,16|regex:/^[a-zA-Z0-9]+$/'
+     * 输入: $validator = 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/'
      * 输出: [
-     *     ['Len', 6, 16, null, $alias],
+     *     ['StrLen', 6, 16, null, $alias],
      *     ['regex', '/^[a-zA-Z0-9]+$/', null, $alias],
      * ]
      *
      * 示例2（自定义验证失败的提示）:
-     * 输入: $validator = 'Len:6,16|regex:/^[a-zA-Z0-9]+$/|>>>:参数验证失败了'
+     * 输入: $validator = 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/|>>>:参数验证失败了'
      * 输出: [
      *     'countOfIfs' => 0,
      *     'required' => false,
      *     'units' => [
-     *         ['Len', 6, 16, '参数验证失败了', $alias],
+     *         ['StrLen', 6, 16, '参数验证失败了', $alias],
      *         ['regex', '/^[a-zA-Z0-9]+$/', '参数验证失败了', $alias],
      *     ],
      * ]
@@ -2612,9 +2612,9 @@ class Validation
                         case 'IntGe':
                         case 'IntLt':
                         case 'IntLe':
-                        case 'Len':
-                        case 'LenGe':
-                        case 'LenLe':
+                        case 'StrLen':
+                        case 'StrLenGe':
+                        case 'StrLenLe':
                         case 'ByteLen':
                         case 'ByteLenGe':
                         case 'ByteLenLe':
@@ -2629,7 +2629,7 @@ class Validation
                         case 'IntGeLe':
                         case 'IntGtLe':
                         case 'IntGeLt':
-                        case 'LenGeLe':
+                        case 'StrLenGeLe':
                         case 'ByteLenGeLe':
                         case 'ArrLenGeLe':
                             $vals = explode(',', $p);
@@ -3132,7 +3132,7 @@ class Validation
     /**
      * 验证一个值
      * @param $value mixed 要验证的值
-     * @param $validator string|string[] 一条验证器, 例: 'Len:6,16|regex:/^[a-zA-Z0-9]+$/'; 或多条验证器的数组, 多条验证器之间是或的关系
+     * @param $validator string|string[] 一条验证器, 例: 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/'; 或多条验证器的数组, 多条验证器之间是或的关系
      * @param string $alias 要验证的值的别名, 用于在验证不通过时生成提示字符串.
      * @param $ignoreRequired bool 是否忽略所有的Required检测子
      * @param array $originParams 原始参数的数组
@@ -3393,11 +3393,11 @@ class Validation
      * @param $params array 包含输入参数的数组. 如['page'=>1,'pageSize'=>10]
      * @param $validations array 包含验证字符串的数组. 如: [
      *     'keypath1' => 'validator string',
-     *     'bookname' => 'Len:2',
-     *     'summary' => 'Len:0',
+     *     'bookname' => 'StrLen:2',
+     *     'summary' => 'StrLen:0',
      *     'authors' => 'Required|Arr',
      *     'authors[*]' => 'Required|Obj',
-     *     'authors[*].name' => 'Len:2',
+     *     'authors[*].name' => 'StrLen:2',
      *     'authors[*].email' => 'Regexp:/^[a-zA-Z0-9]+@[a-zA-Z0-9-]+.[a-z]+$/',
      * ]
      * @param $ignoreRequired bool 是否忽略所有的Required检测子

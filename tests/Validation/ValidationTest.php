@@ -515,11 +515,11 @@ class ValidationTest extends TestCase
         // Str
         $this->assertNotNull(Validation::validateValue('-12311112311111', 'Str'));
 
-        // LenXXX
-        $this->assertNotNull(Validation::validateValue('你好', 'Len:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'LenGe:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'LenLe:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'LenGeLe:2,2'));
+        // StrLenXXX
+        $this->assertNotNull(Validation::validateValue('你好', 'StrLen:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'StrLenGe:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'StrLenLe:2'));
+        $this->assertNotNull(Validation::validateValue('你好', 'StrLenGeLe:2,2'));
 
         // ByteLenXXX
         $this->assertNotNull(Validation::validateValue('你好', 'ByteLen:6'));
@@ -2026,8 +2026,8 @@ class ValidationTest extends TestCase
         ];
         $validations = [
             'type' => 'Required|IntIn:1,2',
-            'title' => 'Required|LenGeLe:2,100',
-            'content' => 'Required|LenGe:1|LenLe:10000000',
+            'title' => 'Required|StrLenGeLe:2,100',
+            'content' => 'Required|StrLenGe:1|StrLenLe:10000000',
             'state' => [
                 'IfIntEq:type,1|IntEq:0', // 检测 type===1 普通文章
                 'IfIntEq:type,2|Required|IntIn:0,1,2', // 检测 type===2 用户投诉
@@ -2039,8 +2039,8 @@ class ValidationTest extends TestCase
         // 嵌套的条件检测
         $validations2 = [
             'article.type' => 'Required|IntIn:1,2',
-            'article.title' => 'Required|LenGeLe:2,100',
-            'article.content' => 'Required|LenGe:1|LenLe:10000000',
+            'article.title' => 'Required|StrLenGeLe:2,100',
+            'article.content' => 'Required|StrLenGe:1|StrLenLe:10000000',
             'article.state' => [
                 'IfIntEq:.type,1|IntEq:0', // 条件参数采用相对路径
                 'IfIntEq:article.type,2|Required|IntIn:0,1,2', // 条件参数采用绝对路径
@@ -2080,21 +2080,21 @@ class ValidationTest extends TestCase
 
         $validators = [
             'id' => 'Required|IntGt:0',
-            'title' => 'Required|LenGeLe:2,100',
-            'content' => 'Required|LenGe:1|LenLe:10000000',
+            'title' => 'Required|StrLenGeLe:2,100',
+            'content' => 'Required|StrLenGe:1|StrLenLe:10000000',
             'timestamp' => 'FloatGt:0',
             'contentType' => 'Required|IntIn:0,1,2',
             'author' => 'Required|Obj',
             'author.id' => 'Required|IntGt:0',
-            'author.username' => 'Required|LenGe:4|Regexp:/^[a-zA-Z0-9]+$/',
-            'author.nickname' => 'LenGe:0',
+            'author.username' => 'Required|StrLenGe:4|Regexp:/^[a-zA-Z0-9]+$/',
+            'author.nickname' => 'StrLenGe:0',
             'author.email' => 'Regexp:/^[a-zA-Z0-9]+@[a-zA-Z0-9-]+.[a-z]+$/',
             'comments' => 'Arr',
             'comments[*]' => 'Obj',
-            'comments[*].content' => 'Required|LenGe:8',
+            'comments[*].content' => 'Required|StrLenGe:8',
             'comments[*].author' => 'Obj',
             'comments[*].author.email' => 'Regexp:/^[a-zA-Z0-9]+@[a-zA-Z0-9-]+.[a-z]+$/',
-            'comments[*].author.nickname' => 'LenGe:0',
+            'comments[*].author.nickname' => 'StrLenGe:0',
             'visitors' => 'Arr',
             'visitors[*]' => 'Obj',
             'visitors[*].id' => 'Required|IntGt:0',
@@ -2105,7 +2105,7 @@ class ValidationTest extends TestCase
 
         // ignore Required
         $params = ['content' => null];
-        $validators = ['content' => 'Required|LenLe:20',];
+        $validators = ['content' => 'Required|StrLenLe:20',];
         $this->_assertThrowExpection(function () use ($params, $validators) {
             Validation::validate($params, $validators);
         }, 'line ' . __LINE__ . ": Validation::validate(\$params, \$validators)应该抛出异常");
@@ -2113,7 +2113,7 @@ class ValidationTest extends TestCase
 
         // ignore Required 2
         $params = ['content' => 'a'];
-        $validators = ['content' => 'Required|LenGeLe:1,20',];
+        $validators = ['content' => 'Required|StrLenGeLe:1,20',];
         $this->assertNotNull(Validation::validate($params, $validators));
         $params = ['content' => null];
         $this->assertNotNull(Validation::validate($params, $validators, true));
