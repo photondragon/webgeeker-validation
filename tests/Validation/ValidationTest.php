@@ -537,35 +537,611 @@ class ValidationTest extends TestCase
         }
     }
 
-    public function testValidateString()
+    public function testValidateStrs()
     {
         // Str
-        $this->assertNotNull(Validation::validateValue('-12311112311111', 'Str'));
+        $strVals = ['', '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Str']);
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Str']);
+            }, '必须是字符串');
+        }
 
-        // StrLenXXX
-        $this->assertNotNull(Validation::validateValue('你好', 'StrLen:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'StrLenGe:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'StrLenLe:2'));
-        $this->assertNotNull(Validation::validateValue('你好', 'StrLenGeLe:2,2'));
+        // StrEq
+        $strVals = ['', '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrEq:'.$strVal]);
+        }
+        foreach ($strVals as $strVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrEq:'.$strVal.'1']);
+            }, '必须等于"');
+        }
+        foreach ($strVals as $strVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrEq:'.$strVal]);
+            }, '必须等于"');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrEq:'.$notStrVal]);
+            }, '必须是字符串');
+        }
 
-        // ByteLenXXX
-        $this->assertNotNull(Validation::validateValue('你好', 'ByteLen:6'));
-        $this->assertNotNull(Validation::validateValue('你好', 'ByteLenGe:6'));
-        $this->assertNotNull(Validation::validateValue('你好', 'ByteLenLe:6'));
-        $this->assertNotNull(Validation::validateValue('你好', 'ByteLenGeLe:6,6'));
+        // StrNe
+        $strVals = ['', '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrNe:'.$strVal.'1']);
+        }
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrNe:'.$strVal]);
+        }
+        foreach ($strVals as $strVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrNe:'.$strVal]);
+            }, '不能等于"');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrNe:'.$notStrVal]);
+            }, '必须是字符串');
+        }
 
-        // 各种其它检测
-        $this->assertNotNull(Validation::validateValue('photondragon@163.com', 'Email'));
-        $this->assertNotNull(Validation::validateValue('http://webgeeker.com', 'Url'));
-        $this->assertNotNull(Validation::validateValue('10.10.10.10', 'Ip'));
-        $this->assertNotNull(Validation::validateValue('01:32:DC:05:2f:0a', 'Mac'));
+        // StrIn
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrIn:'.implode(',',$strVals)]);
+        }
+        foreach ($strVals as $strVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal, $strVals) {
+                Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrIn:'.implode(',',$strVals)]);
+            }, '只能取这些值:');
+        }
+        Validation::validate(['valStr' => 'abc'], ['valStr' => 'StrIn:abc']);
+        Validation::validate(['valStr' => ''], ['valStr' => 'StrIn:']);
+        Validation::validate(['valStr' => ' '], ['valStr' => 'StrIn: ']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => 'abcd'], ['valStr' => 'StrIn:abc']);
+        }, '必须等于"abc"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => ' '], ['valStr' => 'StrIn:  ']);
+        }, '必须等于"  "');
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrIn:Hello']);
+            }, '必须是字符串');
+        }
+
+        // StrNotIn
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal.'postfix'], ['valStr' => 'StrNotIn:'.implode(',',$strVals)]);
+        }
+        foreach ($strVals as $strVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal, $strVals) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrNotIn:'.implode(',',$strVals)]);
+            }, '不能取这些值:');
+        }
+        Validation::validate(['valStr' => 'abcd'], ['valStr' => 'StrNotIn:abc']);
+        Validation::validate(['valStr' => 'abc'], ['valStr' => 'StrNotIn:']);
+        Validation::validate(['valStr' => ''], ['valStr' => 'StrNotIn:abc']);
+        Validation::validate(['valStr' => '  '], ['valStr' => 'StrNotIn: ']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => 'abc'], ['valStr' => 'StrNotIn:abc']);
+        }, '不能等于"abc"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => ''], ['valStr' => 'StrNotIn:']);
+        }, '不能等于""');
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrNotIn:Hello']);
+            }, '必须是字符串');
+        }
+
+        // StrEqI
+        $strVals = ['', '123', 'abc', '你好', '-12311112311111', 'Abc', '你a好'];
+        $str2Vals = ['', '123', 'abc', '你好', '-12311112311111', 'abC', '你A好'];
+        for ($i = 0; $i < count($strVals); $i++) {
+            $strVal = $strVals[$i];
+            $str2Val = $str2Vals[$i];
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrEqI:'.$str2Val]);
+        }
+        foreach ($strVals as $strVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrEqI:'.$strVal.'1']);
+            }, '必须等于"');
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrEqI:'.$strVal]);
+            }, '"（忽略大小写）');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrEqI:'.$notStrVal]);
+            }, '必须是字符串');
+        }
+
+        // StrNeI
+        $strVals = ['', '123', 'abc', '你好', '-12311112311111', 'Abc', '你a好'];
+        $str2Vals = ['', '123', 'abc', '你好', '-12311112311111', 'abC', '你A好'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrNeI:'.$strVal.'1']);
+        }
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrNeI:'.$strVal]);
+        }
+        for ($i = 0; $i < count($strVals); $i++) {
+            $strVal = $strVals[$i];
+            $str2Val = $str2Vals[$i];
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal, $str2Val) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrNeI:'.$str2Val]);
+            }, '不能等于"');
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal, $str2Val) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrNeI:'.$str2Val]);
+            }, '"（忽略大小写）');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrNeI:'.$notStrVal]);
+            }, '必须是字符串');
+        }
+
+        // StrInI
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111', 'Abcd', '你a好'];
+        $str2Vals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111', 'abCd', '你A好'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrInI:'.implode(',',$str2Vals)]);
+        }
+        foreach ($strVals as $strVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal, $strVals) {
+                Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrInI:'.implode(',',$strVals)]);
+            }, '只能取这些值:');
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal, $strVals) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrInI:'.implode('1,',$strVals).'1']);
+            }, '（忽略大小写）');
+        }
+        Validation::validate(['valStr' => 'abc'], ['valStr' => 'StrInI:Abc']);
+        Validation::validate(['valStr' => ''], ['valStr' => 'StrInI:']);
+        Validation::validate(['valStr' => ' '], ['valStr' => 'StrInI: ']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => 'abcd'], ['valStr' => 'StrInI:abc']);
+        }, '必须等于"abc"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => ' '], ['valStr' => 'StrInI:  ']);
+        }, '必须等于"  "');
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrInI:Hello']);
+            }, '必须是字符串');
+        }
+
+        // StrNotInI
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111', 'Abcd', '你a好'];
+        $str2Vals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111', 'abCd', '你A好'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal.'postfix'], ['valStr' => 'StrNotInI:'.implode(',',$strVals)]);
+        }
+        foreach ($strVals as $strVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal, $str2Vals) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrNotInI:'.implode(',',$str2Vals)]);
+            }, '不能取这些值:');
+        }
+        Validation::validate(['valStr' => 'abcd'], ['valStr' => 'StrNotInI:abc']);
+        Validation::validate(['valStr' => 'abc'], ['valStr' => 'StrNotInI:']);
+        Validation::validate(['valStr' => ''], ['valStr' => 'StrNotInI:abc']);
+        Validation::validate(['valStr' => '  '], ['valStr' => 'StrNotInI: ']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => 'abc'], ['valStr' => 'StrNotInI:Abc']);
+        }, '不能等于"Abc"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => 'abc'], ['valStr' => 'StrNotInI:Abc']);
+        }, '（忽略大小写）');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => ''], ['valStr' => 'StrNotInI:']);
+        }, '不能等于""');
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrNotInI:Hello']);
+            }, '必须是字符串');
+        }
+    }
+
+    public function testValidateStrLens()
+    {
+        // StrLen
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrLen:'.mb_strlen($strVal)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrLen:'.(mb_strlen($strVal)+1)]);
+            }, '长度必须等于');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrLen:8']);
+            }, '必须是字符串');
+        }
+
+        // StrLenGe
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrLenGe:'.mb_strlen($strVal)]);
+            Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrLenGe:'.mb_strlen($strVal)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'StrLenGe:'.(mb_strlen($strVal)+1)]);
+            }, '长度必须大于等于');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrLenGe:8']);
+            }, '必须是字符串');
+        }
+
+        // StrLenLe
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrLenLe:'.mb_strlen($strVal)]);
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrLenLe:'.mb_strlen($strVal.'1')]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrLenLe:'.mb_strlen($strVal)]);
+            }, '长度必须小于等于');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrLenLe:8']);
+            }, '必须是字符串');
+        }
+
+        // StrLenGeLe
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'StrLenGeLe:'.mb_strlen($strVal).','.mb_strlen($strVal)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'StrLenGeLe:'.mb_strlen($strVal).','.mb_strlen($strVal)]);
+            }, '长度必须在'); //长度必须在 x - y 之间
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrLenGeLe:6,8']);
+            }, '必须是字符串');
+        }
+    }
+
+    public function testValidateByteLens()
+    {
+        // ByteLen
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'ByteLen:'.strlen($strVal)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'ByteLen:'.(strlen($strVal)+1)]);
+            }, '长度（字节）必须等于');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'ByteLen:8']);
+            }, '必须是字符串');
+        }
+
+        // ByteLenGe
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'ByteLenGe:'.strlen($strVal)]);
+            Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'ByteLenGe:'.strlen($strVal)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal], ['valStr' => 'ByteLenGe:'.(strlen($strVal)+1)]);
+            }, '长度（字节）必须大于等于');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'ByteLenGe:8']);
+            }, '必须是字符串');
+        }
+
+        // ByteLenLe
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'ByteLenLe:'.strlen($strVal)]);
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'ByteLenLe:'.strlen($strVal.'1')]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'ByteLenLe:'.strlen($strVal)]);
+            }, '长度（字节）必须小于等于');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'ByteLenLe:8']);
+            }, '必须是字符串');
+        }
+
+        // ByteLenGeLe
+        $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'ByteLenGeLe:'.strlen($strVal).','.strlen($strVal)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($strVal) {
+                Validation::validate(['valStr' => $strVal.'1'], ['valStr' => 'ByteLenGeLe:'.strlen($strVal).','.strlen($strVal)]);
+            }, '长度（字节）必须在'); //长度必须在 x - y 之间
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'ByteLenGeLe:6,8']);
+            }, '必须是字符串');
+        }
+    }
+
+    public function testValidateOtherStrings()
+    {
+        // Letters
+        $strVals = ['a', 'z', 'A', 'Z', 'abc', 'ABC', 'Hello', 'ZZZ', 'abc'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Letters']);
+        }
+        $wrongVals = ['', ' ', '  ', "\t", '123', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Letters']);
+            }, '只能包含字母');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Letters']);
+            }, '必须是字符串');
+        }
+
+        // Alphabet
+        $strVals = ['a', 'z', 'A', 'Z', 'abc', 'ABC', 'Hello', 'ZZZ', 'abc'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Alphabet']);
+        }
+        $wrongVals = ['', ' ', '  ', "\t", '123', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Alphabet']);
+            }, '只能包含字母');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Alphabet']);
+            }, '必须是字符串');
+        }
+
+        // Numbers
+        $strVals = ['0', '1', '123', '32456236234523452354324'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Numbers']);
+        }
+        $wrongVals = ['', ' ', '  ', "\t", ' 123', '-123', '1.0', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Numbers']);
+            }, '只能是纯数字');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Numbers']);
+            }, '必须是字符串');
+        }
+
+        // Digits
+        $strVals = ['0', '1', '123', '32456236234523452354324'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Digits']);
+        }
+        $wrongVals = ['', ' ', '  ', "\t", ' 123', '-123', '1.0', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Digits']);
+            }, '只能是纯数字');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Digits']);
+            }, '必须是字符串');
+        }
+
+        // LettersNumbers
+        $strVals = ['a', 'z', 'A', 'Z', 'abc', 'ABC', 'Hello', 'ZZZ', 'abc', '0', '1', '123', '32456236234523452354324', 'abc123'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'LettersNumbers']);
+        }
+        $wrongVals = ['_abc123', '', ' ', '  ', "\t", ' 123', '-123', '1.0', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'LettersNumbers']);
+            }, '只能包含字母和数字');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'LettersNumbers']);
+            }, '必须是字符串');
+        }
+
+        // Numeric
+        $strVals = ['0', '-0', '0.0', '-0.0', '1', '-1', '1.0', '-1.0', '123', '-123', '123.0', '-123.0', '-.0', '.0', '1.', '-1.', '23412341234.423412341241234', '3245623623452341234234123452354324', '.3245623623452341234234123452354324', '3245623623452341234234123452354324.3245623623452341234234123452354324'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Numeric']);
+        }
+        $wrongVals = ['1.2.3', '.', '-.', '', ' ', '  ', "\t", ' 123', 'abc.def', '你好', 'abc123'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Numeric']);
+            }, '必须是数值');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Numeric']);
+            }, '必须是字符串');
+        }
+
+        // VarName
+        $strVals = ['_', '_abc', '_abc123', 'a', 'z', 'A', 'Z', 'abc', 'ABC', 'Hello', 'ZZZ', 'abc', 'abc123'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'VarName']);
+        }
+        $wrongVals = ['0', '1', '123', '32456236234523452354324', '1abc', '', ' ', '  ', "\t", ' 123', '-123', '1.0', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'VarName']);
+            }, '只能包含字母、数字和下划线，并且以字母或下划线开头');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'VarName']);
+            }, '必须是字符串');
+        }
+
+        // Email
+        $strVals = ['hi@abc.com', 'admin@webgeeker.com', 'hello@abc-def.com'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Email']);
+        }
+        $wrongVals = ['hi @abc.com', '0', '1', '123', '32456236234523452354324', '1abc', '', ' ', '  ', "\t", ' 123', '-123', '1.0', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Email']);
+            }, '不是合法的email');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Email']);
+            }, '必须是字符串');
+        }
+
+        // Url
+        $strVals = ['http://abc.com', 'https://webgeeker.com', 'http://hello.com/p/1', 'http://hello.com/p/1?str=1&abc=123', 'ftp://abc.com'];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Url']);
+        }
+        $wrongVals = ['abc.com', '//abc.com', 'hi @abc.com', '0', '1', '123', '32456236234523452354324', '1abc', '', ' ', '  ', "\t", ' 123', '-123', '1.0', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Url']);
+            }, '不是合法的Url地址');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Url']);
+            }, '必须是字符串');
+        }
+
+        // Ip
+        $strVals = ['1.1.1.1', '0.0.0.0', '8.8.8.8', '255.255.255.255',
+            '::',
+            '::1', // 本地回环地址.相当于ipv4的127.0.0.1
+            '::ffff:192.168.89.9', // ipv4的ipv6形式（IPv4映射地址）
+            '::ffff:c0a8:5909', // 等价于::ffff:192.168.89.9
+            'fe80::', //fe80::/10－这些链路本地地址指明，这些地址只在区域连接中是合法的，这有点类似于IPv4中的169.254.0.0/16
+            '169.254.0.0',
+            '2001:0DB8:02de:0000:0000:0000:0000:0e13',
+            '2001:DB8:2de:0000:0000:0000:0000:e13',
+            '2001:DB8:2de:000:000:000:000:e13',
+            '2001:DB8:2de:00:00:00:00:e13',
+            '2001:DB8:2de:0:0:0:0:e13',
+            '2001:DB8:2de::e13',
+            '2001:0DB8:0000:0000:0000:0000:1428:57ab',
+            '2001:0DB8:0000:0000:0000::1428:57ab',
+            '2001:0DB8:0:0:0:0:1428:57ab',
+            '2001:0DB8:0::0:1428:57ab',
+            '2001:0DB8::1428:57ab',
+        ];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Ip']);
+        }
+        $wrongVals = ['1.2.3.', '1.2.3.256', '2001::25de::cade', ':::',
+            'abc.com', '//abc.com', 'hi @abc.com', '0', '1', '123', '32456236234523452354324', '1abc', '', ' ', '  ', "\t", ' 123', '-123', '1.0', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Ip']);
+            }, '不是合法的IP地址');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Ip']);
+            }, '必须是字符串');
+        }
+
+        // Mac
+        $strVals = [
+            '00:16:3e:02:02:9c',
+            '00:0A:02:0B:03:0C',
+            'ff:ff:ff:ff:ff:ff', // 广播地址
+            '01:00:00:00:00:00', // 01:xx:xx:xx:xx:xx是多播地址
+            '01:00:5e:00:00:00', // 01:00:5e:xx:xx:xx是IPv4多播地址
+        ];
+        foreach ($strVals as $strVal) {
+            Validation::validate(['valStr' => $strVal], ['valStr' => 'Mac']);
+        }
+        $wrongVals = ['00:16:3e:02:02:9', '1.2.3.', '1.2.3.256', '2001::25de::cade', ':::',
+            'abc.com', '//abc.com', 'hi @abc.com', '0', '1', '123', '32456236234523452354324', '1abc', '', ' ', '  ', "\t", ' 123', '-123', '1.0', 'abc.def', '你好', '-12311112311111'];
+        foreach ($wrongVals as $wrongVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($wrongVal) {
+                Validation::validate(['valStr' => $wrongVal], ['valStr' => 'Mac']);
+            }, '不是合法的MAC地址');
+        }
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Mac']);
+            }, '必须是字符串');
+        }
 
     }
 
     public function testValidateRegexp()
     {
-        $this->assertNotNull(Validation::validateRegexp('10.', '/^[0-9.]+$/', '这是原因'));
-        $this->assertNotNull(Validation::validateRegexp('10/abcd', '/^[0-9]+\/abcd$/'));
+        $valExps = [
+            '0123456789' => '/345/',
+            '10.' => '/^[0-9.]+$/',
+            '10/ab|cd' => '/^[0-9]+\/ab\|cd$/',
+            'var=123' => '/^\s*var\s*=\s*[0-9]+\s*$/',
+            ' var = 123 ' => '/^\s*var\s*=\s*[0-9]+\s*$/',
+        ];
+        foreach ($valExps as $val => $exp) {
+            Validation::validate(['valStr' => $val], ['valStr' => 'Regexp:'.$exp]);
+        }
+        $notMatchValExps = [
+            'a10.' => '/^[0-9.]+$/',
+            'a10/abcd' => '/^[0-9]+\/abcd$/',
+        ];
+        foreach ($notMatchValExps as $val => $exp) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($val, $exp) {
+                Validation::validate(['valStr' => $val], ['valStr' => 'Regexp:'.$exp]);
+            }, '不匹配正则表达式');
+        }
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => 'abc'], ['valStr' => 'Regexp:/abc']);
+        }, '正则表达式验证器Regexp格式错误');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['valStr' => 'abc'], ['valStr' => 'Regexp:abc/']);
+        }, '正则表达式验证器Regexp格式错误');
     }
 
     public function testValidateArr()

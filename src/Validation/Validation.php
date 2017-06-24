@@ -716,7 +716,7 @@ class Validation
         if (is_bool($value)) {
             return $value;
         } else if (is_string($value)) {
-            $valuelc = strtolower($value);
+            $valuelc = mb_strtolower($value);
             if ($valuelc === 'true' || $valuelc === 'false')
                 return $value;
         }
@@ -735,7 +735,7 @@ class Validation
         if ($type === 'boolean')
             return $value;
         else if ($type === 'string') {
-            if (in_array(strtolower($value), ['true', 'false', '1', '0', 'yes', 'no', 'y', 'n'], true))
+            if (in_array(mb_strtolower($value), ['true', 'false', '1', '0', 'yes', 'no', 'y', 'n'], true))
                 return $value;
         } else if ($type === 'integer') {
             if ($value === 0 || $value === 1)
@@ -771,7 +771,7 @@ class Validation
     /**
      * 验证: “{{param}}”必须等于 {{equalsValue}}
      * @param $value string 参数值
-     * @param $equalsValue string 可取值的列表
+     * @param $equalsValue string 比较值
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
@@ -779,15 +779,56 @@ class Validation
      */
     public static function validateStrEq($value, $equalsValue, $reason = null, $alias = 'Parameter')
     {
-        if (is_string($value) && $value === $equalsValue)
-            return $value;
+        if (is_string($value)) {
+            if ($value === $equalsValue)
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrEq'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{value}}', $equalsValue, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['StrEq'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $equalsValue, $error);
+        }
+        throw new \Exception($error);
+    }
+
+    /**
+     * 验证: “{{param}}”不能等于 {{equalsValue}}
+     * @param $value string 参数值
+     * @param $equalsValue string 比较值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function validateStrNe($value, $equalsValue, $reason = null, $alias = 'Parameter')
+    {
+        if (is_string($value)) {
+            if ($value !== $equalsValue)
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['StrNe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $equalsValue, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -805,15 +846,29 @@ class Validation
         if (is_array($valueList) === false || count($valueList) === 0)
             throw new \Exception("“${alias}”参数的验证模版(StrIn:)格式错误, 必须提供可取值的列表");
 
-        if (in_array($value, $valueList, true))
-            return $value;
+        if (is_string($value)) {
+            if (in_array($value, $valueList, true))
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrIn'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else if (count($valueList) === 1) {
+            $error = self::$errorTemplates['StrEq'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $valueList[0], $error);
+        } else {
+            $error = self::$errorTemplates['StrIn'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
+        }
+
         throw new \Exception($error);
     }
 
@@ -831,15 +886,92 @@ class Validation
         if (is_array($valueList) === false || count($valueList) === 0)
             throw new \Exception("“${alias}”参数的验证模版(StrNotIn:)格式错误, 必须提供不可取的值的列表");
 
-        if (in_array($value, $valueList, true) === false)
-            return $value;
+        if (is_string($value)) {
+            if (!in_array($value, $valueList, true))
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrNotIn'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else if (count($valueList) === 1) {
+            $error = self::$errorTemplates['StrNe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $valueList[0], $error);
+        } else {
+            $error = self::$errorTemplates['StrNotIn'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
+        }
+        throw new \Exception($error);
+    }
+
+    /**
+     * 验证: “{{param}}”必须等于 {{equalsValue}}（忽略大小写）
+     * @param $value string 参数值
+     * @param $equalsValue string 比较值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function validateStrEqI($value, $equalsValue, $reason = null, $alias = 'Parameter')
+    {
+        if (is_string($value)) {
+            if (strcasecmp($value, $equalsValue) === 0)
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['StrEqI'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $equalsValue, $error);
+        }
+        throw new \Exception($error);
+    }
+
+    /**
+     * 验证: “{{param}}”不能等于 {{equalsValue}}（忽略大小写）
+     * @param $value string 参数值
+     * @param $equalsValue string 比较值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
+     * @param $alias string 参数别名, 用于错误提示
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function validateStrNeI($value, $equalsValue, $reason = null, $alias = 'Parameter')
+    {
+        if (is_string($value)) {
+            if (strcasecmp($value, $equalsValue) !== 0)
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
+
+        if ($reason !== null)
+            throw new \Exception($reason);
+
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['StrNeI'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $equalsValue, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -852,27 +984,36 @@ class Validation
      * @return mixed
      * @throws \Exception
      */
-    public static function validateStrInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
+    public static function validateStrInI($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrInNoCase:)格式错误, 必须提供可取值的列表");
+            throw new \Exception("“${alias}”参数的验证模版(StrInI:)格式错误, 必须提供可取值的列表");
 
-        $lowerValue = strtolower($value);
-        foreach ($valueList as $v) {
-            if (is_string($v) && strtolower($v) === $lowerValue)
-                continue;
-            goto VeriFailed;
-        }
-        return $value;
-
-        VeriFailed:
+        if (is_string($value)) {
+            $lowerValue = mb_strtolower($value);
+            foreach ($valueList as $v) {
+                if (is_string($v) && mb_strtolower($v) === $lowerValue)
+                    return $value;
+            }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrInNoCase'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else if (count($valueList) === 1) {
+            $error = self::$errorTemplates['StrEqI'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $valueList[0], $error);
+        } else {
+            $error = self::$errorTemplates['StrInI'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
+        }
         throw new \Exception($error);
     }
 
@@ -885,78 +1026,109 @@ class Validation
      * @return mixed
      * @throws \Exception
      */
-    public static function validateStrNotInNoCase($value, $valueList, $reason = null, $alias = 'Parameter')
+    public static function validateStrNotInI($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrNotInNoCase:)格式错误, 必须提供不可取的值的列表");
+            throw new \Exception("“${alias}”参数的验证模版(StrNotInI:)格式错误, 必须提供不可取的值的列表");
 
-        $lowerValue = strtolower($value);
-        foreach ($valueList as $v) {
-            if (is_string($v) && strtolower($v) === $lowerValue)
-                continue;
-            goto VeriFailed;
-        }
-        return $value;
+        if (is_string($value)) {
+            $lowerValue = mb_strtolower($value);
+            foreach ($valueList as $v) {
+                if (is_string($v) && mb_strtolower($v) === $lowerValue) {
+                    $isTypeError = false;
+                    goto VeriFailed;
+                }
+            }
+            return $value;
+        } else
+            $isTypeError = true;
 
         VeriFailed:
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrNotInNoCase'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else if (count($valueList) === 1) {
+            $error = self::$errorTemplates['StrNeI'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $valueList[0], $error);
+        } else {
+            $error = self::$errorTemplates['StrNotInI'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateStrLen($value, $length, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (mb_strlen($value) == $length) {
+            if (mb_strlen($value) == $length)
                 return $value;
-            }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrLen'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{length}}', $length, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['StrLen'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{length}}', $length, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateStrLenGe($value, $min, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (mb_strlen($value) >= $min) {
+            if (mb_strlen($value) >= $min)
                 return $value;
-            }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrLenGe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['StrLenGe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateStrLenLe($value, $max, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (mb_strlen($value) <= $max) {
+            if (mb_strlen($value) <= $max)
                 return $value;
-            }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrLenLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['StrLenLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -967,69 +1139,93 @@ class Validation
 
         if (is_string($value)) {
             $len = mb_strlen($value);
-            if ($len >= $min && $len <= $max) {
+            if ($len >= $min && $len <= $max)
                 return $value;
-            }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['StrLenGeLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['StrLenGeLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateByteLen($value, $length, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (strlen($value) == $length) {
+            if (strlen($value) == $length)
                 return $value;
-            }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ByteLen'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{length}}', $length, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['ByteLen'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{length}}', $length, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateByteLenGe($value, $min, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (strlen($value) >= $min) {
+            if (strlen($value) >= $min)
                 return $value;
-            }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ByteLenGe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['ByteLenGe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateByteLenLe($value, $max, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (strlen($value) <= $max) {
+            if (strlen($value) <= $max)
                 return $value;
-            }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ByteLenLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['ByteLenLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1040,18 +1236,24 @@ class Validation
 
         if (is_string($value)) {
             $len = strlen($value);
-            if ($len >= $min && $len <= $max) {
+            if ($len >= $min && $len <= $max)
                 return $value;
-            }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ByteLenGeLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['ByteLenGeLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1068,13 +1270,20 @@ class Validation
         if (is_string($value)) {
             if (preg_match('/^[a-zA-Z]+$/', $value) === 1)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Letters'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Letters'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1092,13 +1301,20 @@ class Validation
         if (is_string($value)) {
             if (preg_match('/^[a-zA-Z]+$/', $value) === 1)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Alphabet'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Alphabet'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1115,13 +1331,20 @@ class Validation
         if (is_string($value)) {
             if (preg_match('/^[0-9]+$/', $value) === 1)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Numbers'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Numbers'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1139,13 +1362,20 @@ class Validation
         if (is_string($value)) {
             if (preg_match('/^[0-9]+$/', $value) === 1)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Digits'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Digits'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1162,13 +1392,20 @@ class Validation
         if (is_string($value)) {
             if (preg_match('/^[a-zA-Z0-9]+$/', $value) === 1)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['LettersNumbers'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['LettersNumbers'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1199,13 +1436,20 @@ class Validation
                         return $value;
                 }
             }
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Numeric'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Numeric'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1222,69 +1466,108 @@ class Validation
         if (is_string($value)) {
             if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value) === 1)
                 return $value;
-        }
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['VarName'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['VarName'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateEmail($value, $reason = null, $alias = 'Parameter')
     {
-        if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            return $value;
-        }
+        if (is_string($value)) {
+            if (filter_var($value, FILTER_VALIDATE_EMAIL))
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Email'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Email'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateUrl($value, $reason = null, $alias = 'Parameter')
     {
-        if (filter_var($value, FILTER_VALIDATE_URL)) {
-            return $value;
-        }
+        if (is_string($value)) {
+            if (filter_var($value, FILTER_VALIDATE_URL))
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Url'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Url'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateIp($value, $reason = null, $alias = 'Parameter')
     {
-        if (filter_var($value, FILTER_VALIDATE_IP)) {
-            return $value;
-        }
+        if (is_string($value)) {
+            if (filter_var($value, FILTER_VALIDATE_IP))
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Ip'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Ip'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateMac($value, $reason = null, $alias = 'Parameter')
     {
-        if (filter_var($value, FILTER_VALIDATE_MAC)) {
-            return $value;
-        }
+        if (is_string($value)) {
+            if (filter_var($value, FILTER_VALIDATE_MAC))
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Mac'];
-        $error = str_replace('{{param}}', $alias, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Mac'];
+            $error = str_replace('{{param}}', $alias, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -2071,21 +2354,21 @@ class Validation
     protected static function validateIf($value)
     {
         if (is_string($value))
-            $value = strtolower($value);
+            $value = mb_strtolower($value);
         return in_array($value, [1, true, '1', 'true', 'yes', 'y'], true);
     }
 
     protected static function validateIfNot($value)
     {
         if (is_string($value))
-            $value = strtolower($value);
+            $value = mb_strtolower($value);
         return in_array($value, [0, false, '0', 'false', 'no', 'n'], true);
     }
 
     protected static function validateIfTrue($value)
     {
         if (is_string($value))
-            return (strtolower($value) === 'true');
+            return (mb_strtolower($value) === 'true');
         else
             return ($value === true);
     }
@@ -2093,7 +2376,7 @@ class Validation
     protected static function validateIfFalse($value)
     {
         if (is_string($value))
-            return (strtolower($value) === 'false');
+            return (mb_strtolower($value) === 'false');
         else
             return ($value === false);
     }
@@ -2293,19 +2576,22 @@ class Validation
 
         // 字符串
         'Str' => '“{{param}}”必须是字符串',
-        'StrEq' => '“{{param}}”必须等于 {{value}}',
+        'StrEq' => '“{{param}}”必须等于"{{value}}"',
+        'StrNe' => '“{{param}}”不能等于"{{value}}"',
         'StrIn' => '“{{param}}”只能取这些值: {{valueList}}',
         'StrNotIn' => '“{{param}}”不能取这些值: {{valueList}}',
-        'StrInNoCase' => '“{{param}}”只能取这些值: {{valueList}}（忽略大小写）',
-        'StrNotInNoCase' => '“{{param}}”不能取这些值: {{valueList}}（忽略大小写）',
+        'StrEqI' => '“{{param}}”必须等于"{{value}}"（忽略大小写）',
+        'StrNeI' => '“{{param}}”不能等于"{{value}}"（忽略大小写）',
+        'StrInI' => '“{{param}}”只能取这些值: {{valueList}}（忽略大小写）',
+        'StrNotInI' => '“{{param}}”不能取这些值: {{valueList}}（忽略大小写）',
         'StrLen' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
         'StrLenGe' => '“{{param}}”长度必须大于等于 {{min}}',
         'StrLenLe' => '“{{param}}”长度必须小于等于 {{max}}',
         'StrLenGeLe' => '“{{param}}”长度必须在 {{min}} - {{max}} 之间', // 字符串长度
-        'ByteLen' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
-        'ByteLenGe' => '“{{param}}”长度必须大于等于 {{min}}',
-        'ByteLenLe' => '“{{param}}”长度必须小于等于 {{max}}',
-        'ByteLenGeLe' => '“{{param}}”长度必须在 {{min}} - {{max}} 之间', // 字符串长度
+        'ByteLen' => '“{{param}}”长度（字节）必须等于 {{length}}', // 字符串长度
+        'ByteLenGe' => '“{{param}}”长度（字节）必须大于等于 {{min}}',
+        'ByteLenLe' => '“{{param}}”长度（字节）必须小于等于 {{max}}',
+        'ByteLenGeLe' => '“{{param}}”长度（字节）必须在 {{min}} - {{max}} 之间', // 字符串长度
         'Letters' => '“{{param}}”只能包含字母',
         'Alphabet' => '“{{param}}”只能包含字母', // 同Letters
         'Numbers' => '“{{param}}”只能是纯数字',
@@ -2395,10 +2681,13 @@ class Validation
         // 字符串
         'Str' => 'Str',
         'StrEq' => 'StrEq:abc',
+        'StrNe' => 'StrNe:abc',
         'StrIn' => 'StrIn:abc,def,g',
         'StrNotIn' => 'StrNotIn:abc,def,g',
-        'StrInNoCase' => 'StrInNoCase:abc,def,g',
-        'StrNotInNoCase' => 'StrNotInNoCase:abc,def,g',
+        'StrEqI' => 'StrEqI:abc',
+        'StrNeI' => 'StrNeI:abc',
+        'StrInI' => 'StrInI:abc,def,g',
+        'StrNotInI' => 'StrNotInI:abc,def,g',
         'StrLen' => 'StrLen:8',
         'StrLenGe' => 'StrLenGe:8',
         'StrLenLe' => 'StrLenLe:8',
@@ -2541,7 +2830,7 @@ class Validation
             if (strpos($segment, 'Regexp:') === 0) // 是正则表达式
             {
                 if (strpos($segment, '/') !== 7) // 非法的正则表达. 合法的必须首尾加/
-                    throw new \Exception("正则表达式验证器regexp格式非法. 正确的格式是 Regexp:/xxxx/");
+                    throw new \Exception("正则表达式验证器Regexp格式错误. 正确的格式是 Regexp:/xxxx/");
 
                 $pos = 8;
                 $len = strlen($segment);
@@ -2578,7 +2867,7 @@ class Validation
                     }
 
                     if ($i >= $segCount) // 后面没有segment了
-                        throw new \Exception("正则表达式验证器格式错误. 正确的格式是 Regexp:/xxxx/");
+                        throw new \Exception("正则表达式验证器Regexp格式错误. 正确的格式是 Regexp:/xxxx/");
 
                     $segment .= '|';
                     $segment .= $segments[$i]; // 拼接后面一个segment
@@ -2602,10 +2891,12 @@ class Validation
                 } else {
                     $validatorName = substr($segment, 0, $pos);
                     $p = substr($segment, $pos + 1);
-                    // todo 应该允许 strlen($p) === 0 这种情况
-                    if (strlen($validatorName) === 0 || strlen($p) === 0) {
-                        if ($validatorName !== '>>>')
-                            throw new \Exception("无法识别的验证子“${segment}”");
+                    if ($p === false) {
+                        if ($pos + 1 === strlen($segment))
+                            $p = '';
+                    }
+                    if (strlen($validatorName) === 0) {
+                        throw new \Exception("无法识别的验证子“${segment}”");
                     }
                     switch ($validatorName) {
                         case 'IntEq':
@@ -2650,15 +2941,15 @@ class Validation
                             $validator = [$validatorName, $ints];
                             break;
                         case 'StrEq':
-                            $p = trim($p);
-                            if (strlen($p) === 0)
-                                self::_throwFormatError($validatorName);
+                        case 'StrNe':
+                        case 'StrEqI':
+                        case 'StrNeI':
                             $validator = [$validatorName, $p];
                             break;
                         case 'StrIn':
                         case 'StrNotIn':
-                        case 'StrInNoCase':
-                        case 'StrNotInNoCase':
+                        case 'StrInI':
+                        case 'StrNotInI':
                             $strings = self::_parseStringArray($p);
                             if ($strings === false)
                                 self::_throwFormatError($validatorName);
@@ -2868,24 +3159,23 @@ class Validation
      */
     private static function _parseStringArray($value)
     {
-        $vals = explode(',', $value);
-        $strings = [];
-        foreach ($vals as $val) {
-            $val = trim($val);
-            if (strlen($val) === 0)
-                return false; // 检测到了非int
-            $strings[] = $val;
-        }
-        if (count($strings) === 0)
+        if (strlen($value)) {
+            $vals = explode(',', $value);
+            if ($vals === false)
+                return false;
+//            $vals = array_unique($vals); // 不需要去重, 不影响结果. 程序员不应该写出重复的字符串
+        } else
+            $vals = [''];
+        if (count($vals) === 0)
             return false;
-        return $strings;
+        return $vals;
     }
 
     private static function _parseSizeString($value)
     {
-        $value = strtolower($value);
+        $value = mb_strtolower($value);
         $matches = [];
-        if (preg_match('/^([0-9]+)(kb|k|mb|m)*$/', strtolower($value), $matches) !== 1)
+        if (preg_match('/^([0-9]+)(kb|k|mb|m)*$/', mb_strtolower($value), $matches) !== 1)
             return null;
 
         $size = intval($matches[1]);
