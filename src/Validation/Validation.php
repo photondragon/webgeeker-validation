@@ -1585,18 +1585,27 @@ class Validation
         if (is_string($regexp) === false || $regexp === '')
             throw new \Exception("“${alias}”参数的验证模版(Regexp:)格式错误, 没有提供正则表达式");
 
-        $result = @preg_match($regexp, $value);
-        if ($result === 1)
-            return $value;
-        else if ($result === false)
-            throw new \Exception("“${alias}”参数的正则表达式验证失败, 请检查正则表达式是否合法");
+        if (is_string($value)) {
+            $result = @preg_match($regexp, $value);
+            if ($result === 1)
+                return $value;
+            else if ($result === false)
+                throw new \Exception("“${alias}”参数的正则表达式验证失败, 请检查正则表达式是否合法");
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Regexp'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{regexp}}', $regexp, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Str'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['Regexp'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{regexp}}', $regexp, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -1628,7 +1637,7 @@ class Validation
 
     public static function validateArrLen($value, $length, $reason = null, $alias = 'Parameter')
     {
-        if (is_array($value) && count($value) == $length) {
+        if (is_array($value)) {
             $is = true;
             foreach ($value as $key => $val) {
                 if (!is_integer($key)) {
@@ -1636,22 +1645,32 @@ class Validation
                     break;
                 }
             }
-            if ($is)
-                return $value;
-        }
+            if ($is) {
+                if (count($value) == $length)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ArrLen'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{length}}', $length, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Arr'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['ArrLen'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{length}}', $length, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateArrLenGe($value, $min, $reason = null, $alias = 'Parameter')
     {
-        if (is_array($value) && count($value) >= $min) {
+        if (is_array($value)) {
             $is = true;
             foreach ($value as $key => $val) {
                 if (!is_integer($key)) {
@@ -1659,22 +1678,32 @@ class Validation
                     break;
                 }
             }
-            if ($is)
-                return $value;
-        }
+            if ($is) {
+                if (count($value) >= $min)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ArrLenGe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Arr'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['ArrLenGe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateArrLenLe($value, $max, $reason = null, $alias = 'Parameter')
     {
-        if (is_array($value) && count($value) <= $max) {
+        if (is_array($value)) {
             $is = true;
             foreach ($value as $key => $val) {
                 if (!is_integer($key)) {
@@ -1682,43 +1711,61 @@ class Validation
                     break;
                 }
             }
-            if ($is)
-                return $value;
-        }
+            if ($is) {
+                if (count($value) <= $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ArrLenLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Arr'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['ArrLenLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
     public static function validateArrLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
         if (is_array($value)) {
-            $c = count($value);
-            if ($c >= $min && $c <= $max) {
-                $is = true;
-                foreach ($value as $key => $val) {
-                    if (!is_integer($key)) {
-                        $is = false;
-                        break;
-                    }
+            $is = true;
+            foreach ($value as $key => $val) {
+                if (!is_integer($key)) {
+                    $is = false;
+                    break;
                 }
-                if ($is)
-                    return $value;
             }
-        }
+            if ($is) {
+                $c = count($value);
+                if ($c >= $min && $c <= $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } else
+            $isTypeError = true;
 
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['ArrLenGeLe'];
-        $error = str_replace('{{param}}', $alias, $error);
-        $error = str_replace('{{min}}', $min, $error);
-        $error = str_replace('{{max}}', $max, $error);
+        if ($isTypeError) {
+            $error = self::$errorTemplates['Arr'];
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::$errorTemplates['ArrLenGeLe'];
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
         throw new \Exception($error);
     }
 
@@ -2577,13 +2624,14 @@ class Validation
         // 字符串
         'Str' => '“{{param}}”必须是字符串',
         'StrEq' => '“{{param}}”必须等于"{{value}}"',
-        'StrNe' => '“{{param}}”不能等于"{{value}}"',
-        'StrIn' => '“{{param}}”只能取这些值: {{valueList}}',
-        'StrNotIn' => '“{{param}}”不能取这些值: {{valueList}}',
         'StrEqI' => '“{{param}}”必须等于"{{value}}"（忽略大小写）',
+        'StrNe' => '“{{param}}”不能等于"{{value}}"',
         'StrNeI' => '“{{param}}”不能等于"{{value}}"（忽略大小写）',
+        'StrIn' => '“{{param}}”只能取这些值: {{valueList}}',
         'StrInI' => '“{{param}}”只能取这些值: {{valueList}}（忽略大小写）',
+        'StrNotIn' => '“{{param}}”不能取这些值: {{valueList}}',
         'StrNotInI' => '“{{param}}”不能取这些值: {{valueList}}（忽略大小写）',
+        // todo StrSame:var 检测某个参数是否等于别一个参数, 比如password2要等于password
         'StrLen' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
         'StrLenGe' => '“{{param}}”长度必须大于等于 {{min}}',
         'StrLenLe' => '“{{param}}”长度必须小于等于 {{max}}',
@@ -2607,10 +2655,10 @@ class Validation
 
         // 数组. 如何检测数组长度为0
         'Arr' => '“{{param}}”必须是数组',
-        'ArrLen' => '“{{param}}”必须是长度为 {{length}} 的数组',
-        'ArrLenGe' => '“{{param}}”必须是长度大于等于 {{min}} 的数组',
-        'ArrLenLe' => '“{{param}}”必须是长度小于等于 {{max}} 的数组',
-        'ArrLenGeLe' => '“{{param}}”必须是长度在 {{min}} ~ {{max}} 之间的数组',
+        'ArrLen' => '“{{param}}”长度必须等于 {{length}}',
+        'ArrLenGe' => '“{{param}}”长度必须大于等于 {{min}}',
+        'ArrLenLe' => '“{{param}}”长度必须小于等于 {{max}}',
+        'ArrLenGeLe' => '“{{param}}”长度必须在 {{min}} ~ {{max}} 之间',
 
         // 对象
         'Obj' => '“{{param}}”必须是对象',
@@ -2681,12 +2729,12 @@ class Validation
         // 字符串
         'Str' => 'Str',
         'StrEq' => 'StrEq:abc',
-        'StrNe' => 'StrNe:abc',
-        'StrIn' => 'StrIn:abc,def,g',
-        'StrNotIn' => 'StrNotIn:abc,def,g',
         'StrEqI' => 'StrEqI:abc',
+        'StrNe' => 'StrNe:abc',
         'StrNeI' => 'StrNeI:abc',
+        'StrIn' => 'StrIn:abc,def,g',
         'StrInI' => 'StrInI:abc,def,g',
+        'StrNotIn' => 'StrNotIn:abc,def,g',
         'StrNotInI' => 'StrNotInI:abc,def,g',
         'StrLen' => 'StrLen:8',
         'StrLenGe' => 'StrLenGe:8',

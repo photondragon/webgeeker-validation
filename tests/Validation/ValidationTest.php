@@ -1142,35 +1142,140 @@ class ValidationTest extends TestCase
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['valStr' => 'abc'], ['valStr' => 'Regexp:abc/']);
         }, '正则表达式验证器Regexp格式错误');
+        $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
+        foreach ($notStrVals as $notStrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Regexp:/abc/']);
+            }, '必须是字符串');
+        }
     }
 
     public function testValidateArr()
     {
-        $this->assertNotNull(Validation::validateArr([]));
-        $this->assertNotNull(Validation::validateArr([1, 2, 3]));
-        $this->_assertThrowExpection(function () {
-            Validation::validateArr(1);
-        }, 'line ' . __LINE__ . ": Validation::validateArr(1)应该抛出异常");
-        $this->_assertThrowExpection(function () {
-            Validation::validateArr(['a' => 1]);
-        }, 'line ' . __LINE__ . ": Validation::validateArr(['a'=>1])应该抛出异常");
+        // Arr
+        $arrays = [
+            [],
+            [1, 2, 3],
+            ['abc', '123', 'hello', 'hi'],
+        ];
+        foreach ($arrays as $array) {
+            Validation::validate(['array' => $array], ['array' => 'Arr']);
+        }
+        $notArrVals = [1, 0, 1.0, 0.0, true, false, 'asd',
+            ['var'=>123], // 这是Obj
+        ];
+        foreach ($notArrVals as $notArrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notArrVal) {
+                Validation::validate(['array' => $notArrVal], ['array' => 'Arr']);
+            }, '必须是数组');
+        }
 
-        $this->assertNotNull(Validation::validateArrLen([1, 2, 3], 3));
-        $this->assertNotNull(Validation::validateArrLenGe([1, 2, 3], 3));
-        $this->assertNotNull(Validation::validateArrLenLe([1, 2, 3], 3));
-        $this->assertNotNull(Validation::validateArrLenGeLe([1, 2, 3], 3, 3));
+        // ArrLen
+        $arrays = [
+            [],
+            [1, 2, 3],
+            ['abc', '123', 'hello', 'hi'],
+        ];
+        foreach ($arrays as $array) {
+            Validation::validate(['array' => $array], ['array' => 'ArrLen:'.count($array)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($array) {
+                Validation::validate(['array' => $array], ['array' => 'ArrLen:'.(count($array)+1)]);
+            }, '长度必须等于');
+        }
+        $notArrVals = [1, 0, 1.0, 0.0, true, false, 'asd',
+            ['var'=>123], // 这是Obj
+        ];
+        foreach ($notArrVals as $notArrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notArrVal) {
+                Validation::validate(['array' => $notArrVal], ['array' => 'ArrLen:999']);
+            }, '必须是数组');
+        }
+
+        // ArrLenGe
+        $arrays = [
+            [],
+            [1, 2, 3],
+            ['abc', '123', 'hello', 'hi'],
+        ];
+        foreach ($arrays as $array) {
+            Validation::validate(['array' => $array], ['array' => 'ArrLenGe:'.count($array)]);
+            Validation::validate(['array' => array_merge($array, ['haha'])], ['array' => 'ArrLenGe:'.count($array)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($array) {
+                Validation::validate(['array' => $array], ['array' => 'ArrLenGe:'.(count($array)+1)]);
+            }, '长度必须大于等于');
+        }
+        $notArrVals = [1, 0, 1.0, 0.0, true, false, 'asd',
+            ['var'=>123], // 这是Obj
+        ];
+        foreach ($notArrVals as $notArrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notArrVal) {
+                Validation::validate(['array' => $notArrVal], ['array' => 'ArrLenGe:999']);
+            }, '必须是数组');
+        }
+
+        // ArrLenLe
+        $arrays = [
+            [],
+            [1, 2, 3],
+            ['abc', '123', 'hello', 'hi'],
+        ];
+        foreach ($arrays as $array) {
+            Validation::validate(['array' => $array], ['array' => 'ArrLenLe:'.count($array)]);
+            Validation::validate(['array' => $array], ['array' => 'ArrLenLe:'.(count($array)+1)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($array) {
+                Validation::validate(['array' => array_merge($array, ['haha'])], ['array' => 'ArrLenLe:'.count($array)]);
+            }, '长度必须小于等于');
+        }
+        $notArrVals = [1, 0, 1.0, 0.0, true, false, 'asd',
+            ['var'=>123], // 这是Obj
+        ];
+        foreach ($notArrVals as $notArrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notArrVal) {
+                Validation::validate(['array' => $notArrVal], ['array' => 'ArrLenLe:999']);
+            }, '必须是数组');
+        }
+
+        // ArrLenGeLe
+        $arrays = [
+            [],
+            [1, 2, 3],
+            ['abc', '123', 'hello', 'hi'],
+        ];
+        foreach ($arrays as $array) {
+            Validation::validate(['array' => $array], ['array' => 'ArrLenGeLe:'.count($array).','.count($array)]);
+            $this->_assertThrowExpectionContainErrorString(function () use ($array) {
+                Validation::validate(['array' => array_merge($array, ['haha'])], ['array' => 'ArrLenGeLe:'.count($array).','.count($array)]);
+            }, '长度必须在');
+        }
+        $notArrVals = [1, 0, 1.0, 0.0, true, false, 'asd',
+            ['var'=>123], // 这是Obj
+        ];
+        foreach ($notArrVals as $notArrVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notArrVal) {
+                Validation::validate(['array' => $notArrVal], ['array' => 'ArrLenGeLe:1,999']);
+            }, '必须是数组');
+        }
     }
 
     public function testValidateObj()
     {
-        $this->assertNotNull(Validation::validateObj([]));
-        $this->assertNotNull(Validation::validateObj(['a' => 1]));
-        $this->_assertThrowExpection(function () {
-            Validation::validateObj(1.23);
-        }, 'line ' . __LINE__ . ": Validation::validateObj(1.23)应该抛出异常");
-        $this->_assertThrowExpection(function () {
-            Validation::validateObj([1, 2, 3]);
-        }, 'line ' . __LINE__ . ": Validation::validateObj([1,2,3])应该抛出异常");
+        // Obj
+        $objs = [
+            [],
+            ['a' => 1],
+            ['abc' => '123', 'hello' => 'hi'],
+        ];
+        foreach ($objs as $obj) {
+            Validation::validate(['obj' => $obj], ['obj' => 'Obj']);
+        }
+        $notObjVals = [1, 0, 1.0, 0.0, true, false, 'asd',
+            [1, 2, 3], // 这是Arr
+        ];
+        foreach ($notObjVals as $notObjVal) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notObjVal) {
+                Validation::validate(['obj' => $notObjVal], ['obj' => 'Obj']);
+            }, '必须是对象');
+        }
     }
 
     public function testValidateFile()
