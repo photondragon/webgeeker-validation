@@ -316,15 +316,14 @@ class ValidationTest extends TestCase
         Validation::validate(['varFloat' => -1.0], ['varFloat' => 'Float']);
         Validation::validate(['varFloat' => 0.0], ['varFloat' => 'Float']);
         Validation::validate(['varFloat' => 1.0], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => -1], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => 0], ['varFloat' => 'Float']);
+        Validation::validate(['varFloat' => 1], ['varFloat' => 'Float']);
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['varFloat' => true], ['varFloat' => 'Float']);
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['varFloat' => []], ['varFloat' => 'Float']);
-        }, '必须是浮点数');
-        $this->_assertThrowExpectionContainErrorString(function () {
-            // 整型不能算字符串（但整型字符串可以视为Float）
-            Validation::validate(['varFloat' => 1], ['varFloat' => 'Float']);
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'Float']);
@@ -338,13 +337,14 @@ class ValidationTest extends TestCase
         Validation::validate(['varFloat' => '1.0'], ['varFloat' => 'FloatGt:0.0']);
         Validation::validate(['varFloat' => 1.0], ['varFloat' => 'FloatGt:0']);
         Validation::validate(['varFloat' => 0.1], ['varFloat' => 'FloatGt:0.0']);
+        Validation::validate(['varFloat' => 1], ['varFloat' => 'FloatGt:0']);
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误1
             Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGt:0.0']);
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误2
-            Validation::validate(['varFloat' => 1], ['varFloat' => 'FloatGt:0']);
+            Validation::validate(['varFloat' => true], ['varFloat' => 'FloatGt:0']);
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGt:0.0']);
@@ -357,9 +357,11 @@ class ValidationTest extends TestCase
         Validation::validate(['varFloat' => '1'], ['varFloat' => 'FloatGe:0.0']);
         Validation::validate(['varFloat' => '1.0'], ['varFloat' => 'FloatGe:0.0']);
         Validation::validate(['varFloat' => 1.0], ['varFloat' => 'FloatGe:0']);
+        Validation::validate(['varFloat' => 1], ['varFloat' => 'FloatGe:0']);
         Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGe:0.0']);
         Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGe:0.0']);
         Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGe:0']);
+        Validation::validate(['varFloat' => 0], ['varFloat' => 'FloatGe:0']);
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误1
             Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGe:0.0']);
@@ -377,6 +379,7 @@ class ValidationTest extends TestCase
 
         // FloatLt
         Validation::validate(['varFloat' => '-1'], ['varFloat' => 'FloatLt:0.0']);
+        Validation::validate(['varFloat' => -1], ['varFloat' => 'FloatLt:0.0']);
         Validation::validate(['varFloat' => '-0.1'], ['varFloat' => 'FloatLt:0.0']);
         Validation::validate(['varFloat' => -0.1], ['varFloat' => 'FloatLt:0']);
         $this->_assertThrowExpectionContainErrorString(function () {
@@ -396,11 +399,13 @@ class ValidationTest extends TestCase
 
         // FloatLe
         Validation::validate(['varFloat' => '-1'], ['varFloat' => 'FloatLe:0.0']);
+        Validation::validate(['varFloat' => -1], ['varFloat' => 'FloatLe:0.0']);
         Validation::validate(['varFloat' => '-0.1'], ['varFloat' => 'FloatLe:0.0']);
         Validation::validate(['varFloat' => -0.1], ['varFloat' => 'FloatLe:0']);
         Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatLe:0.0']);
         Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatLe:0.0']);
         Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatLe:0']);
+        Validation::validate(['varFloat' => 0], ['varFloat' => 'FloatLe:0']);
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误1
             Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatLe:0.0']);
@@ -420,11 +425,14 @@ class ValidationTest extends TestCase
         Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGeLe:0.0,0']);
         Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGeLe:0.0,0']);
         Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGeLe:0,0.0']);
+        Validation::validate(['varFloat' => 0], ['varFloat' => 'FloatGeLe:0,0.0']);
         Validation::validate(['varFloat' => '11'], ['varFloat' => 'FloatGeLe:-100.0,100']);
         Validation::validate(['varFloat' => '11.0'], ['varFloat' => 'FloatGeLe:-100.0,100']);
         Validation::validate(['varFloat' => 11.0], ['varFloat' => 'FloatGeLe:-100,100.0']);
+        Validation::validate(['varFloat' => 11], ['varFloat' => 'FloatGeLe:-100,100.0']);
         Validation::validate(['varFloat' => '0123'], ['varFloat' => 'FloatGeLe:123.0,123']);
         Validation::validate(['varFloat' => '0123.0'], ['varFloat' => 'FloatGeLe:123.0,123']);
+        Validation::validate(['varFloat' => 123], ['varFloat' => 'FloatGeLe:123.0,123']);
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误1
             Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGeLe:0,0.0']);
@@ -444,6 +452,7 @@ class ValidationTest extends TestCase
         Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGtLt:-1.0,1']);
         Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGtLt:-1.0,1']);
         Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGtLt:-1,1.0']);
+        Validation::validate(['varFloat' => 0], ['varFloat' => 'FloatGtLt:-1,1.0']);
         Validation::validate(['varFloat' => '000'], ['varFloat' => 'FloatGtLt:-1.0,1']);
         Validation::validate(['varFloat' => '00.0'], ['varFloat' => 'FloatGtLt:-1.0,1']);
         $this->_assertThrowExpectionContainErrorString(function () {
@@ -452,7 +461,7 @@ class ValidationTest extends TestCase
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误2
-            Validation::validate(['varFloat' => 1], ['varFloat' => 'FloatGtLt:-1.0,1']);
+            Validation::validate(['varFloat' => true], ['varFloat' => 'FloatGtLt:-1.0,1']);
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['varFloat' => '-1'], ['varFloat' => 'FloatGtLt:-1,1.0']);
@@ -465,8 +474,10 @@ class ValidationTest extends TestCase
         Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGtLe:-1.5,1']);
         Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGtLe:-1.5,1']);
         Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGtLe:-1,1.5']);
+        Validation::validate(['varFloat' => 0], ['varFloat' => 'FloatGtLe:-1,1.5']);
         Validation::validate(['varFloat' => '1'], ['varFloat' => 'FloatGtLe:-1.5,1']);
         Validation::validate(['varFloat' => '1.0'], ['varFloat' => 'FloatGtLe:-1.5,1']);
+        Validation::validate(['varFloat' => 1], ['varFloat' => 'FloatGtLe:-1.5,1']);
         Validation::validate(['varFloat' => 1.5], ['varFloat' => 'FloatGtLe:-1,1.5']);
         Validation::validate(['varFloat' => '001'], ['varFloat' => 'FloatGtLe:-1.5,1']);
         Validation::validate(['varFloat' => '00.1'], ['varFloat' => 'FloatGtLe:-1.5,1']);
@@ -489,8 +500,10 @@ class ValidationTest extends TestCase
         Validation::validate(['varFloat' => '0'], ['varFloat' => 'FloatGeLt:-1.5,1']);
         Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGeLt:-1.5,1']);
         Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGeLt:-1,1.5']);
+        Validation::validate(['varFloat' => 0], ['varFloat' => 'FloatGeLt:-1,1.5']);
         Validation::validate(['varFloat' => '-1.5'], ['varFloat' => 'FloatGeLt:-1.5,1']);
         Validation::validate(['varFloat' => -1.0], ['varFloat' => 'FloatGeLt:-1,1.5']);
+        Validation::validate(['varFloat' => -1], ['varFloat' => 'FloatGeLt:-1,1.5']);
         Validation::validate(['varFloat' => '-001'], ['varFloat' => 'FloatGeLt:-1.5,1']);
         Validation::validate(['varFloat' => '-001.5'], ['varFloat' => 'FloatGeLt:-1.5,1']);
         $this->_assertThrowExpectionContainErrorString(function () {
@@ -499,7 +512,7 @@ class ValidationTest extends TestCase
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误2
-            Validation::validate(['varFloat' => -1], ['varFloat' => 'FloatGeLt:-1,1.5']);
+            Validation::validate(['varFloat' => false], ['varFloat' => 'FloatGeLt:-1,1.5']);
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['varFloat' => '-1.6'], ['varFloat' => 'FloatGeLt:-1.5,1']);

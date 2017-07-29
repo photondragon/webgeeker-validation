@@ -436,7 +436,7 @@ class Validation
         if ($type === 'string') {
             if (is_numeric($value))
                 return $value;
-        } elseif ($type === 'double')
+        } elseif ($type === 'double' || $type === 'integer')
             return $value;
 
         if ($reason !== null)
@@ -458,7 +458,7 @@ class Validation
                 $isTypeError = false;
             } else
                 $isTypeError = true;
-        } elseif ($type === 'double') {
+        } elseif ($type === 'double' || $type === 'integer') {
             if ($value > $min)
                 return $value;
             $isTypeError = false;
@@ -490,7 +490,7 @@ class Validation
                 $isTypeError = false;
             } else
                 $isTypeError = true;
-        } elseif ($type === 'double') {
+        } elseif ($type === 'double' || $type === 'integer') {
             if ($value >= $min)
                 return $value;
             $isTypeError = false;
@@ -522,7 +522,7 @@ class Validation
                 $isTypeError = false;
             } else
                 $isTypeError = true;
-        } elseif ($type === 'double') {
+        } elseif ($type === 'double' || $type === 'integer') {
             if ($value < $max)
                 return $value;
             $isTypeError = false;
@@ -554,7 +554,7 @@ class Validation
                 $isTypeError = false;
             } else
                 $isTypeError = true;
-        } elseif ($type === 'double') {
+        } elseif ($type === 'double' || $type === 'integer') {
             if ($value <= $max)
                 return $value;
             $isTypeError = false;
@@ -586,7 +586,7 @@ class Validation
                 $isTypeError = false;
             } else
                 $isTypeError = true;
-        } elseif ($type === 'double') {
+        } elseif ($type === 'double' || $type === 'integer') {
             if ($value > $min && $value < $max)
                 return $value;
             $isTypeError = false;
@@ -619,7 +619,7 @@ class Validation
                 $isTypeError = false;
             } else
                 $isTypeError = true;
-        } elseif ($type === 'double') {
+        } elseif ($type === 'double' || $type === 'integer') {
             if ($value >= $min && $value <= $max)
                 return $value;
             $isTypeError = false;
@@ -652,7 +652,7 @@ class Validation
                 $isTypeError = false;
             } else
                 $isTypeError = true;
-        } elseif ($type === 'double') {
+        } elseif ($type === 'double' || $type === 'integer') {
             if ($value > $min && $value <= $max)
                 return $value;
             $isTypeError = false;
@@ -685,7 +685,7 @@ class Validation
                 $isTypeError = false;
             } else
                 $isTypeError = true;
-        } elseif ($type === 'double') {
+        } elseif ($type === 'double' || $type === 'integer') {
             if ($value >= $min && $value < $max)
                 return $value;
             $isTypeError = false;
