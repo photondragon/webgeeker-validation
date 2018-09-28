@@ -17,6 +17,7 @@ namespace WebGeeker\RestTest;
 
 use PHPUnit\Framework\TestCase;
 use \WebGeeker\Validation\Validation;
+use WebGeeker\ValidationTest\MyValidation;
 
 /**
  * @class ValidationTest
@@ -2840,4 +2841,106 @@ class ValidationTest extends TestCase
         $this->assertNotNull(Validation::validate($params, $validators, true));
     }
 
+    public function testValidateI18n()
+    {
+        // ============================================================
+        // 错误描述信息模版的翻译
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("");
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int", // 没有Alias，不翻译
+            ]);
+        }, '“var”必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("abc"); // 设置了一个无效的lang code，结果就是不翻译
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int",
+            ]);
+        }, '“var”必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw"); // 将翻译为繁体中文
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int",
+            ]);
+        }, '“var”必須是整數');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("en-us"); // 将翻译为英语（美国）
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int",
+            ]);
+        }, 'var must be a integer');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw");// 将翻译为繁体中文
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Arr",  // 但是翻译表中没有提供翻译文本，所以结果是不翻译
+            ]);
+        }, '“var”必须是数组');
+
+        // ============================================================
+        // （由Alias指定的）参数名称的翻译
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("");
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Obj", // 没有Alias，不翻译
+            ]);
+        }, '“var”必须是对象');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("abc"); // 设置了一个无效的lang code，结果就是不翻译
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Obj|Alias:变量",
+            ]);
+        }, '“变量”必须是对象');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw"); // 将翻译为繁体中文
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Obj|Alias:变量",
+            ]);
+        }, '“變量”必须是对象');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("en-us"); // 将翻译为英语（美国）
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Obj|Alias:变量",
+            ]);
+        }, '“variable”必须是对象');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw");// 将翻译为繁体中文
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Obj|Alias:可变量",  // 但是翻译表中没有提供“可变量”的翻译文本，所以结果是不翻译
+            ]);
+        }, '“可变量”必须是对象');
+
+        // ============================================================
+        // （由“>>>”指定的）错误描述的翻译
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("");
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int", // 没有>>>，不翻译
+            ]);
+        }, '“var”必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("abc"); // 设置了一个无效的lang code，结果就是不翻译
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int|>>>:变量必须是整数",
+            ]);
+        }, '变量必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw"); // 将翻译为繁体中文
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int|>>>:变量必须是整数",
+            ]);
+        }, '變量必須是整數');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("en-us"); // 将翻译为英语（美国）
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int|>>>:变量必须是整数",
+            ]);
+        }, 'variable must be an integer');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw");// 将翻译为繁体中文
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "Int|>>>:可变量必须是整数",  // 但是翻译表中没有提供“可变量必须是整数”的翻译文本，所以结果是不翻译
+            ]);
+        }, '可变量必须是整数');
+
+    }
 }

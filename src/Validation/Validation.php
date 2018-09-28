@@ -39,7 +39,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Int'];
+        $error = self::getErrorTemplate('Int');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -66,10 +66,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntEq'];
+            $error = self::getErrorTemplate('IntEq');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalVal, $error);
         }
@@ -98,10 +98,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntGt'];
+            $error = self::getErrorTemplate('IntGt');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
@@ -130,10 +130,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntGe'];
+            $error = self::getErrorTemplate('IntGe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
@@ -162,10 +162,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntLt'];
+            $error = self::getErrorTemplate('IntLt');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
@@ -194,10 +194,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntLe'];
+            $error = self::getErrorTemplate('IntLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
@@ -226,10 +226,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntGtLt'];
+            $error = self::getErrorTemplate('IntGtLt');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -259,10 +259,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntGeLe'];
+            $error = self::getErrorTemplate('IntGeLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -292,10 +292,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntGtLe'];
+            $error = self::getErrorTemplate('IntGtLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -325,10 +325,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntGeLt'];
+            $error = self::getErrorTemplate('IntGeLt');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -372,10 +372,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntIn'];
+            $error = self::getErrorTemplate('IntIn');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         }
@@ -416,10 +416,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Int'];
+            $error = self::getErrorTemplate('Int');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['IntNotIn'];
+            $error = self::getErrorTemplate('IntNotIn');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         }
@@ -442,7 +442,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Float'];
+        $error = self::getErrorTemplate('Float');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -469,10 +469,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Float'];
+            $error = self::getErrorTemplate('Float');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['FloatGt'];
+            $error = self::getErrorTemplate('FloatGt');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
@@ -501,10 +501,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Float'];
+            $error = self::getErrorTemplate('Float');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['FloatGe'];
+            $error = self::getErrorTemplate('FloatGe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
@@ -533,10 +533,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Float'];
+            $error = self::getErrorTemplate('Float');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['FloatLt'];
+            $error = self::getErrorTemplate('FloatLt');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
@@ -565,10 +565,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Float'];
+            $error = self::getErrorTemplate('Float');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['FloatLe'];
+            $error = self::getErrorTemplate('FloatLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
@@ -597,10 +597,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Float'];
+            $error = self::getErrorTemplate('Float');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['FloatGtLt'];
+            $error = self::getErrorTemplate('FloatGtLt');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -630,10 +630,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Float'];
+            $error = self::getErrorTemplate('Float');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['FloatGeLe'];
+            $error = self::getErrorTemplate('FloatGeLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -663,10 +663,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Float'];
+            $error = self::getErrorTemplate('Float');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['FloatGtLe'];
+            $error = self::getErrorTemplate('FloatGtLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -696,10 +696,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Float'];
+            $error = self::getErrorTemplate('Float');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['FloatGeLt'];
+            $error = self::getErrorTemplate('FloatGeLt');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -724,7 +724,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Bool'];
+        $error = self::getErrorTemplate('Bool');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -745,7 +745,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['BoolSmart'];
+        $error = self::getErrorTemplate('BoolSmart');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -763,7 +763,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Str'];
+        $error = self::getErrorTemplate('Str');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -790,10 +790,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['StrEq'];
+            $error = self::getErrorTemplate('StrEq');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalsValue, $error);
         }
@@ -822,10 +822,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['StrNe'];
+            $error = self::getErrorTemplate('StrNe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalsValue, $error);
         }
@@ -857,14 +857,14 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else if (count($valueList) === 1) {
-            $error = self::$errorTemplates['StrEq'];
+            $error = self::getErrorTemplate('StrEq');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $valueList[0], $error);
         } else {
-            $error = self::$errorTemplates['StrIn'];
+            $error = self::getErrorTemplate('StrIn');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
         }
@@ -897,14 +897,14 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else if (count($valueList) === 1) {
-            $error = self::$errorTemplates['StrNe'];
+            $error = self::getErrorTemplate('StrNe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $valueList[0], $error);
         } else {
-            $error = self::$errorTemplates['StrNotIn'];
+            $error = self::getErrorTemplate('StrNotIn');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
         }
@@ -933,10 +933,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['StrEqI'];
+            $error = self::getErrorTemplate('StrEqI');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalsValue, $error);
         }
@@ -965,10 +965,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['StrNeI'];
+            $error = self::getErrorTemplate('StrNeI');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalsValue, $error);
         }
@@ -1003,14 +1003,14 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else if (count($valueList) === 1) {
-            $error = self::$errorTemplates['StrEqI'];
+            $error = self::getErrorTemplate('StrEqI');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $valueList[0], $error);
         } else {
-            $error = self::$errorTemplates['StrInI'];
+            $error = self::getErrorTemplate('StrInI');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
         }
@@ -1049,14 +1049,14 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else if (count($valueList) === 1) {
-            $error = self::$errorTemplates['StrNeI'];
+            $error = self::getErrorTemplate('StrNeI');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $valueList[0], $error);
         } else {
-            $error = self::$errorTemplates['StrNotInI'];
+            $error = self::getErrorTemplate('StrNotInI');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
         }
@@ -1076,10 +1076,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['StrLen'];
+            $error = self::getErrorTemplate('StrLen');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{length}}', $length, $error);
         }
@@ -1099,10 +1099,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['StrLenGe'];
+            $error = self::getErrorTemplate('StrLenGe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
@@ -1122,10 +1122,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['StrLenLe'];
+            $error = self::getErrorTemplate('StrLenLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
@@ -1149,10 +1149,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['StrLenGeLe'];
+            $error = self::getErrorTemplate('StrLenGeLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -1173,10 +1173,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['ByteLen'];
+            $error = self::getErrorTemplate('ByteLen');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{length}}', $length, $error);
         }
@@ -1196,10 +1196,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['ByteLenGe'];
+            $error = self::getErrorTemplate('ByteLenGe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
@@ -1219,10 +1219,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['ByteLenLe'];
+            $error = self::getErrorTemplate('ByteLenLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
@@ -1246,10 +1246,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['ByteLenGeLe'];
+            $error = self::getErrorTemplate('ByteLenGeLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -1278,10 +1278,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Letters'];
+            $error = self::getErrorTemplate('Letters');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1309,10 +1309,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Alphabet'];
+            $error = self::getErrorTemplate('Alphabet');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1339,10 +1339,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Numbers'];
+            $error = self::getErrorTemplate('Numbers');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1370,10 +1370,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Digits'];
+            $error = self::getErrorTemplate('Digits');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1400,10 +1400,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['LettersNumbers'];
+            $error = self::getErrorTemplate('LettersNumbers');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1444,10 +1444,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Numeric'];
+            $error = self::getErrorTemplate('Numeric');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1474,10 +1474,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['VarName'];
+            $error = self::getErrorTemplate('VarName');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1496,10 +1496,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Email'];
+            $error = self::getErrorTemplate('Email');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1518,10 +1518,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Url'];
+            $error = self::getErrorTemplate('Url');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1540,10 +1540,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Ip'];
+            $error = self::getErrorTemplate('Ip');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1562,10 +1562,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Mac'];
+            $error = self::getErrorTemplate('Mac');
             $error = str_replace('{{param}}', $alias, $error);
         }
         throw new \Exception($error);
@@ -1599,10 +1599,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Str'];
+            $error = self::getErrorTemplate('Str');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['Regexp'];
+            $error = self::getErrorTemplate('Regexp');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{regexp}}', $regexp, $error);
         }
@@ -1630,7 +1630,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Arr'];
+        $error = self::getErrorTemplate('Arr');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -1658,10 +1658,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Arr'];
+            $error = self::getErrorTemplate('Arr');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['ArrLen'];
+            $error = self::getErrorTemplate('ArrLen');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{length}}', $length, $error);
         }
@@ -1691,10 +1691,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Arr'];
+            $error = self::getErrorTemplate('Arr');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['ArrLenGe'];
+            $error = self::getErrorTemplate('ArrLenGe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
@@ -1724,10 +1724,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Arr'];
+            $error = self::getErrorTemplate('Arr');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['ArrLenLe'];
+            $error = self::getErrorTemplate('ArrLenLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
@@ -1758,10 +1758,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isTypeError) {
-            $error = self::$errorTemplates['Arr'];
+            $error = self::getErrorTemplate('Arr');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['ArrLenGeLe'];
+            $error = self::getErrorTemplate('ArrLenGeLe');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
@@ -1797,7 +1797,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Obj'];
+        $error = self::getErrorTemplate('Obj');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -1843,7 +1843,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['File'];
+        $error = self::getErrorTemplate('File');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -1889,7 +1889,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FileImage'];
+        $error = self::getErrorTemplate('FileImage');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -1935,7 +1935,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FileVideo'];
+        $error = self::getErrorTemplate('FileVideo');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -1981,7 +1981,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['FileAudio'];
+        $error = self::getErrorTemplate('FileAudio');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -2050,7 +2050,7 @@ class Validation
         if (strlen($originMimesString) === 0)
             $originMimesString = implode(',', $mimes);
 
-        $error = self::$errorTemplates['FileMimes'];
+        $error = self::getErrorTemplate('FileMimes');
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{mimes}}', $originMimesString, $error);
         throw new \Exception($error);
@@ -2101,7 +2101,7 @@ class Validation
         if (strlen($originSizeString) === 0)
             $originSizeString = (string)$maxSize;
 
-        $error = self::$errorTemplates['FileMaxSize'];
+        $error = self::getErrorTemplate('FileMaxSize');
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{size}}', $originSizeString, $error);
         throw new \Exception($error);
@@ -2152,7 +2152,7 @@ class Validation
         if (strlen($originSizeString) === 0)
             $originSizeString = (string)$minSize;
 
-        $error = self::$errorTemplates['FileMinSize'];
+        $error = self::getErrorTemplate('FileMinSize');
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{size}}', $originSizeString, $error);
         throw new \Exception($error);
@@ -2173,7 +2173,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['Date'];
+        $error = self::getErrorTemplate('Date');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -2201,10 +2201,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isFormatError) {
-            $error = self::$errorTemplates['Date'];
+            $error = self::getErrorTemplate('Date');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['DateFrom'];
+            $error = self::getErrorTemplate('DateFrom');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{from}}', date('Y-m-d', $fromTimestamp), $error);
         }
@@ -2234,10 +2234,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isFormatError) {
-            $error = self::$errorTemplates['Date'];
+            $error = self::getErrorTemplate('Date');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['DateTo'];
+            $error = self::getErrorTemplate('DateTo');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{to}}', date('Y-m-d', $toTimestamp), $error);
         }
@@ -2267,10 +2267,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isFormatError) {
-            $error = self::$errorTemplates['Date'];
+            $error = self::getErrorTemplate('Date');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['DateFromTo'];
+            $error = self::getErrorTemplate('DateFromTo');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{from}}', date('Y-m-d', $fromTimestamp), $error);
             $error = str_replace('{{to}}', date('Y-m-d', $toTimestamp), $error);
@@ -2289,7 +2289,7 @@ class Validation
         if ($reason !== null)
             throw new \Exception($reason);
 
-        $error = self::$errorTemplates['DateTime'];
+        $error = self::getErrorTemplate('DateTime');
         $error = str_replace('{{param}}', $alias, $error);
         throw new \Exception($error);
     }
@@ -2317,10 +2317,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isFormatError) {
-            $error = self::$errorTemplates['DateTime'];
+            $error = self::getErrorTemplate('DateTime');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['DateTimeFrom'];
+            $error = self::getErrorTemplate('DateTimeFrom');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{from}}', date('Y-m-d H:i:s', $fromTimestamp), $error);
         }
@@ -2350,10 +2350,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isFormatError) {
-            $error = self::$errorTemplates['DateTime'];
+            $error = self::getErrorTemplate('DateTime');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['DateTimeTo'];
+            $error = self::getErrorTemplate('DateTimeTo');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{to}}', date('Y-m-d H:i:s', $toTimestamp), $error);
         }
@@ -2383,10 +2383,10 @@ class Validation
             throw new \Exception($reason);
 
         if ($isFormatError) {
-            $error = self::$errorTemplates['DateTime'];
+            $error = self::getErrorTemplate('DateTime');
             $error = str_replace('{{param}}', $alias, $error);
         } else {
-            $error = self::$errorTemplates['DateTimeFromTo'];
+            $error = self::getErrorTemplate('DateTimeFromTo');
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{from}}', date('Y-m-d H:i:s', $fromTimestamp), $error);
             $error = str_replace('{{to}}', date('Y-m-d H:i:s', $toTimestamp), $error);
@@ -2586,12 +2586,62 @@ class Validation
 
     //endregion
 
+    // 当前语言代码
+    static protected $langCode = '';
+
+    /**
+     * 设置当前语言代码。默认lang code是空串""（无效的）
+     * @param $langCode string 语言代码
+     */
+    static public function setLangCode($langCode)
+    {
+        if (is_string($langCode))
+            self::$langCode = $langCode;
+    }
+
+    // “错误提示信息模版”翻译对照表
+    protected static $langCodeToErrorTemplates = [
+//        'en-us' => [],
+    ];
+
+    private static function getErrorTemplate($validator)
+    {
+        $template = self::$errorTemplates[$validator];
+        if (isset(static::$langCodeToErrorTemplates[self::$langCode])) {
+            $templates = static::$langCodeToErrorTemplates[self::$langCode];
+            if (is_array($templates) && isset($templates[$template])) {
+                $newTemplate = $templates[$template];
+                if (is_string($newTemplate) && strlen($newTemplate))
+                    return $newTemplate;
+            }
+        }
+        return $template;
+    }
+
+    // 文本翻译对照表
+    protected static $langCodeToTranslations = [
+//        "en-us" => [],
+    ];
+
+    private static function translateText($text)
+    {
+        if (isset(static::$langCodeToTranslations[self::$langCode])) {
+            $translations = static::$langCodeToTranslations[self::$langCode];
+            if (is_array($translations) && isset($translations[$text])) {
+                $newText = $translations[$text];
+                if (is_string($newText) && strlen($newText))
+                    return $newText;
+            }
+        }
+        return $text;
+    }
+
     /**
      * @var array 验证失败时的错误提示信息的模板
      *
      * 输入值一般为字符串
      */
-    static protected $errorTemplates = [
+    static private $errorTemplates = [
         // 整型（不提供length检测,因为负数的符号位会让人混乱, 可以用大于小于比较来做到这一点）
         'Int' => '“{{param}}”必须是整数',
         'IntEq' => '“{{param}}”必须等于 {{value}}',
@@ -2631,7 +2681,7 @@ class Validation
         'StrInI' => '“{{param}}”只能取这些值: {{valueList}}（忽略大小写）',
         'StrNotIn' => '“{{param}}”不能取这些值: {{valueList}}',
         'StrNotInI' => '“{{param}}”不能取这些值: {{valueList}}（忽略大小写）',
-        // todo StrSame:var 检测某个参数是否等于别一个参数, 比如password2要等于password
+        // todo StrSame:var 检测某个参数是否等于另一个参数, 比如password2要等于password
         'StrLen' => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
         'StrLenGe' => '“{{param}}”长度必须大于等于 {{min}}',
         'StrLenLe' => '“{{param}}”长度必须小于等于 {{max}}',
@@ -3139,11 +3189,12 @@ class Validation
                             for (; $i < $segCount; $i++) {
                                 $customReason .= '|' . $segments[$i];
                             }
+                            $customReason = static::translateText($customReason);
                             $validator = null;
                             break;
                         case 'Alias':
                             if (strlen($p))
-                                $alias = $p;
+                                $alias = static::translateText($p);
                             $validator = null;
                             break;
                         default:
@@ -3602,7 +3653,7 @@ class Validation
                         $params[] = $validatorUnit[$j];
                     }
 
-                    $value = call_user_func_array([self::class, $method], $params);
+                    $value = call_user_func_array([static::class, $method], $params);
                 }
 
                 $success++;
@@ -3799,9 +3850,9 @@ class Validation
                         $prefix .= ".$key";
                 }
 
-                if (array_key_exists($prefix, $cachedKeyValues)) {
-                    echo "\n命中: key=$prefix" . ", value=" . $cachedKeyValues[$prefix] . "\n";
-                }
+//                if (array_key_exists($prefix, $cachedKeyValues)) {
+//                    echo "\n命中: key=$prefix" . ", value=" . $cachedKeyValues[$prefix] . "\n";
+//                }
             }
         }
 
@@ -3811,7 +3862,7 @@ class Validation
 
             $key = $keys[$n];
             if ($key === '*') {
-                Validation::validateArr($siblings, null, $keyPrefix);
+                self::validateArr($siblings, null, $keyPrefix);
                 $c = count($siblings);
                 if ($c > 0) {
                     $subKeys = array_slice($keys, $n + 1);
@@ -3847,9 +3898,9 @@ class Validation
                     $value = null; // 这里是针对$value==[]这种情况的特殊处理
             } else {
                 if (is_integer($key))
-                    Validation::validateArr($siblings, null, $keyPrefix);
+                    self::validateArr($siblings, null, $keyPrefix);
                 else
-                    Validation::validateObj($siblings, null, $keyPrefix);
+                    self::validateObj($siblings, null, $keyPrefix);
                 $value = @$siblings[$key];
             }
 
@@ -3936,7 +3987,7 @@ class Validation
 
             $key = $keys[$n];
             if ($key === '*') {
-                Validation::validateArr($siblings, null, $keyPrefix);
+                self::validateArr($siblings, null, $keyPrefix);
                 $c = count($siblings);
                 if ($c > 0) {
                     $subKeys = array_slice($keys, $n + 1);
@@ -3947,7 +3998,7 @@ class Validation
                         if ($subKeysCount)
                             self::_validate($element, $subKeys, $subKeysCount, $validator, $keyPath, $ignoreRequired, $cachedKeyValues);
                         else {
-                            Validation::validateValue($element, $validator, $keyPath, $ignoreRequired, $params, $siblings);
+                            self::validateValue($element, $validator, $keyPath, $ignoreRequired, $params, $siblings);
 
                             // 缓存数组本身的没什么用, 因为提取不到.
                             if ($cachedKeyValues !== null && $keyPrefix) {
@@ -3961,9 +4012,9 @@ class Validation
                     $value = null; // 这里是针对$value==[]这种情况的特殊处理
             } else {
                 if (is_integer($key))
-                    Validation::validateArr($siblings, null, $keyPrefix);
+                    self::validateArr($siblings, null, $keyPrefix);
                 else
-                    Validation::validateObj($siblings, null, $keyPrefix);
+                    self::validateObj($siblings, null, $keyPrefix);
                 $value = @$siblings[$key];
             }
 
@@ -3981,7 +4032,7 @@ class Validation
 
         // 到这里$n表示当前的$value是第几层
         if ($n == $keysCount) {
-            Validation::validateValue($value, $validator, $keyPath, $ignoreRequired, $params, $siblings);
+            self::validateValue($value, $validator, $keyPath, $ignoreRequired, $params, $siblings);
         } else {
             if ($cachedKeyValues !== null) {
                 for (; $n < $keysCount; $n++) {
