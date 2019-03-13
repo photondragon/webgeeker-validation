@@ -1,8 +1,8 @@
 # WebGeeker-Validation: 一个强大的参数验证工具(PHP)
 
-主要用于对API请求的参数取值进行合法性验证。
+主要用于对API请求的参数取值进行合法性检查。
 
-在实现服务端的API接口时，对于每一个接口的每一个参数，都应该验证其取值是否合法，以免错误的数据输入到系统中。这个工作可以说是费时费力，但又不得不做。本工具就是针对这个工作而设计的，能够有效地减少编码量，代码可读性好。
+在实现服务端的API接口时，对于每一个接口的每一个参数，都应该检测其取值是否合法，以免错误的数据输入到系统中。这个工作可以说是费时费力，但又不得不做。本工具就是针对这个工作而设计的，能够有效地减少编码量，代码可读性好。
 
 看看下面这段代码，可以对用法有个大概印象，应该不难看懂：
 ```php
@@ -15,7 +15,7 @@ Validation::validate($params, [
 ]);
 ```
 
-支持多种数据类型的验证：整型、浮点型、bool型、字符串、数组、对象、文件、日期时间，能够验证嵌套的数据结构中的参数，还支持带条件判断的验证。
+支持多种数据类型的校验：整型、浮点型、bool型、字符串、数组、对象、文件、日期时间，能够验证嵌套的数据结构中的参数，还支持带条件判断的验证。
 
 - 目录
   * [1 简介](#1-%E7%AE%80%E4%BB%8B)
@@ -43,6 +43,7 @@ Validation::validate($params, [
     + [4.13 关于基本数据类型与字符串的关系](#413-%E5%85%B3%E4%BA%8E%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%85%B3%E7%B3%BB)
     + [4.14 自定义错误信息输出文本](#414-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%94%99%E8%AF%AF%E4%BF%A1%E6%81%AF%E8%BE%93%E5%87%BA%E6%96%87%E6%9C%AC)
     + [4.15 国际化](#415-%E5%9B%BD%E9%99%85%E5%8C%96)
+    + [4.16 国际化（0.4版之前）](#416-%E5%9B%BD%E9%99%85%E5%8C%9604%E7%89%88%E4%B9%8B%E5%89%8D)
   * [A 附录 - 验证器列表](#a-%E9%99%84%E5%BD%95---%E9%AA%8C%E8%AF%81%E5%99%A8%E5%88%97%E8%A1%A8)
     + [A.1 整型](#a1-%E6%95%B4%E5%9E%8B)
     + [A.2 浮点型](#a2-%E6%B5%AE%E7%82%B9%E5%9E%8B)
@@ -74,6 +75,7 @@ Validation::validate($params, [
 1. 理论上能够支持验证无限嵌套的参数
 1. 易学易记。比如整型验证器都是以"Int"开头，浮点型验证器都是以"Float"开头，等等。唯一不符合这一规则的是字符串型验证器，它们一部分以"Str"开头的，但也有一部分不以"Str"开头，比如`Regexp`, `Ip`, `Email`, `Url`等。
 1. 不绑定任何一个框架，无任何依赖。你可以在任何一个框架中使用这个工具，就算你不使用框架，也可以使用本工具。
+1. 每个功能特性都有对应的单元测试
 
 ### 1.3 一个简单示例
 
@@ -122,7 +124,7 @@ composer require webgeeker/validation:^0.3
 
 ### 3.1 一个完整的示例（不使用任何框架）
 
-这个例子直接验证`$_GET`中的参数，展示了最基本的用法
+这个例子直接验证`$_POST`（POST表单）中的参数，展示了最基本的用法
 
 ```php
 <?php
@@ -131,7 +133,7 @@ include "vendor/autoload.php";
 use WebGeeker\Validation\Validation;
 
 try {
-    Validation::validate($_GET, [
+    Validation::validate($_POST, [
         "offset" => "IntGe:0", // 参数offset应该大于等于0
         "count" => "Required|IntGeLe:1,200", // 参数count是必需的且大于等于1小于等于200
     ]);
@@ -425,6 +427,71 @@ Validation::validate($params, [
 
 ### 4.15 国际化
 
+从0.4版开始：
+* 使用新的静态成员变量 `$langCode2ErrorTemplates` 来进行“错误提示信息模版”的翻译，主要目的是简化格式（感谢 @gitHusband 的建议）。
+* 旧的翻译表 `$langCodeToErrorTemplates` 仍然有效，已有代码无需修改（参考下一节）。如果新旧翻译表同时提供，优先新的，新表中查不到再使用旧的。
+
+要支持国际化，需要自定义一个类，继承`\WebGeeker\Validation\Validation`，重载两个静态成员变量：
+* `$langCode2ErrorTemplates`用于提供“错误提示信息模版”的翻译对照表。完整的错误提示信息模版列表可以在`\WebGeeker\Validation\Validation::$errorTemplates`成员变量中找到
+* `$langCodeToTranslations`用于提供“自定义参数名称”（由`Alias`指定）和“自定义错误描述文本”（由`>>>`指定）的翻译对照表。
+
+下面提供一个示例类：
+```php
+class MyValidation extends Validation
+{
+    // “错误提示信息模版”翻译对照表
+    protected static $langCodeToErrorTemplates = [
+        "zh-tw" => [
+            'Int' => '“{{param}}”必須是整數', // 🌝
+            'IntGt' => '“{{param}}”必須大於 {{min}}',
+            'Str' => '“{{param}}”必須是字符串',
+        ],
+        "en-us" => [
+            'Int' => '{{param}} must be an integer',
+            'IntGt' => '{{param}} must be greater than {{min}}',
+            'Str' => '{{param}} must be a string',
+        ],
+    ];
+
+    // 文本翻译对照表
+    protected static $langCodeToTranslations = [
+        "zh-tw" => [
+            "变量" => "變量", // 🌙
+            "变量必须是整数" => "變量必須是整數", // ⭐
+        ],
+        "en-us" => [
+            "变量" => "variable",
+            "变量必须是整数" => "variable must be an integer",
+        ],
+    ];
+}
+```
+注意：
+* 语言代码是区分大小写的，建议全部用小写，如"zh-cn", "en-us"等。
+* 语言代码的名称是自定义的，你可以随便起名，比如"abc"（建议使用标准的语言代码）。
+
+使用这个`MyValidation`类来进行验证，就可以实现文本的翻译了。
+```php
+MyValidation::setLangCode("zh-tw"); // 设置语言代码
+
+MyValidation::validate(["var" => 1.0], [
+    "var" => "Int", // 既没有Alias，也没有>>>，只会翻译错误提示信息模版（对应🌝那行）
+]); // 会抛出异常：“var”必須是整數
+
+MyValidation::validate(["var" => 1.0], [
+    "var" => "Int|Alias:变量", // 有Alias，除了翻译错误提示信息模版外，还会翻译参数名称（对应🌙那行）
+]); // 会抛出异常：“變量”必須是整數
+
+MyValidation::validate(["var" => 1.0], [
+    "var" => "Int|>>>:变量必须是整数", // 有>>>，会翻译自定义错误描述文本（对应⭐那行）
+]); // 会抛出异常：變量必須是整數
+```
+如果提供了错误的语言代码，或者没有找到翻译的文本，那么就不翻译，输出原始的文本。
+
+### 4.16 国际化（0.4版之前）
+
+*（如何你使用的是0.4及之后的版本，建议使用新的国际化方案（参考上一节），更简洁一点）*。
+
 要支持国际化，需要自定义一个类，继承`\WebGeeker\Validation\Validation`，重载两个静态成员变量：
 * `$langCodeToErrorTemplates`用于提供“错误提示信息模版”的翻译对照表。完整的错误提示信息模版列表可以在`\WebGeeker\Validation\Validation::$errorTemplates`成员变量中找到
 * `$langCodeToTranslations`用于提供“自定义参数名称”（由`Alias`指定）和“自定义错误描述文本”（由`>>>`指定）的翻译对照表。
@@ -458,18 +525,20 @@ class MyValidation extends Validation
     ];
 }
 ```
-注意：语言代码是区分大小写的，建议全部用小写，如"zh-cn", "en-us"等。
+注意：
+* 语言代码是区分大小写的，建议全部用小写，如"zh-cn", "en-us"等。
+* 语言代码的名称是自定义的，你可以随便起名，比如"abc"（建议使用标准的语言代码）。
 
 使用这个`MyValidation`类来进行验证，就可以实现文本的翻译了。
 ```php
 MyValidation::setLangCode("zh-tw"); // 设置语言代码
 
 MyValidation::validate(["var" => 1.0], [
-    "var" => "Int", // 既没有Alias，也没有>>>，只会翻译错误提示信息模版
+    "var" => "Int", // 既没有Alias，也没有>>>，只会翻译错误提示信息模版（对应🌝那行）
 ]); // 会抛出异常：“var”必須是整數
 
 MyValidation::validate(["var" => 1.0], [
-    "var" => "Int|Alias:变量", // 有Alias，除了翻译错误提示信息模版外（对应🌝那行），还会翻译参数名称（对应🌙那行）
+    "var" => "Int|Alias:变量", // 有Alias，除了翻译错误提示信息模版外，还会翻译参数名称（对应🌙那行）
 ]); // 会抛出异常：“變量”必須是整數
 
 MyValidation::validate(["var" => 1.0], [

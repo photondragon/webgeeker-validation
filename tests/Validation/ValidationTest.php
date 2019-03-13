@@ -18,6 +18,7 @@ namespace WebGeeker\RestTest;
 use PHPUnit\Framework\TestCase;
 use \WebGeeker\Validation\Validation;
 use WebGeeker\ValidationTest\MyValidation;
+use WebGeeker\ValidationTest\MyValidation2;
 
 /**
  * @class ValidationTest
@@ -2844,7 +2845,7 @@ class ValidationTest extends TestCase
     public function testValidateI18n()
     {
         // ============================================================
-        // 错误描述信息模版的翻译
+        // 旧的“错误描述信息模版”的翻译
         $this->_assertThrowExpectionContainErrorString(function () {
             MyValidation::setLangCode("");
             MyValidation::validate(["var" => 1.0], [
@@ -2872,6 +2873,39 @@ class ValidationTest extends TestCase
         $this->_assertThrowExpectionContainErrorString(function () {
             MyValidation::setLangCode("zh-tw");// 将翻译为繁体中文
             MyValidation::validate(["var" => 1.0], [
+                "var" => "Arr",  // 但是翻译表中没有提供翻译文本，所以结果是不翻译
+            ]);
+        }, '“var”必须是数组');
+
+        // ============================================================
+        // 新的“错误描述信息模版”的翻译
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("");
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "Int", // 没有Alias，不翻译
+            ]);
+        }, '“var”必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("abc"); // 设置了一个无效的lang code，结果就是不翻译
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "Int",
+            ]);
+        }, '“var”必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("zh-tw"); // 将翻译为繁体中文
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "Int",
+            ]);
+        }, '“var”必須是整數');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("en-us"); // 将翻译为英语（美国）
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "Int",
+            ]);
+        }, 'var must be an integer');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("zh-tw");// 将翻译为繁体中文
+            MyValidation2::validate(["var" => 1.0], [
                 "var" => "Arr",  // 但是翻译表中没有提供翻译文本，所以结果是不翻译
             ]);
         }, '“var”必须是数组');

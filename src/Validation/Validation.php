@@ -2599,13 +2599,48 @@ class Validation
             self::$langCode = $langCode;
     }
 
-    // “错误提示信息模版”翻译对照表
+    /**
+     * @var array “错误提示信息模版”翻译对照表
+     * @deprecated 0.4 从0.4版开始，
+     *     使用新的翻译表 static::$langCode2ErrorTemplates, 格式简化了。
+     *     旧的翻译表 static::$langCodeToErrorTemplates 仍然有效。
+     *     如果新旧翻译表同时提供，优先新的，新表中查不到再使用旧的。
+     */
     protected static $langCodeToErrorTemplates = [
 //        'en-us' => [],
     ];
 
+    /**
+     * @var array “错误提示信息模版”翻译对照表。
+     * 完整的“错误提示信息模版”可在成员变量 $errorTemplates 中找到
+     * 从0.4版开始，使用新的翻译表取代旧的, 简化了格式。
+     * 旧的翻译表 static::$langCodeToErrorTemplates 仍然有效。
+     * 如果新旧翻译表同时提供，优先新的，新表中查不到再使用旧的。
+     */
+    protected static $langCode2ErrorTemplates = [
+//        "zh-tw" => [
+//            'Int' => '“{{param}}”必須是整數',
+//            'IntGt' => '“{{param}}”必須大於 {{min}}',
+//            'Str' => '“{{param}}”必須是字符串',
+//        ],
+//        "en-us" => [
+//            'Int' => '{{param}} must be an integer',
+//            'IntGt' => '{{param}} must be greater than {{min}}',
+//            'Str' => '{{param}} must be a string',
+//        ],
+    ];
+
     private static function getErrorTemplate($validator)
     {
+        if (isset(static::$langCode2ErrorTemplates[self::$langCode])) {
+            $errorTemplates = static::$langCode2ErrorTemplates[self::$langCode];
+            if (is_array($errorTemplates) && isset($errorTemplates[$validator])) {
+                $errorTemplate = $errorTemplates[$validator];
+                if (is_string($errorTemplate) && strlen($errorTemplate))
+                    return $errorTemplate;
+            }
+        }
+
         $template = self::$errorTemplates[$validator];
         if (isset(static::$langCodeToErrorTemplates[self::$langCode])) {
             $templates = static::$langCodeToErrorTemplates[self::$langCode];
