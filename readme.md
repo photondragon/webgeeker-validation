@@ -490,7 +490,7 @@ MyValidation::validate(["var" => 1.0], [
 
 ### 4.16 国际化（0.4版之前）
 
-*（如何你使用的是0.4及之后的版本，建议使用新的国际化方案（参考上一节），更简洁一点）*。
+*（如果你使用的是0.4及之后的版本，建议使用新的国际化方案（参考上一节），更简洁一点）*。
 
 要支持国际化，需要自定义一个类，继承`\WebGeeker\Validation\Validation`，重载两个静态成员变量：
 * `$langCodeToErrorTemplates`用于提供“错误提示信息模版”的翻译对照表。完整的错误提示信息模版列表可以在`\WebGeeker\Validation\Validation::$errorTemplates`成员变量中找到
