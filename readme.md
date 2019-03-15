@@ -95,7 +95,7 @@ $validations = [
     ],
     "search.keyword" => "StrLenGeLe:1,100", // search.keyword 应该是一个长度在[1, 100]之间的字符串
     "search.start_time" => "Date", // search.start_time 应该是一个包含合法日期的字符串
-    "search.end_time" => "BoolSmart", // search.end_time 应该是一个包含合法日期的字符串
+    "search.end_time" => "Date", // search.end_time 应该是一个包含合法日期的字符串
 ];
 
 // 待验证参数
