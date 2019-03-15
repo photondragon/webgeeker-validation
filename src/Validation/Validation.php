@@ -37,11 +37,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('Int');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntEq($value, $equalVal, $reason = null, $alias = 'Parameter')
@@ -63,7 +63,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -73,7 +73,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalVal, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntGt($value, $min, $reason = null, $alias = 'Parameter')
@@ -95,7 +95,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -105,7 +105,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntGe($value, $min, $reason = null, $alias = 'Parameter')
@@ -127,7 +127,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -137,7 +137,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntLt($value, $max, $reason = null, $alias = 'Parameter')
@@ -159,7 +159,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -169,7 +169,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntLe($value, $max, $reason = null, $alias = 'Parameter')
@@ -191,7 +191,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -201,7 +201,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntGtLt($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -223,7 +223,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -234,7 +234,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -256,7 +256,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -267,7 +267,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntGtLe($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -289,7 +289,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -300,7 +300,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIntGeLt($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -322,7 +322,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -333,7 +333,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -345,12 +345,12 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return string
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateIntIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(IntIn:)格式错误, 必须提供可取值的列表");
+            throw new ValidationException("“${alias}”参数的验证模版(IntIn:)格式错误, 必须提供可取值的列表");
 
         $type = gettype($value);
         if ($type === 'string') {
@@ -369,7 +369,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -379,7 +379,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -389,12 +389,12 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateIntNotIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(IntNotIn:)格式错误, 必须提供可取值的列表");
+            throw new ValidationException("“${alias}”参数的验证模版(IntNotIn:)格式错误, 必须提供可取值的列表");
 
         $type = gettype($value);
         if ($type === 'string') {
@@ -413,7 +413,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Int');
@@ -423,7 +423,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', implode(', ', $valueList), $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     //endregion
@@ -440,11 +440,11 @@ class Validation
             return $value;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('Float');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFloatGt($value, $min, $reason = null, $alias = 'Parameter')
@@ -466,7 +466,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Float');
@@ -476,7 +476,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFloatGe($value, $min, $reason = null, $alias = 'Parameter')
@@ -498,7 +498,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Float');
@@ -508,7 +508,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFloatLt($value, $max, $reason = null, $alias = 'Parameter')
@@ -530,7 +530,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Float');
@@ -540,7 +540,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFloatLe($value, $max, $reason = null, $alias = 'Parameter')
@@ -562,7 +562,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Float');
@@ -572,7 +572,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFloatGtLt($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -594,7 +594,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Float');
@@ -605,7 +605,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFloatGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -627,7 +627,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Float');
@@ -638,7 +638,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFloatGtLe($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -660,7 +660,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Float');
@@ -671,7 +671,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFloatGeLt($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -693,7 +693,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Float');
@@ -704,7 +704,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     //endregion
@@ -722,11 +722,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('Bool');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateBoolSmart($value, $reason = null, $alias = 'Parameter')
@@ -743,11 +743,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('BoolSmart');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     //endregion
@@ -761,11 +761,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('Str');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -775,7 +775,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateStrEq($value, $equalsValue, $reason = null, $alias = 'Parameter')
     {
@@ -787,7 +787,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -797,7 +797,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalsValue, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -807,7 +807,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateStrNe($value, $equalsValue, $reason = null, $alias = 'Parameter')
     {
@@ -819,7 +819,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -829,7 +829,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalsValue, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -839,12 +839,12 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return string
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateStrIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrIn:)格式错误, 必须提供可取值的列表");
+            throw new ValidationException("“${alias}”参数的验证模版(StrIn:)格式错误, 必须提供可取值的列表");
 
         if (is_string($value)) {
             if (in_array($value, $valueList, true))
@@ -854,7 +854,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -869,7 +869,7 @@ class Validation
             $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
         }
 
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -879,12 +879,12 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateStrNotIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrNotIn:)格式错误, 必须提供不可取的值的列表");
+            throw new ValidationException("“${alias}”参数的验证模版(StrNotIn:)格式错误, 必须提供不可取的值的列表");
 
         if (is_string($value)) {
             if (!in_array($value, $valueList, true))
@@ -894,7 +894,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -908,7 +908,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -918,7 +918,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateStrEqI($value, $equalsValue, $reason = null, $alias = 'Parameter')
     {
@@ -930,7 +930,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -940,7 +940,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalsValue, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -950,7 +950,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateStrNeI($value, $equalsValue, $reason = null, $alias = 'Parameter')
     {
@@ -962,7 +962,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -972,7 +972,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{value}}', $equalsValue, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -982,12 +982,12 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateStrInI($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrInI:)格式错误, 必须提供可取值的列表");
+            throw new ValidationException("“${alias}”参数的验证模版(StrInI:)格式错误, 必须提供可取值的列表");
 
         if (is_string($value)) {
             $lowerValue = mb_strtolower($value);
@@ -1000,7 +1000,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1014,7 +1014,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1024,12 +1024,12 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateStrNotInI($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new \Exception("“${alias}”参数的验证模版(StrNotInI:)格式错误, 必须提供不可取的值的列表");
+            throw new ValidationException("“${alias}”参数的验证模版(StrNotInI:)格式错误, 必须提供不可取的值的列表");
 
         if (is_string($value)) {
             $lowerValue = mb_strtolower($value);
@@ -1046,7 +1046,7 @@ class Validation
         VeriFailed:
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1060,7 +1060,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateStrLen($value, $length, $reason = null, $alias = 'Parameter')
@@ -1073,7 +1073,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1083,7 +1083,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{length}}', $length, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateStrLenGe($value, $min, $reason = null, $alias = 'Parameter')
@@ -1096,7 +1096,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1106,7 +1106,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateStrLenLe($value, $max, $reason = null, $alias = 'Parameter')
@@ -1119,7 +1119,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1129,13 +1129,13 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateStrLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
         if ($min > $max)
-            throw new \Exception("“${alias}”参数的验证模版StrLenGeLe格式错误, min不应该大于max");
+            throw new ValidationException("“${alias}”参数的验证模版StrLenGeLe格式错误, min不应该大于max");
 
         if (is_string($value)) {
             $len = mb_strlen($value);
@@ -1146,7 +1146,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1157,7 +1157,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateByteLen($value, $length, $reason = null, $alias = 'Parameter')
@@ -1170,7 +1170,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1180,7 +1180,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{length}}', $length, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateByteLenGe($value, $min, $reason = null, $alias = 'Parameter')
@@ -1193,7 +1193,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1203,7 +1203,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateByteLenLe($value, $max, $reason = null, $alias = 'Parameter')
@@ -1216,7 +1216,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1226,13 +1226,13 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateByteLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
     {
         if ($min > $max)
-            throw new \Exception("“${alias}”参数的验证模版ByteLenGeLe格式错误, min不应该大于max");
+            throw new ValidationException("“${alias}”参数的验证模版ByteLenGeLe格式错误, min不应该大于max");
 
         if (is_string($value)) {
             $len = strlen($value);
@@ -1243,7 +1243,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1254,7 +1254,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1263,7 +1263,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateLetters($value, $reason = null, $alias = 'Parameter')
     {
@@ -1275,7 +1275,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1284,7 +1284,7 @@ class Validation
             $error = self::getErrorTemplate('Letters');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1294,7 +1294,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateAlphabet($value, $reason = null, $alias = 'Parameter')
     {
@@ -1306,7 +1306,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1315,7 +1315,7 @@ class Validation
             $error = self::getErrorTemplate('Alphabet');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1324,7 +1324,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateNumbers($value, $reason = null, $alias = 'Parameter')
     {
@@ -1336,7 +1336,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1345,7 +1345,7 @@ class Validation
             $error = self::getErrorTemplate('Numbers');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1355,7 +1355,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateDigits($value, $reason = null, $alias = 'Parameter')
     {
@@ -1367,7 +1367,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1376,7 +1376,7 @@ class Validation
             $error = self::getErrorTemplate('Digits');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1385,7 +1385,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateLettersNumbers($value, $reason = null, $alias = 'Parameter')
     {
@@ -1397,7 +1397,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1406,7 +1406,7 @@ class Validation
             $error = self::getErrorTemplate('LettersNumbers');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1417,7 +1417,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateNumeric($value, $reason = null, $alias = 'Parameter')
     {
@@ -1441,7 +1441,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1450,7 +1450,7 @@ class Validation
             $error = self::getErrorTemplate('Numeric');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1459,7 +1459,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateVarName($value, $reason = null, $alias = 'Parameter')
     {
@@ -1471,7 +1471,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1480,7 +1480,7 @@ class Validation
             $error = self::getErrorTemplate('VarName');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateEmail($value, $reason = null, $alias = 'Parameter')
@@ -1493,7 +1493,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1502,7 +1502,7 @@ class Validation
             $error = self::getErrorTemplate('Email');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateUrl($value, $reason = null, $alias = 'Parameter')
@@ -1515,7 +1515,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1524,7 +1524,7 @@ class Validation
             $error = self::getErrorTemplate('Url');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateIp($value, $reason = null, $alias = 'Parameter')
@@ -1537,7 +1537,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1546,7 +1546,7 @@ class Validation
             $error = self::getErrorTemplate('Ip');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateMac($value, $reason = null, $alias = 'Parameter')
@@ -1559,7 +1559,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1568,7 +1568,7 @@ class Validation
             $error = self::getErrorTemplate('Mac');
             $error = str_replace('{{param}}', $alias, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     /**
@@ -1578,25 +1578,25 @@ class Validation
      * @param $reason null|string 原因（当不匹配时用于错误提示）. 如果为null, 当不匹配时会提示 “${alias}”不匹配正则表达式$regexp
      * @param $alias string 参数别名, 用于错误提示
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateRegexp($value, $regexp, $reason = null, $alias = 'Parameter')
     {
         if (is_string($regexp) === false || $regexp === '')
-            throw new \Exception("“${alias}”参数的验证模版(Regexp:)格式错误, 没有提供正则表达式");
+            throw new ValidationException("“${alias}”参数的验证模版(Regexp:)格式错误, 没有提供正则表达式");
 
         if (is_string($value)) {
             $result = @preg_match($regexp, $value);
             if ($result === 1)
                 return $value;
             else if ($result === false)
-                throw new \Exception("“${alias}”参数的正则表达式验证失败, 请检查正则表达式是否合法");
+                throw new ValidationException("“${alias}”参数的正则表达式验证失败, 请检查正则表达式是否合法");
             $isTypeError = false;
         } else
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Str');
@@ -1606,7 +1606,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{regexp}}', $regexp, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     //endregion
@@ -1628,11 +1628,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('Arr');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateArrLen($value, $length, $reason = null, $alias = 'Parameter')
@@ -1655,7 +1655,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Arr');
@@ -1665,7 +1665,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{length}}', $length, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateArrLenGe($value, $min, $reason = null, $alias = 'Parameter')
@@ -1688,7 +1688,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Arr');
@@ -1698,7 +1698,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{min}}', $min, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateArrLenLe($value, $max, $reason = null, $alias = 'Parameter')
@@ -1721,7 +1721,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Arr');
@@ -1731,7 +1731,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateArrLenGeLe($value, $min, $max, $reason = null, $alias = 'Parameter')
@@ -1755,7 +1755,7 @@ class Validation
             $isTypeError = true;
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isTypeError) {
             $error = self::getErrorTemplate('Arr');
@@ -1766,7 +1766,7 @@ class Validation
             $error = str_replace('{{min}}', $min, $error);
             $error = str_replace('{{max}}', $max, $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     //endregion
@@ -1778,7 +1778,7 @@ class Validation
      * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 则自动生成
      * @param string $alias
      * @return mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateObj($value, $reason = null, $alias = 'Parameter')
     {
@@ -1795,11 +1795,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('Obj');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     //endregion
@@ -1809,9 +1809,9 @@ class Validation
     private static function _throwFileUploadError($err, $isFilesArray, $alias, $fileIndex)
     {
         if ($isFilesArray)
-            throw new \Exception("“${alias}[$fileIndex]”上传失败(ERR=$err)");
+            throw new ValidationException("“${alias}[$fileIndex]”上传失败(ERR=$err)");
         else
-            throw new \Exception("“${alias}”上传失败(ERR=$err)");
+            throw new ValidationException("“${alias}”上传失败(ERR=$err)");
     }
 
     public static function validateFile($value, $reason = null, $alias = 'Parameter')
@@ -1841,11 +1841,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('File');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFileImage($value, $reason = null, $alias = 'Parameter')
@@ -1887,11 +1887,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('FileImage');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFileVideo($value, $reason = null, $alias = 'Parameter')
@@ -1933,11 +1933,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('FileVideo');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFileAudio($value, $reason = null, $alias = 'Parameter')
@@ -1979,11 +1979,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('FileAudio');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFileMimes($value, $mimes, $originMimesString = null, $reason = null, $alias = 'Parameter')
@@ -2045,7 +2045,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if (strlen($originMimesString) === 0)
             $originMimesString = implode(',', $mimes);
@@ -2053,7 +2053,7 @@ class Validation
         $error = self::getErrorTemplate('FileMimes');
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{mimes}}', $originMimesString, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFileMaxSize($value, $maxSize, $originSizeString = null, $reason = null, $alias = 'Parameter')
@@ -2096,7 +2096,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if (strlen($originSizeString) === 0)
             $originSizeString = (string)$maxSize;
@@ -2104,7 +2104,7 @@ class Validation
         $error = self::getErrorTemplate('FileMaxSize');
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{size}}', $originSizeString, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateFileMinSize($value, $minSize, $originSizeString = null, $reason = null, $alias = 'Parameter')
@@ -2147,7 +2147,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if (strlen($originSizeString) === 0)
             $originSizeString = (string)$minSize;
@@ -2155,7 +2155,7 @@ class Validation
         $error = self::getErrorTemplate('FileMinSize');
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{size}}', $originSizeString, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     //endregion
@@ -2171,11 +2171,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('Date');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateDateFrom($value, $fromTimestamp, $reason = null, $alias = 'Parameter')
@@ -2198,7 +2198,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isFormatError) {
             $error = self::getErrorTemplate('Date');
@@ -2208,7 +2208,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{from}}', date('Y-m-d', $fromTimestamp), $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateDateTo($value, $toTimestamp, $reason = null, $alias = 'Parameter')
@@ -2231,7 +2231,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isFormatError) {
             $error = self::getErrorTemplate('Date');
@@ -2241,7 +2241,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{to}}', date('Y-m-d', $toTimestamp), $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateDateFromTo($value, $fromTimestamp, $toTimestamp, $reason = null, $alias = 'Parameter')
@@ -2264,7 +2264,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isFormatError) {
             $error = self::getErrorTemplate('Date');
@@ -2275,7 +2275,7 @@ class Validation
             $error = str_replace('{{from}}', date('Y-m-d', $fromTimestamp), $error);
             $error = str_replace('{{to}}', date('Y-m-d', $toTimestamp), $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateDateTime($value, $reason = null, $alias = 'Parameter')
@@ -2287,11 +2287,11 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('DateTime');
         $error = str_replace('{{param}}', $alias, $error);
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateDateTimeFrom($value, $fromTimestamp, $reason = null, $alias = 'Parameter')
@@ -2314,7 +2314,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isFormatError) {
             $error = self::getErrorTemplate('DateTime');
@@ -2324,7 +2324,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{from}}', date('Y-m-d H:i:s', $fromTimestamp), $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateDateTimeTo($value, $toTimestamp, $reason = null, $alias = 'Parameter')
@@ -2347,7 +2347,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isFormatError) {
             $error = self::getErrorTemplate('DateTime');
@@ -2357,7 +2357,7 @@ class Validation
             $error = str_replace('{{param}}', $alias, $error);
             $error = str_replace('{{to}}', date('Y-m-d H:i:s', $toTimestamp), $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     public static function validateDateTimeFromTo($value, $fromTimestamp, $toTimestamp, $reason = null, $alias = 'Parameter')
@@ -2380,7 +2380,7 @@ class Validation
         }
 
         if ($reason !== null)
-            throw new \Exception($reason);
+            throw new ValidationException($reason);
 
         if ($isFormatError) {
             $error = self::getErrorTemplate('DateTime');
@@ -2391,7 +2391,7 @@ class Validation
             $error = str_replace('{{from}}', date('Y-m-d H:i:s', $fromTimestamp), $error);
             $error = str_replace('{{to}}', date('Y-m-d H:i:s', $toTimestamp), $error);
         }
-        throw new \Exception($error);
+        throw new ValidationException($error);
     }
 
     //endregion
@@ -2935,12 +2935,12 @@ class Validation
      * @param $validator string 一条验证字符串
      * @param $alias string 参数的别名. 如果验证器中包含Alias:xxx, 会用xxx取代这个参数的值
      * @return array 返回包含验证信息的array
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _compileValidator($validator, $alias)
     {
         if (is_string($validator) === false)
-            throw new \Exception("编译Validator失败: Validator必须是字符串");;
+            throw new ValidationException("编译Validator失败: Validator必须是字符串");;
         if (strlen($validator) === 0) {
             return [
                 'countOfIfs' => 0,
@@ -2963,7 +2963,7 @@ class Validation
             if (strpos($segment, 'Regexp:') === 0) // 是正则表达式
             {
                 if (strpos($segment, '/') !== 7) // 非法的正则表达. 合法的必须首尾加/
-                    throw new \Exception("正则表达式验证器Regexp格式错误. 正确的格式是 Regexp:/xxxx/");
+                    throw new ValidationException("正则表达式验证器Regexp格式错误. 正确的格式是 Regexp:/xxxx/");
 
                 $pos = 8;
                 $len = strlen($segment);
@@ -3000,7 +3000,7 @@ class Validation
                     }
 
                     if ($i >= $segCount) // 后面没有segment了
-                        throw new \Exception("正则表达式验证器Regexp格式错误. 正确的格式是 Regexp:/xxxx/");
+                        throw new ValidationException("正则表达式验证器Regexp格式错误. 正确的格式是 Regexp:/xxxx/");
 
                     $segment .= '|';
                     $segment .= $segments[$i]; // 拼接后面一个segment
@@ -3017,7 +3017,7 @@ class Validation
                 if ($pos === false) {
                     if ($segment === 'Required') {
                         if (count($validatorUnits) > $countOfIfs)
-                            throw new \Exception("Required只能出现在验证器的开头（IfXxx后面）");
+                            throw new ValidationException("Required只能出现在验证器的开头（IfXxx后面）");
                         $required = true;
                     } else
                         $validatorUnits[] = [$segment];
@@ -3029,7 +3029,7 @@ class Validation
                             $p = '';
                     }
                     if (strlen($validatorName) === 0) {
-                        throw new \Exception("无法识别的验证子“${segment}”");
+                        throw new ValidationException("无法识别的验证子“${segment}”");
                     }
                     switch ($validatorName) {
                         case 'IntEq':
@@ -3095,7 +3095,7 @@ class Validation
                         case 'IfIntGe':
                         case 'IfIntLe':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("IfXxx只能出现在验证器的开头");
                             $params = self::_parseIfXxxWith1Param1Int($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
@@ -3105,7 +3105,7 @@ class Validation
                         case 'IfIntIn':
                         case 'IfIntNotIn':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("IfXxx只能出现在验证器的开头");
                             $params = self::_parseIfXxxWith1ParamMultiInts($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
@@ -3119,7 +3119,7 @@ class Validation
                         case 'IfStrGe':
                         case 'IfStrLe':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("IfXxx只能出现在验证器的开头");
                             $params = self::_parseIfXxxWith1Param1Str($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
@@ -3129,7 +3129,7 @@ class Validation
                         case 'IfStrIn':
                         case 'IfStrNotIn':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("IfXxx只能出现在验证器的开头");
                             $params = self::_parseIfXxxWith1ParamMultiStrings($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
@@ -3145,7 +3145,7 @@ class Validation
 //                        case 'IfSame':
 //                        case 'IfNotSame':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new \Exception("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("IfXxx只能出现在验证器的开头");
                             $varname = self::_parseIfXxxWith1Param($p);
                             if ($varname === false)
                                 self::_throwFormatError($validatorName);
@@ -3233,7 +3233,7 @@ class Validation
                             $validator = null;
                             break;
                         default:
-                            throw new \Exception("无法识别的验证子“${segment}”");
+                            throw new ValidationException("无法识别的验证子“${segment}”");
                     }
                     if ($validator)
                         $validatorUnits[] = $validator;
@@ -3258,8 +3258,8 @@ class Validation
     {
         $sampleFormat = @self::$sampleFormats[$validatorName];
         if ($sampleFormat === null)
-            throw new \Exception("验证器${validatorName}格式错误");
-        throw new \Exception("验证器${validatorName}格式错误, 正确的格式是: $sampleFormat");
+            throw new ValidationException("验证器${validatorName}格式错误");
+        throw new ValidationException("验证器${validatorName}格式错误, 正确的格式是: $sampleFormat");
     }
 
     private static function _isIntOrIntString($value)
@@ -3415,7 +3415,7 @@ class Validation
      * 将Mimes字符串转为Mimes数组（逗号分隔）
      * @param $value
      * @return string[]|bool 如果至少有1个有效字符串, 返回字符串数组; 否则返回false
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _parseMimesArray($value)
     {
@@ -3429,17 +3429,17 @@ class Validation
             if (($pos = strpos($mime, '/')) === false) // 没有斜杠'/'. 例: jpg 或 avi
             {
                 if ($mime === '*')
-                    throw new \Exception("无效的MIME“${mime}”");
+                    throw new ValidationException("无效的MIME“${mime}”");
                 $mime = "/$mime";
             } else // 有斜杠'/'. 例: image/jpeg 或 video/*
             {
                 $parts = explode('/', $mime);
                 if (count($parts) !== 2)
-                    throw new \Exception("无效的MIME“${mime}”");
+                    throw new ValidationException("无效的MIME“${mime}”");
                 $type = $parts[0];
                 $ext = $parts[1];
                 if (strlen($type) === 0 || strlen($ext) === 0 || $type === '*')
-                    throw new \Exception("无效的MIME“${mime}”");
+                    throw new ValidationException("无效的MIME“${mime}”");
 
                 // 将形如"video/*"的转化为"video/"以方便后续处理
                 if ($ext === '*')
@@ -3458,7 +3458,7 @@ class Validation
      * @param $paramstr string
      * @param $validatorName string 条件验证子'IfIntXx'
      * @return array|false 出错返回false, 否则返回 ['varname', 123]
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _parseIfXxxWith1Param1Int($paramstr, $validatorName)
     {
@@ -3477,7 +3477,7 @@ class Validation
      * @param $paramstr string
      * @param $validatorName string 条件验证子'IfStrXx'
      * @return array|false 出错返回false, 否则返回 ['varname', 'abc']
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _parseIfXxxWith1Param1Str($paramstr, $validatorName)
     {
@@ -3488,7 +3488,7 @@ class Validation
         $varName = $params[0];
 //        $value = $params[1];
         if (strlen($varName) == 0) // 简单检测
-            throw new \Exception("“$validatorName:${paramstr}”中“${$validatorName}”后面必须是一个参数（变量）名，实际上却是空串");
+            throw new ValidationException("“$validatorName:${paramstr}”中“${$validatorName}”后面必须是一个参数（变量）名，实际上却是空串");
         return $params;
     }
 
@@ -3496,7 +3496,7 @@ class Validation
      * 解析 IfXxx:varname 中的冒号后面的部分（1个条件参数后面带0个值）
      * @param $paramstr string
      * @return string|false 出错返回false, 否则返回 'varname'
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _parseIfXxxWith1Param($paramstr)
     {
@@ -3513,7 +3513,7 @@ class Validation
      * @param $paramstr string
      * @param $validatorName string 条件验证子'IfStrXxx'
      * @return array|false 出错返回false, 否则返回 ['varname', ['a','b','abc']]
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _parseIfXxxWith1ParamMultiStrings($paramstr, $validatorName)
     {
@@ -3535,7 +3535,7 @@ class Validation
      * @param $paramstr string
      * @param $validatorName string 条件验证子'IfIntXxx'
      * @return array|false 出错返回false, 否则返回 ['varname', [1,2,3]]
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _parseIfXxxWith1ParamMultiInts($paramstr, $validatorName)
     {
@@ -3563,7 +3563,7 @@ class Validation
      * @param array $originParams 原始参数的数组
      * @param array $siblings 与当前要检测的参数同级的全部参数的数组
      * @return mixed 返回$value被过滤后的新值
-     * @throws \Exception
+     * @throws ValidationException
      */
     public static function validateValue($value, $validator, $alias = 'Parameter', $ignoreRequired = false, $originParams = [], $siblings = [])
     {
@@ -3572,7 +3572,7 @@ class Validation
         } else if (is_string($validator)) {
             $validators = [$validator];
         } else
-            throw new \Exception(self::class . '::' . __FUNCTION__ . "(): \$validator必须是字符串或字符串数组");
+            throw new ValidationException(self::class . '::' . __FUNCTION__ . "(): \$validator必须是字符串或字符串数组");
 
         /*
          * 一个参数可以有一条或多条validator, 检测是否通过的规则如下:
@@ -3598,7 +3598,7 @@ class Validation
                     $ifName = $validatorUnit[0];
                     $method = 'validate' . ucfirst($ifName);
                     if (method_exists(self::class, $method) === false)
-                        throw new \Exception("找不到条件判断${$ifName}的验证方法");
+                        throw new ValidationException("找不到条件判断${$ifName}的验证方法");
 
                     $varkeypath = $validatorUnit[1]; // 条件参数的路径
 
@@ -3614,7 +3614,7 @@ class Validation
                         $asterisksCount = 0;
                         $keys = self::_compileKeypath($varkeypath, $asterisksCount);
                         if ($asterisksCount > 0) {
-                            throw new \Exception("IfXxx中的条件参数“${varkeypath}”中不得包含*号");
+                            throw new ValidationException("IfXxx中的条件参数“${varkeypath}”中不得包含*号");
                         }
 
                         $keysCount = count($keys);
@@ -3632,7 +3632,7 @@ class Validation
                             if ($actualValue === null // 依赖的条件参数不存在
                                 && $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
                             )
-                                throw new \Exception("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
+                                throw new ValidationException("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
                         } else // 如果参数不存在，则该参数不检测
                         {
                             return $value;
@@ -3643,7 +3643,7 @@ class Validation
                         if ($actualValue === null // 依赖的条件参数不存在
                             && $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
                         )
-                            throw new \Exception("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
+                            throw new ValidationException("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
                     }
 
                     $compareVal = $validatorUnit[2];
@@ -3680,7 +3680,7 @@ class Validation
 //                    }
 
                     if (method_exists(self::class, $method) === false)
-                        throw new \Exception("找不到验证子${validatorUnitName}的验证方法");
+                        throw new ValidationException("找不到验证子${validatorUnitName}的验证方法");
 
                     $params = [$value];
                     $paramsCount = count($validatorUnit);
@@ -3693,7 +3693,7 @@ class Validation
 
                 $success++;
                 break; // 多个validator只需要一条验证成功即可
-            } catch (\Exception $e) {
+            } catch (ValidationException $e) {
                 $lastException = $e;
                 $failed++;
             }
@@ -3704,26 +3704,26 @@ class Validation
 
         if (isset($lastException))
             throw $lastException;
-        throw new \Exception("“${alias}”验证失败"); // 这句应该不会执行
+        throw new ValidationException("“${alias}”验证失败"); // 这句应该不会执行
     }
 
     /**
      * @param $keypath string 路径
      * @param $asterisksCount int& 路径中包含星号(*)的个数
      * @return array
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _compileKeypath($keypath, &$asterisksCount)
     {
         if (strlen($keypath) === 0)
-            throw new \Exception('$validations数组中包含空的字段名');
+            throw new ValidationException('$validations数组中包含空的字段名');
 
         if (preg_match('/^[a-zA-Z0-9_.\[\]*]+$/', $keypath) !== 1)
-            throw new \Exception("非法的字段名“${keypath}”");
+            throw new ValidationException("非法的字段名“${keypath}”");
 
         $keys = explode('.', $keypath); // $keys中的数组还没有解析
         if (count($keys) === 0)
-            throw new \Exception('$validations数组中包含空的字段名');
+            throw new ValidationException('$validations数组中包含空的字段名');
 
         $asterisksCount = 0;
 
@@ -3731,38 +3731,38 @@ class Validation
         // 尝试识别普通数组, 形如'varname[*]'
         foreach ($keys as $key) {
             if (strlen($key) === 0)
-                throw new \Exception("“${keypath}”中包含空的字段名");
+                throw new ValidationException("“${keypath}”中包含空的字段名");
 
             $i = strpos($key, '[');
             if ($i === false) // 普通的key
             {
                 if (strpos($key, '*') !== false)
-                    throw new \Exception("“${keypath}”中'*'号只能处于方括号[]中");
+                    throw new ValidationException("“${keypath}”中'*'号只能处于方括号[]中");
                 if (strpos($key, ']') !== false)
-                    throw new \Exception("“${key}”中包含了非法的']'号");
+                    throw new ValidationException("“${key}”中包含了非法的']'号");
                 if (preg_match('/^[0-9]/', $key) === 1) {
                     if (count($keys) === 1)
-                        throw new \Exception("字段名“${keypath}”不得以数字开头");
+                        throw new ValidationException("字段名“${keypath}”不得以数字开头");
                     else
-                        throw new \Exception("“${keypath}”中包含了以数字开头的字段名“${key}”");
+                        throw new ValidationException("“${keypath}”中包含了以数字开头的字段名“${key}”");
                 }
                 $filteredKeys[] = $key;
                 continue;
             } else if ($i === 0) {
-                throw new \Exception("“${keypath}”中'['号前面没有变量名");
+                throw new ValidationException("“${keypath}”中'['号前面没有变量名");
             } else {
                 $j = strpos($key, ']');
                 if ($j === false)
-                    throw new \Exception("“${key}”中的'['号之后缺少']'");
+                    throw new ValidationException("“${key}”中的'['号之后缺少']'");
                 if ($i > $j)
-                    throw new \Exception("“${key}”中'[', ']'顺序颠倒了");
+                    throw new ValidationException("“${key}”中'[', ']'顺序颠倒了");
 
                 // 识别普通数组的变量名（'[*]'之前的部分）
                 $varName = substr($key, 0, $i);
                 if (strpos($varName, '*') !== false)
-                    throw new \Exception("“${key}”中包含了非法的'*'号");
+                    throw new ValidationException("“${key}”中包含了非法的'*'号");
                 if (preg_match('/^[0-9]/', $varName) === 1)
-                    throw new \Exception("“${keypath}”中包含了以数字开头的字段名“${varName}”");
+                    throw new ValidationException("“${keypath}”中包含了以数字开头的字段名“${varName}”");
                 $filteredKeys[] = $varName;
 
                 // 识别普通数组的索引值
@@ -3773,7 +3773,7 @@ class Validation
                 } else if (is_numeric($index))
                     $filteredKeys[] = intval($index);
                 else
-                    throw new \Exception("“${key}”中的方括号[]之间只能包含数字或'*'号");
+                    throw new ValidationException("“${key}”中的方括号[]之间只能包含数字或'*'号");
 
                 // 尝试识别多维数组
                 $len = strlen($key);
@@ -3781,10 +3781,10 @@ class Validation
                     $j++;
                     $i = strpos($key, '[', $j);
                     if ($i !== $j)
-                        throw new \Exception("“${key}”中的“[$index]”之后包含非法字符");
+                        throw new ValidationException("“${key}”中的“[$index]”之后包含非法字符");
                     $j = strpos($key, ']', $i);
                     if ($j === false)
-                        throw new \Exception("“${key}”中的'['号之后缺少']'");
+                        throw new ValidationException("“${key}”中的'['号之后缺少']'");
 
                     $index = substr($key, $i + 1, $j - $i - 1);
                     if ($index === '*') {
@@ -3793,7 +3793,7 @@ class Validation
                     } else if (is_numeric($index))
                         $filteredKeys[] = intval($index);
                     else
-                        throw new \Exception("“${key}”中的方括号[]之间只能包含数字或'*'号");
+                        throw new ValidationException("“${key}”中的方括号[]之间只能包含数字或'*'号");
                 }
             }
         }
@@ -3827,12 +3827,12 @@ class Validation
      * ]
      * @param $ignoreRequired bool 是否忽略所有的Required检测子
      * @return mixed
-     * @throws \Exception 验证不通过会抛出异常
+     * @throws ValidationException 验证不通过会抛出异常
      */
     public static function validate($params, $validations, $ignoreRequired = false)
     {
         if (is_array($params) === false)
-            throw new \Exception(self::class . '::' . __FUNCTION__ . "(): \$params必须是数组");
+            throw new ValidationException(self::class . '::' . __FUNCTION__ . "(): \$params必须是数组");
 
         $cachedKeyValues = [];
         foreach ($validations as $keypath => $validator) {
@@ -3861,7 +3861,7 @@ class Validation
      * @param string $keyPrefix
      * @param $cachedKeyValues array&|null
      * @return null|mixed
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _getValue($params, $keys, $keysCount, &$ancestorExist, $keyPrefix = '', &$cachedKeyValues = null)
     {
@@ -3989,7 +3989,7 @@ class Validation
      * @param string $keyPrefix
      * @param $cachedKeyValues array|null 缓存已取过的值. 存储格式为: ['key1' => val1, 'key2' => val2]
      * @param $ignoreRequired bool 是否忽略所有的Required检测子
-     * @throws \Exception
+     * @throws ValidationException
      */
     private static function _validate($params, $keys, $keysCount, $validator, $keyPrefix = '', $ignoreRequired = false, &$cachedKeyValues = null)
     {
