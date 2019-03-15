@@ -1,6 +1,6 @@
-# WebGeeker-Validation: 一个强大的参数验证工具(PHP)
+# WebGeeker-Validation: 一个强大的 PHP 参数验证器
 
-主要用于对API请求的参数取值进行合法性检查。
+用于对API接口的请求参数进行合法性检查。
 
 在实现服务端的API接口时，对于每一个接口的每一个参数，都应该检测其取值是否合法，以免错误的数据输入到系统中。这个工作可以说是费时费力，但又不得不做。而且PHP本身是弱类型语言，不但要验证取值，还要验证数据的类型是否符合，这就更复杂了。
 
@@ -119,7 +119,7 @@ Validation::validate($params, $validations);
 
 通过Composer安装
 ```
-composer require webgeeker/validation:^0.3
+composer require webgeeker/validation:^0.4
 ```
 
 ## 3 快速上手
