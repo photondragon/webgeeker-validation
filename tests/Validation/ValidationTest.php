@@ -63,6 +63,39 @@ class ValidationTest extends TestCase
         throw new \Exception("Line $callLine: 这里应该抛出异常");
     }
 
+    public function testValidateRequired()
+    {
+        $params = [
+            'name' => "WebGeeker",
+        ];
+
+        Validation::validate($params, ['name' => 'Required']);
+        Validation::validate($params, ['name' => 'Required|Alias:姓名']);
+        Validation::validate($params, ['name' => 'Required|>>>:必须提供姓名']);
+        Validation::validate($params, ['name' => 'Required|StrLenGeLe:1,20']);
+        Validation::validate($params, ['name' => 'Required|StrLenGeLe:1,20|Alias:姓名']);
+        Validation::validate($params, ['name' => 'Required|StrLenGeLe:1,20|>>>:必须提供姓名']);
+
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, ['phone' => 'Required']);
+        }, '必须提供“phone”');
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, ['phone' => 'Required|Alias:电话']);
+        }, '必须提供“电话”');
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, ['phone' => 'Required|>>>:必须提供电话']);
+        }, '必须提供电话');
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, ['phone' => 'Required|StrLen:11']);
+        }, '必须提供“phone”');
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, ['phone' => 'Required|StrLen:11|Alias:电话']);
+        }, '必须提供“电话”');
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, ['phone' => 'Required|StrLen:11|>>>:必须提供电话']);
+        }, '必须提供电话');
+    }
+
     public function testValidateInt()
     {
         // Int

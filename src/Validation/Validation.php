@@ -2770,7 +2770,7 @@ class Validation
 //        'TimeZone' => 'TimeZone:timezone_identifiers_list()',
 
         // 其它
-        'Required' => '必须提供参数{{param}}',
+        'Required' => '必须提供“{{param}}”',
 
 //        // 预处理（只处理字符串类型, 如果是其它类型, 则原值返回）
 //        'Trim' => '', // 对要检测的值先作一个trim操作, 后续的检测是针对trim后的值进行检测
@@ -2917,8 +2917,14 @@ class Validation
      * 示例1:
      * 输入: $validator = 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/'
      * 输出: [
-     *     ['StrLen', 6, 16, null, $alias],
-     *     ['regex', '/^[a-zA-Z0-9]+$/', null, $alias],
+     *     'countOfIfs' => 0,
+     *     'required' => false,
+     *     'units' => [
+     *         ['StrLen', 6, 16],
+     *         ['regex', '/^[a-zA-Z0-9]+$/'],
+     *     ],
+     *     'reason' => null,
+     *     'alias' => $alias,
      * ]
      *
      * 示例2（自定义验证失败的提示）:
@@ -2927,9 +2933,11 @@ class Validation
      *     'countOfIfs' => 0,
      *     'required' => false,
      *     'units' => [
-     *         ['StrLen', 6, 16, '参数验证失败了', $alias],
-     *         ['regex', '/^[a-zA-Z0-9]+$/', '参数验证失败了', $alias],
+     *         ['StrLen', 6, 16],
+     *         ['regex', '/^[a-zA-Z0-9]+$/'],
      *     ],
+     *     'reason' => $reason,
+     *     'alias' => $alias,
      * ]
      *
      * @param $validator string 一条验证字符串
@@ -3243,14 +3251,12 @@ class Validation
 
         if (!is_string($alias) || strlen($alias) === 0)
             $alias = 'UnknownParameter';
-        for ($i = count($validatorUnits) - 1; $i >= 0; $i--) {
-            $validatorUnits[$i][] = $customReason;
-            $validatorUnits[$i][] = $alias;
-        }
         return [
             'countOfIfs' => $countOfIfs,
             'required' => $required,
             'units' => $validatorUnits,
+            'reason' => $customReason,
+            'alias' => $alias,
         ];
     }
 
@@ -3590,7 +3596,6 @@ class Validation
 
                 $countOfIfs = $validatorInfo['countOfIfs'];
                 $countOfUnits = count($validatorUnits);
-
                 for ($i = 0; $i < $countOfIfs; $i++) {
                     $validatorUnit = $validatorUnits[$i];
 //                    echo "\n".json_encode($validatorUnit)."\n";
@@ -3664,8 +3669,18 @@ class Validation
                 {
                     if (($validatorInfo['required'] === false) || $ignoreRequired)
                         continue; // 忽略本条validator
-                    else
-                        $failed++;
+                    else {
+                        $reason = $validatorInfo['reason'];
+                        if ($reason !== null)
+                            throw new ValidationException($reason);
+
+                        $error = self::getErrorTemplate('Required');
+                        $aAlias = $validatorInfo['alias'];
+                        if ($aAlias == null)
+                            $aAlias = $alias;
+                        $error = str_replace('{{param}}', $aAlias, $error);
+                        throw new ValidationException($error);
+                    }
                 }
 
                 for ($i = $countOfIfs; $i < $countOfUnits; $i++) {
@@ -3687,6 +3702,8 @@ class Validation
                     for ($j = 1; $j < $paramsCount; $j++) {
                         $params[] = $validatorUnit[$j];
                     }
+                    $params[] = $validatorInfo['reason'];
+                    $params[] = $validatorInfo['alias'];
 
                     $value = call_user_func_array([static::class, $method], $params);
                 }
