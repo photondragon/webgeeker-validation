@@ -617,7 +617,8 @@ class ValidationTest extends TestCase
         $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
         foreach ($notStrVals as $notStrVal) {
             $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
-                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrEq:'.$notStrVal]);
+
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrEq:'.(is_array($notStrVal) ? 'aArray' : $notStrVal)]);
             }, '必须是字符串');
         }
 
@@ -637,7 +638,7 @@ class ValidationTest extends TestCase
         $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
         foreach ($notStrVals as $notStrVal) {
             $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
-                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrNe:'.$notStrVal]);
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrNe:'.(is_array($notStrVal) ? 'aArray' : $notStrVal)]);
             }, '必须是字符串');
         }
 
@@ -713,7 +714,7 @@ class ValidationTest extends TestCase
         $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
         foreach ($notStrVals as $notStrVal) {
             $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
-                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrEqI:'.$notStrVal]);
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrEqI:'.(is_array($notStrVal) ? 'aArray' : $notStrVal)]);
             }, '必须是字符串');
         }
 
@@ -739,7 +740,7 @@ class ValidationTest extends TestCase
         $notStrVals = [1, 0, 1.0, 0.0, true, false, []];
         foreach ($notStrVals as $notStrVal) {
             $this->_assertThrowExpectionContainErrorString(function () use ($notStrVal) {
-                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrNeI:'.$notStrVal]);
+                Validation::validate(['valStr' => $notStrVal], ['valStr' => 'StrNeI:'.(is_array($notStrVal) ? 'aArray' : $notStrVal)]);
             }, '必须是字符串');
         }
 
@@ -2446,7 +2447,7 @@ class ValidationTest extends TestCase
 
             //条件成立+验证不通过
             $params = ['condition' => $notStrVal, 'param' => 0];
-            $notStrVal2 = $notStrVal . 'a';
+            $notStrVal2 = (is_array($notStrVal) ? 'aArray' : $notStrVal) . 'a';
             $this->_assertThrowExpection(function () use ($params, $notStrVal2) {
                 Validation::validate($params, ['param' => "IfStrNe:condition,$notStrVal2|IntEq:1"]);
             }, 'line ' . __LINE__ . ": 应该抛出异常");

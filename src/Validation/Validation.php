@@ -3651,8 +3651,10 @@ class Validation
                             throw new ValidationException("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
                     }
 
-                    $compareVal = $validatorUnit[2];
-                    $params = [$actualValue, $compareVal];
+                    if (isset($validatorUnit[2]))
+                        $params = [$actualValue, $validatorUnit[2]];
+                    else
+                        $params = [$actualValue];
                     $trueOfFalse = call_user_func_array([self::class, $method], $params);
                     if ($trueOfFalse === false) // If条件不满足
                         break; // 跳出
