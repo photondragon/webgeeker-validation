@@ -189,9 +189,13 @@ Validation::validate($params, [
 
 ### 4.3 验证bool型参数
 
-bool型验证器只有两个：
+bool型验证器：
 * Bool: 合法的取值为: `true`, `false`, `"true"`, `"false"`（字符串忽略大小写）。
+* BoolTrue: 合法的取值为: `true`, `"true"`（字符串忽略大小写）。
+* BoolFalse: 合法的取值为: `false`, `"false"`（字符串忽略大小写）。
 * BoolSmart: 合法的取值为: `true`, `false`, `"true"`, `"false"`, `1`, `0`, `"1"`, `"0"`, `"yes"`, `"no"`, `"y"`, `"n"`（字符串忽略大小写）
+* BoolSmartTrue: 合法的取值为: `true`, `"true"`, `1`, `"1"`, `"yes"`, `"y"`（字符串忽略大小写）
+* BoolSmartFalse: 合法的取值为: `false`, `"false"`, `0`, `"0"`, `"no"`, `"n"`（字符串忽略大小写）
 
 例
 ```php
@@ -597,7 +601,11 @@ MyValidation::validate(["var" => 1.0], [
 | bool型验证器 | 示例 | 说明 |
 | :------| :------ | :------ |
 | Bool | Bool | 合法的取值为: `true`, `false`, `"true"`, `"false"`（忽略大小写） |
+| BoolTrue | BoolTrue | 合法的取值为: `true`, `"true"`（忽略大小写） |
+| BoolFalse | BoolFalse | 合法的取值为: `false`,`"false"`（忽略大小写） |
 | BoolSmart | BoolSmart | 合法的取值为: `true`, `false`, `"true"`, `"false"`, `1`, `0`, `"1"`, `"0"`, `"yes"`, `"no"`, `"y"`, `"n"`（忽略大小写） |
+| BoolSmartTrue | BoolSmartTrue | 合法的取值为: `true`, `"true"`, `1`, `"1"`, `"yes"`, `"y"`（忽略大小写） |
+| BoolSmartFalse | BoolSmartFalse | 合法的取值为: `false`, `"false"`, `0`, `"0"`, `"no"`, `"n"`（忽略大小写） |
 
 ### A.4 字符串型
 

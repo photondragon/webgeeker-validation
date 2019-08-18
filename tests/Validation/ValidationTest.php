@@ -572,6 +572,30 @@ class ValidationTest extends TestCase
             }, '必须是bool型');
         }
 
+        // BoolTrue
+        $boolValues = [true, 'True'];
+        foreach ($boolValues as $boolValue) {
+            Validation::validate(['varBool' => $boolValue], ['varBool' => 'BoolTrue']);
+        }
+        $notBoolValues = [false, 'false', 1, 0, '1', '0', 1.0, 'hello', []];
+        foreach ($notBoolValues as $notBoolValue) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notBoolValue) {
+                Validation::validate(['varBool' => $notBoolValue], ['varBool' => 'BoolTrue']);
+            }, '必须为true');
+        }
+
+        // BoolFalse
+        $boolValues = [false, 'faLse'];
+        foreach ($boolValues as $boolValue) {
+            Validation::validate(['varBool' => $boolValue], ['varBool' => 'BoolFalse']);
+        }
+        $notBoolValues = [true, 'True', 1, 0, '1', '0', 1.0, 'hello', []];
+        foreach ($notBoolValues as $notBoolValue) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notBoolValue) {
+                Validation::validate(['varBool' => $notBoolValue], ['varBool' => 'BoolFalse']);
+            }, '必须为false');
+        }
+
         // BoolSmart
         $smartBoolValues = [true, false, 'True', 'faLse', 1, 0, '1', '0', 'Yes', 'no', 'y', 'n'];
         foreach ($smartBoolValues as $smartBoolValue) {
@@ -582,6 +606,30 @@ class ValidationTest extends TestCase
             $this->_assertThrowExpectionContainErrorString(function () use ($notSmartBoolValue) {
                 Validation::validate(['varBool' => $notSmartBoolValue], ['varBool' => 'BoolSmart']);
             }, '只能取这些值: true, false,');
+        }
+
+        // BoolSmartTrue
+        $smartBoolValues = [true, 'True', 1, '1', 'Yes', 'y'];
+        foreach ($smartBoolValues as $smartBoolValue) {
+            Validation::validate(['varBool' => $smartBoolValue], ['varBool' => 'BoolSmartTrue']);
+        }
+        $notSmartBoolValues = [false, 'faLse', 0, '0', 'no', 'n', 8, '100', 1.0, 0.0, '1.0', '0.0', 'hello', []];
+        foreach ($notSmartBoolValues as $notSmartBoolValue) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notSmartBoolValue) {
+                Validation::validate(['varBool' => $notSmartBoolValue], ['varBool' => 'BoolSmartTrue']);
+            }, '只能取这些值: true, 1, yes, y（忽略大小写）');
+        }
+
+        // BoolSmartFalse
+        $smartBoolValues = [false, 'faLse', 0, '0', 'no', 'n'];
+        foreach ($smartBoolValues as $smartBoolValue) {
+            Validation::validate(['varBool' => $smartBoolValue], ['varBool' => 'BoolSmartFalse']);
+        }
+        $notSmartBoolValues = [true, 'True', 1, '1', 'Yes', 'y', 8, '100', 1.0, 0.0, '1.0', '0.0', 'hello', []];
+        foreach ($notSmartBoolValues as $notSmartBoolValue) {
+            $this->_assertThrowExpectionContainErrorString(function () use ($notSmartBoolValue) {
+                Validation::validate(['varBool' => $notSmartBoolValue], ['varBool' => 'BoolSmartFalse']);
+            }, '只能取这些值: false, 0, no, n（忽略大小写）');
         }
     }
 

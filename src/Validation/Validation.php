@@ -729,6 +729,42 @@ class Validation
         throw new ValidationException($error);
     }
 
+    public static function validateBoolTrue($value, $reason = null, $alias = 'Parameter')
+    {
+        if (is_bool($value) && $value) {
+            return $value;
+        } else if (is_string($value)) {
+            $valuelc = mb_strtolower($value);
+            if ($valuelc === 'true')
+                return $value;
+        }
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        $error = self::getErrorTemplate('BoolTrue');
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new ValidationException($error);
+    }
+
+    public static function validateBoolFalse($value, $reason = null, $alias = 'Parameter')
+    {
+        if (is_bool($value) && $value === false) {
+            return $value;
+        } else if (is_string($value)) {
+            $valuelc = mb_strtolower($value);
+            if ($valuelc === 'false')
+                return $value;
+        }
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        $error = self::getErrorTemplate('BoolFalse');
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new ValidationException($error);
+    }
+
     public static function validateBoolSmart($value, $reason = null, $alias = 'Parameter')
     {
         $type = gettype($value);
@@ -746,6 +782,48 @@ class Validation
             throw new ValidationException($reason);
 
         $error = self::getErrorTemplate('BoolSmart');
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new ValidationException($error);
+    }
+
+    public static function validateBoolSmartTrue($value, $reason = null, $alias = 'Parameter')
+    {
+        $type = gettype($value);
+        if ($type === 'boolean' && $value)
+            return $value;
+        else if ($type === 'string') {
+            if (in_array(mb_strtolower($value), ['true', '1', 'yes', 'y'], true))
+                return $value;
+        } else if ($type === 'integer') {
+            if ($value === 1)
+                return $value;
+        }
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        $error = self::getErrorTemplate('BoolSmartTrue');
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new ValidationException($error);
+    }
+
+    public static function validateBoolSmartFalse($value, $reason = null, $alias = 'Parameter')
+    {
+        $type = gettype($value);
+        if ($type === 'boolean' && $value === false)
+            return $value;
+        else if ($type === 'string') {
+            if (in_array(mb_strtolower($value), ['false', '0', 'no', 'n'], true))
+                return $value;
+        } else if ($type === 'integer') {
+            if ($value === 0)
+                return $value;
+        }
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        $error = self::getErrorTemplate('BoolSmartFalse');
         $error = str_replace('{{param}}', $alias, $error);
         throw new ValidationException($error);
     }
@@ -2705,6 +2783,10 @@ class Validation
         // bool型
         'Bool' => '“{{param}}”必须是bool型(true or false)', // 忽略大小写
         'BoolSmart' => '“{{param}}”只能取这些值: true, false, 1, 0, yes, no, y, n（忽略大小写）',
+        'BoolTrue' => '“{{param}}”必须为true',
+        'BoolFalse' => '“{{param}}”必须为false',
+        'BoolSmartTrue' => '“{{param}}”只能取这些值: true, 1, yes, y（忽略大小写）',
+        'BoolSmartFalse' => '“{{param}}”只能取这些值: false, 0, no, n（忽略大小写）',
 
         // 字符串
         'Str' => '“{{param}}”必须是字符串',
@@ -2808,8 +2890,12 @@ class Validation
         'FloatGeLt' => 'FloatGeLt:0,1.0',
 
         // bool型
-        'Bool' => 'Bool', // 忽略大小写
+        'Bool' => 'Bool',
         'BoolSmart' => 'BoolSmart',
+        'BoolTrue' => 'BoolTrue',
+        'BoolFalse' => 'BoolFalse',
+        'BoolSmartTrue' => 'BoolSmartTrue',
+        'BoolSmartFalse' => 'BoolSmartFalse',
 
         // 字符串
         'Str' => 'Str',
