@@ -15,6 +15,7 @@
 
 namespace WebGeeker\RestTest;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use \WebGeeker\Validation\Validation;
 use WebGeeker\ValidationTest\MyValidation;
@@ -28,41 +29,55 @@ use WebGeeker\ValidationTest\MyValidation2;
  */
 class ValidationTest extends TestCase
 {
-    // $callback必须抛出异常
+    /**
+     * 断言 $callback 必须抛出异常
+     * @param callable $callback
+     * @param string $message
+     * @throws Exception
+     */
     private function _assertThrowExpection(callable $callback, $message = '')
     {
         if (is_callable($callback) === false)
-            throw new \Exception("\$callback不是可执行函数");
+            throw new Exception("\$callback不是可执行函数");
         try {
             $callback();
             $ret = true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $ret = false;
         }
         $this->assertFalse($ret, $message);
     }
 
+    /**
+     * 断言 $callback 必须抛出异常, 并且异常描述字符串中包含子串 $containedErroString
+     * @param callable $callback
+     * @param string $containedErroString
+     * @throws Exception
+     */
     private function _assertThrowExpectionContainErrorString(callable $callback, $containedErroString = '')
     {
         try {
-            throw new \Exception("这里抛出异常, 然后捕获它, 以便在调用栈中找出当前函数的调用代码所在的行");
-        } catch (\Exception $e) {
+            throw new Exception("这里抛出异常, 然后捕获它, 以便在调用栈中找出当前函数的调用代码所在的行");
+        } catch (Exception $e) {
             $callLine = $e->getTrace()[0]['line'];
         }
 
         if (is_callable($callback) === false)
-            throw new \Exception("\$callback不是可执行函数");
+            throw new Exception("\$callback不是可执行函数");
         try {
             $callback();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errstr = $e->getMessage();
             if (strpos($errstr, $containedErroString) === false)
-                throw new \Exception("Line $callLine: 这里抛出的异常中应该包含字符串“${containedErroString}”\n\t实际抛出的异常是“${errstr}”");
+                throw new Exception("Line $callLine: 这里抛出的异常中应该包含字符串“${containedErroString}”\n\t实际抛出的异常是“${errstr}”");
             return;
         }
-        throw new \Exception("Line $callLine: 这里应该抛出异常");
+        throw new Exception("Line $callLine: 这里应该抛出异常");
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateRequired()
     {
         $params = [
@@ -96,6 +111,9 @@ class ValidationTest extends TestCase
         }, '必须提供电话');
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateInt()
     {
         // Int
@@ -339,6 +357,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateFloat()
     {
         // Float
@@ -558,6 +579,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateBool()
     {
         // Bool
@@ -633,6 +657,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateStrs()
     {
         // Str
@@ -854,6 +881,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateStrLens()
     {
         // StrLen
@@ -919,6 +949,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateByteLens()
     {
         // ByteLen
@@ -984,6 +1017,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateOtherStrings()
     {
         // Letters
@@ -1212,6 +1248,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateRegexp()
     {
         $valExps = [
@@ -1247,6 +1286,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateArr()
     {
         // Arr
@@ -1354,6 +1396,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateObj()
     {
         // Obj
@@ -1375,6 +1420,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateFile()
     {
         // 缺少某些字段
@@ -1445,6 +1493,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateFileTypes()
     {
         // 图片
@@ -1553,6 +1604,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateFileMimes()
     {
         // FileMimes格式书写错误
@@ -1653,6 +1707,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateFileSize()
     {
         // 文件大小为0
@@ -1721,6 +1778,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateDate()
     {
         // Date
@@ -1794,6 +1854,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateDateTime()
     {
         // DateTime
@@ -1866,6 +1929,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateOthers()
     {
         // 验证器为空时
@@ -1875,19 +1941,19 @@ class ValidationTest extends TestCase
         $this->assertNotNull(Validation::validateValue(1, 'Int|>>>:验证会通过,不会抛出异常'));
         try {
             Validation::validateValue([1, 2, 3], 'Int|>>>:对不起, 您必须输入一个整数');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errstr = $e->getMessage();
             $this->assertEquals('对不起, 您必须输入一个整数', $errstr);
         }
         try {
             Validation::validateValue([1, 2, 3], 'Int|>>>:|>>>:ERROR: 您必须输入一个整数|Arr');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errstr = $e->getMessage();
             $this->assertEquals('|>>>:ERROR: 您必须输入一个整数|Arr', $errstr);
         }
         try {
             Validation::validateValue(123, 'Int|Str|>>>:对不起, 您必须输入一个包含数字的字符串');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errstr = $e->getMessage();
             $this->assertEquals('对不起, 您必须输入一个包含数字的字符串', $errstr);
         }
@@ -1895,24 +1961,30 @@ class ValidationTest extends TestCase
         // 参数别名相关
         try {
             Validation::validateValue('abc', 'Alias:参数别名|Int', null);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errstr = $e->getMessage();
             $this->assertStringMatchesFormat('%S参数别名%S', $errstr);
         }
         try {
             Validation::validateValue('abc', 'Bool|Alias:param alias', null);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $errstr = $e->getMessage();
             $this->assertStringMatchesFormat('%Sparam alias%S', $errstr);
         }
         Validation::validateValue('abc', 'Alias:参数别名', null);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateCompile()
     {
         Validation::validateValue('1||2/3/', 'Regexp:/^1\|\|2\/3\//');
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfBools()
     {
         // If
@@ -1996,6 +2068,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfExists()
     {
         // IfExist
@@ -2049,6 +2124,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntXx()
     {
         // 检测格式书写错误: IfIntXx:condition,abc
@@ -2059,6 +2137,9 @@ class ValidationTest extends TestCase
         }, 'line ' . __LINE__ . ": 应该抛出异常");
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntEq()
     {
         // IfIntEq
@@ -2102,6 +2183,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntNe()
     {
         // IfIntNe
@@ -2146,6 +2230,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntGt()
     {
         // IfIntGt
@@ -2189,6 +2276,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntGe()
     {
         // IfIntGe
@@ -2232,6 +2322,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntLt()
     {
         // IfIntLt
@@ -2275,6 +2368,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntLe()
     {
         // IfIntLe
@@ -2318,6 +2414,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntIn()
     {
         // IfIntIn 条件成立
@@ -2365,6 +2464,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfIntNotIn()
     {
         // IfIntNotIn 条件不成立
@@ -2414,6 +2516,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfStrEq()
     {
         // IfStrEq
@@ -2457,6 +2562,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfStrNe()
     {
         // IfStrNe
@@ -2503,6 +2611,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfStrGt()
     {
         // IfStrGt
@@ -2547,6 +2658,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfStrGe()
     {
         // IfStrGe
@@ -2591,6 +2705,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfStrLt()
     {
         // IfStrLt
@@ -2635,6 +2752,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfStrLe()
     {
         // IfStrLe
@@ -2679,6 +2799,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfStrIn()
     {
         // IfStrIn 条件成立
@@ -2730,6 +2853,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIfStrNotIn()
     {
         // IfStrNotIn 条件不成立
@@ -2785,7 +2911,10 @@ class ValidationTest extends TestCase
         }
     }
 
-    // 测试对条件参数不存在的情况的处理
+    /**
+     * 测试对条件参数不存在的情况的处理
+     * @throws Exception
+     */
     public function testIfConditionParamExistance()
     {
         // 非增量更新 + 条件参数不存在 + 参数存在 -> 应该抛出异常
@@ -2814,6 +2943,9 @@ class ValidationTest extends TestCase
 
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateIf()
     {
         // 测试条件检测的应用
@@ -2855,6 +2987,9 @@ class ValidationTest extends TestCase
         Validation::validate(['article' => $complaintInfo], $validations2);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidate()
     {
         $params = [
@@ -2924,6 +3059,9 @@ class ValidationTest extends TestCase
         $this->assertNotNull(Validation::validate($params, $validators, true));
     }
 
+    /**
+     * @throws Exception
+     */
     public function testValidateI18n()
     {
         // ============================================================
