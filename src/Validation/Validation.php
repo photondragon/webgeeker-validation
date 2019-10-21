@@ -350,7 +350,7 @@ class Validation
     public static function validateIntIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new ValidationException("“${alias}”参数的验证模版(IntIn:)格式错误, 必须提供可取值的列表");
+            throw new ValidationException("验证器IntIn的参数格式错误, 必须提供整数的列表, 以逗号分隔");
 
         $type = gettype($value);
         if ($type === 'string') {
@@ -394,7 +394,7 @@ class Validation
     public static function validateIntNotIn($value, $valueList, $reason = null, $alias = 'Parameter')
     {
         if (is_array($valueList) === false || count($valueList) === 0)
-            throw new ValidationException("“${alias}”参数的验证模版(IntNotIn:)格式错误, 必须提供可取值的列表");
+            throw new ValidationException("验证器IntNotIn的参数格式错误, 必须提供整数的列表, 以逗号分隔");
 
         $type = gettype($value);
         if ($type === 'string') {
@@ -3623,9 +3623,9 @@ class Validation
     }
 
     /**
-     * 解析 IfIntXxx:varname,1,2,3 中的冒号后面的部分（1个条件参数后面带多个整数）
+     * 解析 IfIntInXxx:varname,1,2,3 中的冒号后面的部分（1个条件参数后面带多个整数）
      * @param $paramstr string
-     * @param $validatorName string 条件验证子'IfIntXxx'
+     * @param $validatorName string 条件验证子'IfIntInXxx'
      * @return array|false 出错返回false, 否则返回 ['varname', [1,2,3]]
      * @throws ValidationException
      */
@@ -3652,8 +3652,8 @@ class Validation
      * @param $validator string|string[] 一条验证器, 例: 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/'; 或多条验证器的数组, 多条验证器之间是或的关系
      * @param string $alias 要验证的值的别名, 用于在验证不通过时生成提示字符串.
      * @param $ignoreRequired bool 是否忽略所有的Required检测子
-     * @param array $originParams 原始参数的数组
-     * @param array $siblings 与当前要检测的参数同级的全部参数的数组
+     * @param array $originParams 原始参数的数组(这个参数只用于条件验证器的参数的取值)
+     * @param array $siblings 与当前要检测的参数同级的全部参数的数组(这个参数只用于条件验证器的参数的取值)
      * @return mixed 返回$value被过滤后的新值
      * @throws ValidationException
      */
@@ -3708,8 +3708,7 @@ class Validation
                             throw new ValidationException("IfXxx中的条件参数“${varkeypath}”中不得包含*号");
                         }
 
-                        $keysCount = count($keys);
-                        $actualValue = self::_getValue($originParams, $keys, $keysCount, $ancestorExist);
+                        $actualValue = self::_getValue($originParams, $keys, $ancestorExist);
                     }
 
 //                    echo "\n\$actualValue = $actualValue\n";
@@ -3814,7 +3813,7 @@ class Validation
 
     /**
      * @param $keypath string 路径
-     * @param $asterisksCount int& 路径中包含星号(*)的个数
+     * @param $asterisksCount &int 路径中包含星号(*)的个数
      * @return array
      * @throws ValidationException
      */
@@ -3958,95 +3957,40 @@ class Validation
     }
 
     /**
-     * 根据路径从参数数组中取值. 可以用于Ifxxx中参数的取值
+     * 根据路径从参数数组中取值. 可以用于IfXxx中参数的取值
+     *
+     * 本函数里的代码与 _validate() 中的相似, 但是不可能合并成一个函数.
+     * 因为针对"comments[*]"这样的参数路径, _validate() 方法内部必须枚举数组
+     * 的每个元素, 一个个检测; 而本函数根本就不会遇到参数路径中带*号的情况, 因
+     * 为本函数只需要返回一个值, 带*号的话就不知道要返回哪个值了.
+     *
      * @param $params array
-     * @param $keys array
-     * @param $keysCount int
-     * @param $ancestorExist bool&
+     * @param $keys array 条件参数的路径中不能有 * 号, 否则就不知道取哪个值了
+     * @param $ancestorExist &bool 返回: 上一级是否存在
      * @param string $keyPrefix
-     * @param $cachedKeyValues array&|null
      * @return null|mixed
      * @throws ValidationException
      */
-    private static function _getValue($params, $keys, $keysCount, &$ancestorExist, $keyPrefix = '', &$cachedKeyValues = null)
+    private static function _getValue($params, $keys, &$ancestorExist, $keyPrefix = '')
     {
         $keyPath = $keyPrefix;
-        $siblings = $params;
         $value = $params;
 
-        if ($keysCount > 1) {
-            // 查询缓存
-            if ($cachedKeyValues !== null) {
-
-                // todo 如果没有*号, 没必要重新合成路径
-                $prefix = $keyPrefix;
-                for ($i = 0; $i < $keysCount - 1; $i++) {
-                    $key = $keys[$i];
-                    if ($prefix === '')
-                        $prefix = $key;
-                    else if (is_integer($key) || $key === '*')
-                        $prefix .= "[$key]";
-                    else
-                        $prefix .= ".$key";
-                }
-
-//                if (array_key_exists($prefix, $cachedKeyValues)) {
-//                    echo "\n命中: key=$prefix" . ", value=" . $cachedKeyValues[$prefix] . "\n";
-//                }
-            }
-        }
-
+        $keysCount = count($keys);
         for ($n = 0; $n < $keysCount; $n++) {
             $siblings = $value;
             $keyPrefix = $keyPath;
 
             $key = $keys[$n];
-            if ($key === '*') {
+            if (is_integer($key))
                 self::validateArr($siblings, null, $keyPrefix);
-                $c = count($siblings);
-                if ($c > 0) {
-                    $subKeys = array_slice($keys, $n + 1);
-                    $subKeysCount = $keysCount - $n - 1;
-
-                    if ($subKeysCount) // *号后面还有keys
-                    {
-                        $values = [];
-                        $ancestorExist = false;
-                        for ($i = 0; $i < $c; $i++) {
-                            $element = $siblings[$i];
-                            $keyPath = $keyPrefix . "[$i]";
-                            $aAncestorExist = false;
-                            $aValue = self::_getValue($element, $subKeys, $subKeysCount, $aAncestorExist, $keyPath, $cachedKeyValues);
-                            if ($aAncestorExist) {
-                                $values[] = $aValue;
-                                $ancestorExist = true;
-                            }
-//                            self::_validate($element, $subKeys, $subKeysCount, $validator, $keyPath, $ignoreRequired, $cachedKeyValues);
-                        }
-                    } else // *号是最后一级
-                    {
-                        $values = $siblings;
-
-                        // todo 缓存数组本身的没什么用, 因为提取不到.
-                        if ($cachedKeyValues !== null && $keyPrefix) {
-                            $cachedKeyValues[$keyPrefix] = $siblings;
-//                            echo "\n缓存: keyPrefix=$keyPrefix, key=$keyPath" . ", value=$siblings\n";
-                        }
-                    }
-                    return $values;
-                } else // 'items[*]' => 'Required' 要求items至少有1个元素, 但上面的循环不检测items==[]的情况
-                    $value = null; // 这里是针对$value==[]这种情况的特殊处理
-            } else {
-                if (is_integer($key))
-                    self::validateArr($siblings, null, $keyPrefix);
-                else
-                    self::validateObj($siblings, null, $keyPrefix);
-                $value = @$siblings[$key];
-            }
+            else
+                self::validateObj($siblings, null, $keyPrefix);
+            $value = @$siblings[$key];
 
             if ($keyPrefix === '')
                 $keyPath = $key;
-            else if (is_integer($key) || $key === '*')
+            else if (is_integer($key))
                 $keyPath = $keyPrefix . "[$key]";
             else
                 $keyPath = "$keyPrefix.$key";
@@ -4062,25 +4006,6 @@ class Validation
             $ancestorExist = true;
         } else {
             $ancestorExist = false;
-            if ($cachedKeyValues !== null) {
-                for (; $n < $keysCount; $n++) {
-                    $keyPrefix = $keyPath;
-
-                    $key = $keys[$n];
-
-                    if ($keyPrefix === '')
-                        $keyPath = $key;
-                    else if (is_integer($key) || $key === '*')
-                        $keyPath = $keyPrefix . "[$key]";
-                    else
-                        $keyPath = "$keyPrefix.$key";
-                }
-                $siblings = null;
-            }
-        }
-        if ($cachedKeyValues !== null && $keyPrefix) {
-            $cachedKeyValues[$keyPrefix] = $siblings; // 将父级数据缓存起来
-//            echo "\n缓存: keyPrefix=$keyPrefix, key=$keyPath" . ", value=$siblings\n";
         }
         return $value;
     }
@@ -4101,25 +4026,6 @@ class Validation
         $keyPath = $keyPrefix;
         $siblings = $params;
         $value = $params;
-
-        if ($keysCount > 1) {
-            if ($cachedKeyValues !== null) {
-                $prefix = $keyPrefix;
-                for ($i = 0; $i < $keysCount - 1; $i++) {
-                    $key = $keys[$i];
-                    if ($prefix === '')
-                        $prefix = $key;
-                    else if (is_integer($key) || $key === '*')
-                        $prefix .= "[$key]";
-                    else
-                        $prefix .= ".$key";
-                }
-
-//                if(array_key_exists($prefix, $cachedKeyValues)) {
-//                    echo "\n命中: key=$prefix" . ", value=".json_encode($cachedKeyValues[$prefix])."\n";
-//                }
-            }
-        }
 
         for ($n = 0; $n < $keysCount; $n++) {
             $siblings = $value;

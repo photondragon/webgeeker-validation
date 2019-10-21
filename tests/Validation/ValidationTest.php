@@ -316,44 +316,44 @@ class ValidationTest extends TestCase
         }, '必须大于等于 -1 小于 1');
 
         // IntIn
-        Validation::validate(['varInt' => '1'], ['varInt' => 'IntIn:1,2,3']);
-        Validation::validate(['varInt' => 1], ['varInt' => 'IntIn:1,2,3']);
-        Validation::validate(['varInt' => '02'], ['varInt' => 'IntIn:1,2,3']);
-        Validation::validate(['varInt' => 2], ['varInt' => 'IntIn:1,2,3']);
+        Validation::validate(['varInt' => '1'], ['varInt' => 'IntIn:1,2,-3']);
+        Validation::validate(['varInt' => 1], ['varInt' => 'IntIn:1,2,-3']);
+        Validation::validate(['varInt' => '02'], ['varInt' => 'IntIn:1,2,-3']);
+        Validation::validate(['varInt' => 2], ['varInt' => 'IntIn:1,2,-3']);
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误1
-            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntIn:1,2,3']);
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntIn:1,2,-3']);
         }, '必须是整数');
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误2
-            Validation::validate(['varInt' => -1.0], ['varInt' => 'IntIn:1,2,3']);
+            Validation::validate(['varInt' => -1.0], ['varInt' => 'IntIn:1,2,-3']);
         }, '必须是整数');
         $this->_assertThrowExpectionContainErrorString(function () {
-            Validation::validate(['varInt' => '0'], ['varInt' => 'IntIn:1,2,3']);
-        }, '只能取这些值: 1, 2, 3');
+            Validation::validate(['varInt' => '0'], ['varInt' => 'IntIn:1,2,-3']);
+        }, '只能取这些值: 1, 2, -3');
         $this->_assertThrowExpectionContainErrorString(function () {
-            Validation::validate(['varInt' => 5], ['varInt' => 'IntIn:1,2,3']);
-        }, '只能取这些值: 1, 2, 3');
+            Validation::validate(['varInt' => 5], ['varInt' => 'IntIn:1,2,-3']);
+        }, '只能取这些值: 1, 2, -3');
 
         // IntNotIn
-        Validation::validate(['varInt' => '0'], ['varInt' => 'IntNotIn:1,2,3']);
-        Validation::validate(['varInt' => 0], ['varInt' => 'IntNotIn:1,2,3']);
-        Validation::validate(['varInt' => '04'], ['varInt' => 'IntNotIn:1,2,3']);
-        Validation::validate(['varInt' => 4], ['varInt' => 'IntNotIn:1,2,3']);
+        Validation::validate(['varInt' => '0'], ['varInt' => 'IntNotIn:1,2,-3']);
+        Validation::validate(['varInt' => 0], ['varInt' => 'IntNotIn:1,2,-3']);
+        Validation::validate(['varInt' => '04'], ['varInt' => 'IntNotIn:1,2,-3']);
+        Validation::validate(['varInt' => 4], ['varInt' => 'IntNotIn:1,2,-3']);
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误1
-            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntNotIn:1,2,3']);
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntNotIn:1,2,-3']);
         }, '必须是整数');
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误2
-            Validation::validate(['varInt' => -1.0], ['varInt' => 'IntNotIn:1,2,3']);
+            Validation::validate(['varInt' => -1.0], ['varInt' => 'IntNotIn:1,2,-3']);
         }, '必须是整数');
         $this->_assertThrowExpectionContainErrorString(function () {
-            Validation::validate(['varInt' => '1'], ['varInt' => 'IntNotIn:1,2,3']);
-        }, '不能取这些值: 1, 2, 3');
+            Validation::validate(['varInt' => '1'], ['varInt' => 'IntNotIn:1,2,-3']);
+        }, '不能取这些值: 1, 2, -3');
         $this->_assertThrowExpectionContainErrorString(function () {
-            Validation::validate(['varInt' => 2], ['varInt' => 'IntNotIn:1,2,3']);
-        }, '不能取这些值: 1, 2, 3');
+            Validation::validate(['varInt' => -3], ['varInt' => 'IntNotIn:1,2,-3']);
+        }, '不能取这些值: 1, 2, -3');
 
     }
 
@@ -482,13 +482,14 @@ class ValidationTest extends TestCase
         Validation::validate(['varFloat' => '0.0'], ['varFloat' => 'FloatGeLe:0.0,0']);
         Validation::validate(['varFloat' => 0.0], ['varFloat' => 'FloatGeLe:0,0.0']);
         Validation::validate(['varFloat' => 0], ['varFloat' => 'FloatGeLe:0,0.0']);
-        Validation::validate(['varFloat' => '11'], ['varFloat' => 'FloatGeLe:-100.0,100']);
+        Validation::validate(['varFloat' => '-11'], ['varFloat' => 'FloatGeLe:-100.0,100']);
         Validation::validate(['varFloat' => '11.0'], ['varFloat' => 'FloatGeLe:-100.0,100']);
         Validation::validate(['varFloat' => 11.0], ['varFloat' => 'FloatGeLe:-100,100.0']);
-        Validation::validate(['varFloat' => 11], ['varFloat' => 'FloatGeLe:-100,100.0']);
+        Validation::validate(['varFloat' => -11], ['varFloat' => 'FloatGeLe:-100,100.0']);
         Validation::validate(['varFloat' => '0123'], ['varFloat' => 'FloatGeLe:123.0,123']);
         Validation::validate(['varFloat' => '0123.0'], ['varFloat' => 'FloatGeLe:123.0,123']);
-        Validation::validate(['varFloat' => 123], ['varFloat' => 'FloatGeLe:123.0,123']);
+        Validation::validate(['varFloat' => -123], ['varFloat' => 'FloatGeLe:-123.0,-123']);
+        Validation::validate(['varFloat' => -123.0], ['varFloat' => 'FloatGeLe:-123.0,-123']);
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误1
             Validation::validate(['varFloat' => 'abc'], ['varFloat' => 'FloatGeLe:0,0.0']);
@@ -853,7 +854,7 @@ class ValidationTest extends TestCase
         $strVals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111', 'Abcd', '你a好'];
         $str2Vals = ['', ' ', '  ', "\t", '123', 'abc', '你好', '-12311112311111', 'abCd', '你A好'];
         foreach ($strVals as $strVal) {
-            Validation::validate(['valStr' => $strVal.'postfix'], ['valStr' => 'StrNotInI:'.implode(',',$strVals)]);
+            Validation::validate(['valStr' => $strVal.'postfix'], ['valStr' => 'StrNotInI:'.implode(',',$str2Vals)]);
         }
         foreach ($strVals as $strVal) {
             $this->_assertThrowExpectionContainErrorString(function () use ($strVal, $str2Vals) {
@@ -1951,8 +1952,9 @@ class ValidationTest extends TestCase
             $errstr = $e->getMessage();
             $this->assertEquals('|>>>:ERROR: 您必须输入一个整数|Arr', $errstr);
         }
+        Validation::validateValue("123", 'Str|Int|>>>:对不起, 您必须输入一个包含数字的字符串');
         try {
-            Validation::validateValue(123, 'Int|Str|>>>:对不起, 您必须输入一个包含数字的字符串');
+            Validation::validateValue(123, 'Str|Int|>>>:对不起, 您必须输入一个包含数字的字符串');
         } catch (Exception $e) {
             $errstr = $e->getMessage();
             $this->assertEquals('对不起, 您必须输入一个包含数字的字符串', $errstr);
@@ -2985,6 +2987,31 @@ class ValidationTest extends TestCase
         ];
         Validation::validate(['article' => $articleInfo], $validations2);
         Validation::validate(['article' => $complaintInfo], $validations2);
+
+        $params = [
+            'user' => [
+                'name' => 'hello',
+                'flags' => [
+                    1,  // 是否绑定了手机
+                    1,  // 是否绑定了邮箱
+                    1,  // 是否绑定了支付宝
+                ],
+                'phone' => '18812340001',
+                'email' => '18812340001@163.com',
+                'alipay' => '18812340001@alipay.com',
+            ],
+        ];
+        $validations = [
+            'user.phone' => 'If:user.flags[0]|Required|StrLen:11',
+            'user.email' => 'If:user.flags[1]|Required|StrLenGeLe:1,100',
+            'user.alipay' => 'If:user.flags[2]|Required|StrLenGeLe:1,100',
+        ];
+        Validation::validate($params, $validations);
+        unset($params['user']['email']);
+        $this->_assertThrowExpectionContainErrorString(function () use ($params, $validations) {
+            Validation::validate($params, $validations);
+        }, '必须提供“user.email”');
+
     }
 
     /**
