@@ -338,6 +338,11 @@ $validations = [
 ```
 参数"sex"的值不同，参数"height"的验证规则也不一样。
 
+除了`IfExist`和`IfNotExist`，其它的条件验证器 IfXxx 都要求*条件参数*必须存在。如果希望*条件参数*是可选的，那么可以结合`IfExist`或`IfNotExist`一起使用, 如:  
+```php
+"IfExist:sex|IfStrEq:sex,male|IntGe:180"
+```
+
 注意:  
 设计条件验证器的主要目的是根据一个参数的取值不同，对另外一个参数应用不同的验证规则。  
 "IfXxx:"的后面应该是另一个参数的名称，而不是当前参数，这一点一定要注意。  
@@ -576,6 +581,7 @@ MyValidation::validate(["var" => 1.0], [
 | :------| :------ | :------ |
 | Int | Int | “{{param}}”必须是整数 |
 | IntEq | IntEq:100 | “{{param}}”必须等于 {{value}} |
+| IntNe | IntNe:100 | “{{param}}”不能等于 {{value}} |
 | IntGt | IntGt:100 | “{{param}}”必须大于 {{min}} |
 | IntGe | IntGe:100 | “{{param}}”必须大于等于 {{min}} |
 | IntLt | IntLt:100 | “{{param}}”必须小于 {{max}} |

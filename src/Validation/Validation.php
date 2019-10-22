@@ -76,6 +76,38 @@ class Validation
         throw new ValidationException($error);
     }
 
+    public static function validateIntNe($value, $equalVal, $reason = null, $alias = 'Parameter')
+    {
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value) && strpos($value, '.') === false) {
+                $val = intval($value);
+                if ($val != $equalVal)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'integer') {
+            if ($value != $equalVal)
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        if ($isTypeError) {
+            $error = self::getErrorTemplate('Int');
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::getErrorTemplate('IntNe');
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $equalVal, $error);
+        }
+        throw new ValidationException($error);
+    }
+
     public static function validateIntGt($value, $min, $reason = null, $alias = 'Parameter')
     {
         $type = gettype($value);
@@ -2758,6 +2790,7 @@ class Validation
         // 整型（不提供length检测,因为负数的符号位会让人混乱, 可以用大于小于比较来做到这一点）
         'Int' => '“{{param}}”必须是整数',
         'IntEq' => '“{{param}}”必须等于 {{value}}',
+        'IntNe' => '“{{param}}”不能等于 {{value}}',
         'IntGt' => '“{{param}}”必须大于 {{min}}',
         'IntGe' => '“{{param}}”必须大于等于 {{min}}',
         'IntLt' => '“{{param}}”必须小于 {{max}}',
@@ -2867,6 +2900,7 @@ class Validation
         // 整型（不提供length检测,因为负数的符号位会让人混乱, 可以用大于小于比较来做到这一点）
         'Int' => 'Int',
         'IntEq' => 'IntEq:100',
+        'IntNe' => 'IntNe:100',
         'IntGt' => 'IntGt:100',
         'IntGe' => 'IntGe:100',
         'IntLt' => 'IntLt:100',
@@ -3127,6 +3161,7 @@ class Validation
                     }
                     switch ($validatorName) {
                         case 'IntEq':
+                        case 'IntNe':
                         case 'IntGt':
                         case 'IntGe':
                         case 'IntLt':
@@ -3698,7 +3733,7 @@ class Validation
                     {
                         $key = substr($varkeypath, 1); // 去掉开头的.号
                         self::validateVarName($key, "IfXxx中的条件参数“${key}”不是合法的变量名");
-                        $actualValue = @$siblings[$key];
+                        $ifParamValue = isset($siblings[$key]) ? $siblings[$key] : null;
                     } else // 绝对路径
                     {
                         // 解析路径
@@ -3708,7 +3743,7 @@ class Validation
                             throw new ValidationException("IfXxx中的条件参数“${varkeypath}”中不得包含*号");
                         }
 
-                        $actualValue = self::_getValue($originParams, $keys, $ancestorExist);
+                        $ifParamValue = self::getParamValueForIf($originParams, $keys);
                     }
 
 //                    echo "\n\$actualValue = $actualValue\n";
@@ -3719,10 +3754,10 @@ class Validation
                     {
                         if ($value !== null) // 如果参数存在，则其依赖的条件参数也必须存在
                         {
-                            if ($actualValue === null // 依赖的条件参数不存在
+                            if ($ifParamValue === null // 依赖的条件参数不存在
                                 && $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
                             )
-                                throw new ValidationException("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
+                                throw new ValidationException("必须提供条件参数“${varkeypath}”，因为“${alias}”的验证依赖它");
                         } else // 如果参数不存在，则该参数不检测
                         {
                             return $value;
@@ -3730,16 +3765,16 @@ class Validation
                     } else // 不是增量更新
                     {
                         // 无论参数是否存在，则其依赖的条件参数都必须存在
-                        if ($actualValue === null // 依赖的条件参数不存在
+                        if ($ifParamValue === null // 依赖的条件参数不存在
                             && $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
                         )
-                            throw new ValidationException("必须提供条件参数“${varkeypath}”，因为参数“${alias}”的验证依赖它");
+                            throw new ValidationException("必须提供条件参数“${varkeypath}”，因为“${alias}”的验证依赖它");
                     }
 
                     if (isset($validatorUnit[2]))
-                        $params = [$actualValue, $validatorUnit[2]];
+                        $params = [$ifParamValue, $validatorUnit[2]];
                     else
-                        $params = [$actualValue];
+                        $params = [$ifParamValue];
                     $trueOfFalse = call_user_func_array([self::class, $method], $params);
                     if ($trueOfFalse === false) // If条件不满足
                         break; // 跳出
@@ -3957,7 +3992,7 @@ class Validation
     }
 
     /**
-     * 根据路径从参数数组中取值. 可以用于IfXxx中参数的取值
+     * 根据路径从参数数组中取值. 只用于IfXxx中参数的取值
      *
      * 本函数里的代码与 _validate() 中的相似, 但是不可能合并成一个函数.
      * 因为针对"comments[*]"这样的参数路径, _validate() 方法内部必须枚举数组
@@ -3967,45 +4002,47 @@ class Validation
      * @param $params array
      * @param $keys array 条件参数的路径中不能有 * 号, 否则就不知道取哪个值了
      * @param $ancestorExist &bool 返回: 上一级是否存在
-     * @param string $keyPrefix
      * @return null|mixed
      * @throws ValidationException
      */
-    private static function _getValue($params, $keys, &$ancestorExist, $keyPrefix = '')
+    private static function getParamValueForIf($params, $keys, &$ancestorExist = null)
     {
-        $keyPath = $keyPrefix;
+        $keysCount = count($keys);
+
         $value = $params;
 
-        $keysCount = count($keys);
+        $keyPath = '';
+        $siblings = $params;
         for ($n = 0; $n < $keysCount; $n++) {
-            $siblings = $value;
-            $keyPrefix = $keyPath;
 
             $key = $keys[$n];
             if (is_integer($key))
-                self::validateArr($siblings, null, $keyPrefix);
+                self::validateArr($siblings, null, $keyPath);
             else
-                self::validateObj($siblings, null, $keyPrefix);
-            $value = @$siblings[$key];
+                self::validateObj($siblings, null, $keyPath);
+            $value = isset($siblings[$key]) ? $siblings[$key] : null;
 
-            if ($keyPrefix === '')
+            if ($keyPath === '')
                 $keyPath = $key;
             else if (is_integer($key))
-                $keyPath = $keyPrefix . "[$key]";
+                $keyPath .= "[$key]";
             else
-                $keyPath = "$keyPrefix.$key";
+                $keyPath .= ".$key";
 
             if ($value === null) {
                 $n++;
                 break;
             }
+            $siblings = $value;
         }
 
         // 到这里$n表示当前的$value是第几层. 取值在[1, $keysCount]之间, 也就是说 $n 只可能小于或等于$keysCount
         if ($n == $keysCount) {
-            $ancestorExist = true;
+            if ($ancestorExist !== null)
+                $ancestorExist = true;
         } else {
-            $ancestorExist = false;
+            if ($ancestorExist !== null)
+                $ancestorExist = false;
         }
         return $value;
     }
@@ -4061,7 +4098,7 @@ class Validation
                     self::validateArr($siblings, null, $keyPrefix);
                 else
                     self::validateObj($siblings, null, $keyPrefix);
-                $value = @$siblings[$key];
+                $value = isset($siblings[$key]) ? $siblings[$key] : null;
             }
 
             if ($keyPrefix === '')

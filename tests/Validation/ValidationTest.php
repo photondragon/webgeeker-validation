@@ -157,6 +157,24 @@ class ValidationTest extends TestCase
             Validation::validate(['varInt' => 0], ['varInt' => 'IntEq:-1']);
         }, '必须等于 -1');
 
+        // IntNe
+        Validation::validate(['varInt' => '1'], ['varInt' => 'IntNe:-1']);
+        Validation::validate(['varInt' => 1], ['varInt' => 'IntNe:-1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            Validation::validate(['varInt' => 'abc'], ['varInt' => 'IntNe:-1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            Validation::validate(['varInt' => true], ['varInt' => 'IntNe:-1']);
+        }, '必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => '-1'], ['varInt' => 'IntNe:-1']);
+        }, '不能等于 -1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['varInt' => -1], ['varInt' => 'IntNe:-1']);
+        }, '不能等于 -1');
+
         // IntGt
         Validation::validate(['varInt' => '1'], ['varInt' => 'IntGt:0']);
         Validation::validate(['varInt' => 1], ['varInt' => 'IntGt:0']);
@@ -2031,7 +2049,7 @@ class ValidationTest extends TestCase
 
         // IfTrue
         $trues = [true, 'true'];
-        $falses = [false, 'false', 'hello', 2.5]; //'hello'和2.5即不是true, 也不是false
+        $falses = [false, 'false', 0, '0', 1, '1', 'yes', 'y', 'no', 'n', 'hello', 2.5];
         for ($i = 0; $i < count($trues); $i++) {
             for ($j = 0; $j < count($falses); $j++) {
                 $true = $trues[$i];
@@ -2050,7 +2068,7 @@ class ValidationTest extends TestCase
         }
 
         // IfFalse
-        $trues = [true, 'true', 'hello', 2.5]; //'hello'和2.5即不是true, 也不是false
+        $trues = [true, 'true', 0, '0', 1, '1', 'yes', 'y', 'no', 'n', 'hello', 2.5];
         $falses = [false, 'false'];
         for ($i = 0; $i < count($trues); $i++) {
             for ($j = 0; $j < count($falses); $j++) {
@@ -2077,7 +2095,7 @@ class ValidationTest extends TestCase
     {
         // IfExist
         $existVals = [0, 123, '', '123', true, false, 0.0, 1.0, [], [1, 2, 3]];
-        $notExistVals = [null, 'undefined']; // 后面对 'undefined' 会作特殊处理
+        $notExistVals = [null, 'undefined']; // 后面对 'undefined' 会作特殊处理(表示条件参数不存在的情况)
         for ($i = 0; $i < count($existVals); $i++) {
             for ($j = 0; $j < count($notExistVals); $j++) {
                 $existVal = $existVals[$i];
@@ -2102,7 +2120,7 @@ class ValidationTest extends TestCase
 
         // IfNotExist
         $existVals = [0, 123, '', '123', true, false, 0.0, 1.0, [], [1, 2, 3]];
-        $notExistVals = [null, 'undefined']; // 后面对 'undefined' 会作特殊处理
+        $notExistVals = [null, 'undefined']; // 后面对 'undefined' 会作特殊处理(表示条件参数不存在的情况)
         for ($i = 0; $i < count($existVals); $i++) {
             for ($j = 0; $j < count($notExistVals); $j++) {
                 $existVal = $existVals[$i];
@@ -2129,7 +2147,7 @@ class ValidationTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testValidateIfIntXx()
+    public function testValidateIfXxx()
     {
         // 检测格式书写错误: IfIntXx:condition,abc
         $this->_assertThrowExpection(function () {
@@ -2821,6 +2839,12 @@ class ValidationTest extends TestCase
                 Validation::validate($params, ['param' => "IfStrIn:condition,,abc,-100,-1,0,1,100|IntEq:1"]);
             }, 'line ' . __LINE__ . ": 应该抛出异常");
         }
+        $params = ['condition' => '', 'param' => 1];
+        Validation::validate($params, ['param' => "IfStrIn:condition,|IntEq:1"]);
+        $params = ['condition' => '', 'param' => 0];
+        $this->_assertThrowExpection(function () use ($params) {
+            Validation::validate($params, ['param' => "IfStrIn:condition,,|IntEq:1"]);
+        }, 'line ' . __LINE__ . ": 应该抛出异常");
 
         // IfStrIn 条件不成立
         $intNotInVals = ['hello', 'world', '-13', '13', '-123', '123'];
@@ -2873,6 +2897,10 @@ class ValidationTest extends TestCase
             $params = ['condition' => $strInVal, 'param' => 0];
             Validation::validate($params, ['param' => "IfStrNotIn:condition,,abc,-100,-1,0,1,100|IntEq:1"]);
         }
+        $params = ['condition' => '', 'param' => 1];
+        Validation::validate($params, ['param' => "IfStrNotIn:condition,|IntEq:1"]);
+        $params = ['condition' => '', 'param' => 0];
+        Validation::validate($params, ['param' => "IfStrNotIn:condition,,|IntEq:1"]);
 
         // IfStrNotIn 条件成立
         $intNotInVals = ['hello', 'world', '-13', '13', '-123', '123'];
@@ -2917,7 +2945,7 @@ class ValidationTest extends TestCase
      * 测试对条件参数不存在的情况的处理
      * @throws Exception
      */
-    public function testIfConditionParamExistance()
+    public function testValidateIfParamExistence()
     {
         // 非增量更新 + 条件参数不存在 + 参数存在 -> 应该抛出异常
         $params = [/*'condition' => 1, */
@@ -2991,10 +3019,12 @@ class ValidationTest extends TestCase
         $params = [
             'user' => [
                 'name' => 'hello',
-                'flags' => [
-                    1,  // 是否绑定了手机
-                    1,  // 是否绑定了邮箱
-                    1,  // 是否绑定了支付宝
+                'setting' => [
+                    'flags' => [
+                        1,  // 是否绑定了手机
+                        1,  // 是否绑定了邮箱
+                        1,  // 是否绑定了支付宝
+                    ],
                 ],
                 'phone' => '18812340001',
                 'email' => '18812340001@163.com',
@@ -3002,15 +3032,40 @@ class ValidationTest extends TestCase
             ],
         ];
         $validations = [
-            'user.phone' => 'If:user.flags[0]|Required|StrLen:11',
-            'user.email' => 'If:user.flags[1]|Required|StrLenGeLe:1,100',
-            'user.alipay' => 'If:user.flags[2]|Required|StrLenGeLe:1,100',
+            'user.phone' => 'If:user.setting.flags[0]|Required|StrLen:11',
+            'user.email' => 'If:user.setting.flags[1]|Required|StrLenGeLe:1,100',
+            'user.alipay' => 'If:user.setting.flags[2]|Required|StrLenGeLe:1,100',
         ];
         Validation::validate($params, $validations);
+        $params['user']['setting']['flags'] = [1,1]; // If 条件参数的不存在
+        $this->_assertThrowExpectionContainErrorString(function () use ($params, $validations) {
+            Validation::validate($params, $validations);
+        }, '必须提供条件参数“user.setting.flags[2]”，因为“user.alipay”的验证依赖它');
         unset($params['user']['email']);
         $this->_assertThrowExpectionContainErrorString(function () use ($params, $validations) {
             Validation::validate($params, $validations);
         }, '必须提供“user.email”');
+        unset($params['user']['setting']['flags']); // If 条件参数的上一级不存在
+        $this->_assertThrowExpectionContainErrorString(function () use ($params, $validations) {
+            Validation::validate($params, $validations);
+        }, '必须提供条件参数“user.setting.flags[0]”，因为“user.phone”的验证依赖它');
+        unset($params['user']['setting']); // If 条件参数的上上级不存在
+        $this->_assertThrowExpectionContainErrorString(function () use ($params, $validations) {
+            Validation::validate($params, $validations);
+        }, '必须提供条件参数“user.setting.flags[0]”，因为“user.phone”的验证依赖它');
+        $params['user']['setting'] = "abc"; // If 条件参数的上上级不是map
+        $this->_assertThrowExpectionContainErrorString(function () use ($params, $validations) {
+            Validation::validate($params, $validations);
+        }, '“user.setting”必须是对象');
+        $params['user']['setting'] = ['flags' => "abc"]; // If 条件参数的上一级不是数组
+        $this->_assertThrowExpectionContainErrorString(function () use ($params, $validations) {
+            Validation::validate($params, $validations);
+        }, '“user.setting.flags”必须是数组');
+        // If 条件参数的类型错误, 应该算条件不成立, 忽略
+        $params['user']['setting'] = ['flags' => ['abc', 1.0, []]];
+        unset($params['user']['alipay']);
+        unset($params['user']['phone']);
+        Validation::validate($params, $validations);
 
     }
 
