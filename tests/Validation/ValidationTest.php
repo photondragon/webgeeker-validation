@@ -90,6 +90,9 @@ class ValidationTest extends TestCase
         Validation::validate($params, ['name' => 'Required|StrLenGeLe:1,20']);
         Validation::validate($params, ['name' => 'Required|StrLenGeLe:1,20|Alias:姓名']);
         Validation::validate($params, ['name' => 'Required|StrLenGeLe:1,20|>>>:必须提供姓名']);
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, ['name' => 'Str|Required']);
+        }, 'Required只能出现在验证规则的开头（IfXxx后面）');
 
         $this->_assertThrowExpectionContainErrorString(function () use ($params) {
             Validation::validate($params, ['phone' => 'Required']);
@@ -514,7 +517,7 @@ class ValidationTest extends TestCase
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             // 类型错误2
-            Validation::validate(['varFloat' => ''], ['varFloat' => 'FloatGeLe:0.0,0']);
+            Validation::validate(['varFloat' => []], ['varFloat' => 'FloatGeLe:0.0,0']);
         }, '必须是浮点数');
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['varFloat' => '-0.1'], ['varFloat' => 'FloatGeLe:0,10.0']);
@@ -1303,6 +1306,11 @@ class ValidationTest extends TestCase
                 Validation::validate(['valStr' => $notStrVal], ['valStr' => 'Regexp:/abc/']);
             }, '必须是字符串');
         }
+
+        // 为了提高测试覆盖率: _compileValidator() 方法中的行: else if ($pos === $len - 2)
+        Validation::validate(["param" => "abc/"], ["param" => 'Regexp:/^(abc\/|def)$/',]);
+        Validation::validate(["param" => "def"], ["param" => 'Regexp:/^(abc\/|def)$/',]);
+
     }
 
     /**
@@ -1413,6 +1421,50 @@ class ValidationTest extends TestCase
                 Validation::validate(['array' => $notArrVal], ['array' => 'ArrLenGeLe:1,999']);
             }, '必须是数组');
         }
+
+        // 多维数组
+        Validation::validate([
+            "matrix" => [
+                [1, 2, 345],
+                [6, 7, 8],
+            ],
+        ], [
+            "matrix[*][*]" => 'Int',
+            "matrix[0][1]" => 'IntEq:2',
+            "matrix[0][100]" => 'IntEq:2',
+        ]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([
+                "matrix" => [
+                    [1, 2, "abc"],
+                    [6, 7, 8],
+                ],
+            ], ["matrix[*][*]" => 'Int',]);
+        }, '“matrix[0][2]”必须是整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([
+                "matrix" => [
+                    [1, 2, 345],
+                    [6, "ddd", 8],
+                ],
+            ], ["matrix[*][*]" => 'Int',]);
+        }, '“matrix[1][1]”必须是整数');
+
+        // 完善覆盖率测试: _validate() 方法中的行: $value = null; // 这里是针对$value==[]这种情况的特殊处理
+        $params = [
+            "comments" => [],
+        ];
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, [
+                "comments[*]" => 'Required',  // 这个检测最好换成 "comments" => 'ArrLenGe:1'
+            ]);
+        }, '必须提供“comments[*]”');
+        $this->_assertThrowExpectionContainErrorString(function () use ($params) {
+            Validation::validate($params, [
+                "comments" => 'ArrLenGe:1',
+            ]);
+        }, '“comments”长度必须大于等于 1');
+
     }
 
     /**
@@ -1528,6 +1580,10 @@ class ValidationTest extends TestCase
             ],
         ];
         Validation::validate($params, ['file' => 'FileImage']);
+        $this->_assertThrowExpection(function () use ($params) {
+            $params['file']['error'] = 1;
+            Validation::validate($params, ['file' => 'FileImage']);
+        }, '“file”上传失败(ERR=1)');
 
         // 不是图片
         $params = [
@@ -1580,6 +1636,20 @@ class ValidationTest extends TestCase
             ],
         ];
         Validation::validate($params, ['file' => 'FileVideo']);
+        $this->_assertThrowExpection(function () use ($params) {
+            $params['file']['error'] = 1;
+            Validation::validate($params, ['file' => 'FileVideo']);
+        }, '“file”上传失败(ERR=1)');
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.mp4"],
+                "type" => ["video/mp4"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [0],
+                "size" => [2873551]
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileVideo']);
 
         // 不是视频
         $params = [
@@ -1603,6 +1673,20 @@ class ValidationTest extends TestCase
                 "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
                 "error" => 0,
                 "size" => 2873551
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileAudio']);
+        $this->_assertThrowExpection(function () use ($params) {
+            $params['file']['error'] = 1;
+            Validation::validate($params, ['file' => 'FileAudio']);
+        }, '“file”上传失败(ERR=1)');
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.mp3"],
+                "type" => ["audio/mp3"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [0],
+                "size" => [2873551]
             ],
         ];
         Validation::validate($params, ['file' => 'FileAudio']);
@@ -1659,6 +1743,16 @@ class ValidationTest extends TestCase
             ],
         ];
         Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4|>>>:file必须是音频文件']);
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.mp3"],
+                "type" => ["audio/mp3"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [0],
+                "size" => [2873551]
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4|>>>:file必须是音频文件']);
         // mp4也可被当作音频
         $params = [
             'file' => [
@@ -1682,7 +1776,7 @@ class ValidationTest extends TestCase
             ],
         ];
         $this->_assertThrowExpection(function () use ($params) {
-            Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4|>>>:file必须是音频文件']);
+            Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4']);
         }, 'line ' . __LINE__ . ": 应该抛出异常");
         // audio/mp3 不会匹配 xaudio/*
         $params = [
@@ -1724,6 +1818,11 @@ class ValidationTest extends TestCase
             Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4x|>>>:file必须是音频文件']);
         }, 'line ' . __LINE__ . ": 应该抛出异常");
 
+        $this->_assertThrowExpection(function () use ($params) {
+            $params['file']['error'] = 1;
+            Validation::validate($params, ['file' => 'FileMimes:audio/*,mp4x|>>>:file必须是音频文件']);
+        }, '“file”上传失败(ERR=1)');
+
     }
 
     /**
@@ -1754,6 +1853,16 @@ class ValidationTest extends TestCase
             ],
         ];
         Validation::validate($params, ['file' => 'FileMaxSize:1m']);
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.mp4"],
+                "type" => ["video/mp4"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [0],
+                "size" => [1048576]
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileMaxSize:1m']);
 
         // FileMaxSize 检测不通过
         $params = [
@@ -1769,6 +1878,11 @@ class ValidationTest extends TestCase
             Validation::validate($params, ['file' => 'FileMaxSize:1k']);
         }, 'line ' . __LINE__ . ": 应该抛出异常");
 
+        $this->_assertThrowExpection(function () use ($params) {
+            $params['file']['error'] = 1;
+            Validation::validate($params, ['file' => 'FileMaxSize:1k']);
+        }, '“file”上传失败(ERR=1)');
+
         // FileMinSize 检测通过
         $params = [
             'file' => [
@@ -1777,6 +1891,16 @@ class ValidationTest extends TestCase
                 "tmp_name" => "/Applications/MAMP/tmp/php/php19AQMs",
                 "error" => 0,
                 "size" => 100
+            ],
+        ];
+        Validation::validate($params, ['file' => 'FileMinSize:100']);
+        $params = [
+            'file' => [
+                "name" => ["audio_爱情买卖.mp4"],
+                "type" => ["video/mp4"],
+                "tmp_name" => ["/Applications/MAMP/tmp/php/php19AQMs"],
+                "error" => [0],
+                "size" => [100]
             ],
         ];
         Validation::validate($params, ['file' => 'FileMinSize:100']);
@@ -1794,6 +1918,11 @@ class ValidationTest extends TestCase
         $this->_assertThrowExpection(function () use ($params) {
             Validation::validate($params, ['file' => 'FileMinSize:1000000']);
         }, 'line ' . __LINE__ . ": 应该抛出异常");
+
+        $this->_assertThrowExpection(function () use ($params) {
+            $params['file']['error'] = 1;
+            Validation::validate($params, ['file' => 'FileMinSize:1000000']);
+        }, '“file”上传失败(ERR=1)');
 
     }
 
@@ -1832,6 +1961,10 @@ class ValidationTest extends TestCase
             // 日期验证器格式错误
             Validation::validate(['date' => '2017-06-15'], ['date' => 'DateFrom:2017/06\15']);
         }, 'DateFrom格式错误');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式正确, 但时间不存在(6月没有32号)
+            Validation::validate(['date' => '2017-06-32'], ['date' => 'DateFrom:2017-06-20']);
+        }, '“date”必须符合日期格式YYYY-MM-DD');
 
         // DateTo
         Validation::validate(['date' => '2017-06-15'], ['date' => 'DateTo:2017-06-15']);
@@ -1848,6 +1981,10 @@ class ValidationTest extends TestCase
             // 日期验证器格式错误
             Validation::validate(['date' => '2017-06-15'], ['date' => 'DateTo:2017/06\15']);
         }, 'DateTo格式错误');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式正确, 但时间不存在(6月没有32号)
+            Validation::validate(['date' => '2017-06-32'], ['date' => 'DateTo:2017-07-20']);
+        }, '“date”必须符合日期格式YYYY-MM-DD');
 
         // DateFromTo
         Validation::validate(['date' => '2017-06-15'], ['date' => 'DateFromTo:2017-06-15,2017-06-15']);
@@ -1870,6 +2007,10 @@ class ValidationTest extends TestCase
             // 日期验证器格式错误
             Validation::validate(['date' => '2017-06-15'], ['date' => 'DateFromTo:2017-06-15']);
         }, 'DateFromTo格式错误');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式正确, 但时间不存在(6月没有32号)
+            Validation::validate(['date' => '2017-06-32'], ['date' => 'DateFromTo:2017-06-10,2017-07-20']);
+        }, '“date”必须符合日期格式YYYY-MM-DD');
 
     }
 
@@ -1892,6 +2033,10 @@ class ValidationTest extends TestCase
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate(['datetime' => '2017-06-01 12/00/00'], ['datetime' => 'DateTime']);
         }, '必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式正确, 但时间不存在(6月没有32号)
+            Validation::validate(['datetime' => '2017-06-32 12:00:00'], ['datetime' => 'DateTime']);
+        }, '“datetime”必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
 
         // DateTimeFrom
         Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFrom:2017-06-15 12:00:00']);
@@ -1908,8 +2053,12 @@ class ValidationTest extends TestCase
             // 日期时间验证器格式错误
             Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFrom:2017-06-15 12/00/00']);
         }, 'DateTimeFrom格式错误');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式正确, 但时间不存在(6月没有32号)
+            Validation::validate(['datetime' => '2017-06-32 12:00:00'], ['datetime' => 'DateTimeFrom:2017-06-15 12:00:00']);
+        }, '“datetime”必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
 
-        // DateTo
+        // DateTimeTo
         Validation::validate(['datetime' => '2017-06-15 11:59:59'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
         Validation::validate(['datetime' => '2017-06-15 11:59:58'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
         $this->_assertThrowExpectionContainErrorString(function () {
@@ -1924,6 +2073,10 @@ class ValidationTest extends TestCase
             // 日期时间验证器格式错误
             Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeTo:2017-06-15 12/00/00']);
         }, 'DateTimeTo格式错误');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式正确, 但时间不存在(6月没有32号)
+            Validation::validate(['datetime' => '2017-06-32 12:00:00'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
+        }, '“datetime”必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
 
         // DateTimeFromTo
         Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00,2017-06-15 13:00:00']);
@@ -1945,6 +2098,10 @@ class ValidationTest extends TestCase
             // 日期时间验证器格式错误
             Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00']);
         }, 'DateTimeFromTo格式错误');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 日期时间格式正确, 但时间不存在(6月没有32号)
+            Validation::validate(['datetime' => '2017-06-32 12:00:00'], ['datetime' => 'DateTimeFromTo:2017-06-15 12:00:00,2017-07-15 13:00:00']);
+        }, '“datetime”必须符合日期时间格式YYYY-MM-DD HH:mm:ss');
 
     }
 
@@ -3063,9 +3220,46 @@ class ValidationTest extends TestCase
         }, '“user.setting.flags”必须是数组');
         // If 条件参数的类型错误, 应该算条件不成立, 忽略
         $params['user']['setting'] = ['flags' => ['abc', 1.0, []]];
+        Validation::validate($params, $validations);
         unset($params['user']['alipay']);
+        Validation::validate($params, $validations);
         unset($params['user']['phone']);
         Validation::validate($params, $validations);
+
+        // 多个If串联
+        Validation::validate(["cond" => 1, "param" => 2,], [
+            "param" => 'IfIntGe:cond,1|IfIntLe:cond,1|IntGe:2',
+        ]);
+
+        // If验证器位置不对
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(["cond" => 1, "param" => 2,], [
+                "param" => 'IntGe:2|IfIntGe:cond,0|IfIntLe:cond,100',
+            ]);
+        }, '条件验证器 IfXxx 只能出现在验证规则的开头');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(["cond" => 1, "param" => 2,], [
+                "param" => 'IfIntGe:cond,0|IntGe:2|IfIntLe:cond,100',
+            ]);
+        }, '条件验证器 IfXxx 只能出现在验证规则的开头');
+
+        // 以下测试主要是为了完善测试覆盖率
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([
+                "cond" => 1,
+                "param" => 2,
+            ], [
+                "param" => 'If:cond[*]|Int',
+            ]);
+        }, 'IfXxx中的条件参数“cond[*]”中不得包含*号');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([
+                "cond" => [1,2],
+                "param" => 2,
+            ], [
+                "param" => 'IfIntEq:cond[1],2|IntEq:3',
+            ]);
+        }, '“param”必须等于 3');
 
     }
 
@@ -3074,6 +3268,10 @@ class ValidationTest extends TestCase
      */
     public function testValidate()
     {
+        Validation::validate([], []); // 没有验证规则
+        Validation::validate([], ["abc" => '',]); // 验证规则为""
+        Validation::validate(["abc" => 1], ["abc" => '',]); // 验证规则为""
+
         $params = [
             'id' => 1,
             'title' => 'WebGeeker Validation',
@@ -3133,12 +3331,90 @@ class ValidationTest extends TestCase
         }, 'line ' . __LINE__ . ": Validation::validate(\$params, \$validators)应该抛出异常");
         $this->assertNotNull(Validation::validate($params, $validators, true));
 
-        // ignore Required 2
-        $params = ['content' => 'a'];
-        $validators = ['content' => 'Required|StrLenGeLe:1,20',];
-        $this->assertNotNull(Validation::validate($params, $validators));
-        $params = ['content' => null];
-        $this->assertNotNull(Validation::validate($params, $validators, true));
+        // 纯粹为了提高测试覆盖率
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validateValue(123, true);
+        }, '$validator必须是字符串或字符串数组');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["param" => "Haha:3"]);
+        }, '未知的验证器"Haha"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["param" => ":pending"]);
+        }, '“:pending”中的\':\'号前面没有验证器');
+
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testValidateKeyPath()
+    {
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["1abc" => '',]);
+        }, '参数名称“1abc”不得以数字开头');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["1abc.def" => '',]);
+        }, '“1abc.def”中包含了以数字开头的参数名称“1abc”');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["abc.34ab" => '',]);
+        }, '“abc.34ab”中包含了以数字开头的参数名称“34ab”');
+
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["[*]" => 'Obj',]);
+        }, '“[*]”中\'[\'号前面没有参数名称');
+
+        Validation::validate([], ["numbers[*]" => 'Int',]);
+        Validation::validate([], ["numbers[0]" => 'Int',]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["comments[abc]" => 'Obj',]);
+        }, '“comments[abc]”中的方括号[]之间只能包含\'*\'号或数字');
+
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["matrix[*]abc[*]" => 'Int',]);
+        }, '“matrix[*]abc[*]”中的“[*]”之后包含非法字符');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["matrix[*]abc" => 'Int',]);
+        }, '“matrix[*]abc”中的“[*]”之后包含非法字符');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["matrix[*" => 'Int',]);
+        }, '“matrix[*”中的\'[\'号之后缺少\']\'');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["matrix[*][*" => 'Int',]);
+        }, '“matrix[*][*”中的\'[\'号之后缺少\']\'');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["matrix[*[*]" => 'Int',]);
+        }, '“matrix[*[*]”中的方括号[]之间只能包含\'*\'号或数字');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["matrix[*][aaa]" => 'Int',]);
+        }, '“matrix[*][aaa]”中的方括号[]之间只能包含*号或数字');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["matrix[0][-110]" => 'Int',]);
+        }, '非法的参数名称“matrix[0][-110]”');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["" => 'Int',]);
+        }, '参数$validations中包含空的参数名称');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["." => 'Int',]);
+        }, '“.”中包含空的参数名称');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["abc..def" => 'Int',]);
+        }, '“abc..def”中包含空的参数名称');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["abc*" => 'Int',]);
+        }, '“abc*”中\'*\'号只能处于方括号[]中');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["abc]" => 'Int',]);
+        }, '“abc]”中包含了非法的\']\'号');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["abc]*[" => 'Int',]);
+        }, '“abc]*[”中\'[\', \']\'顺序颠倒了');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["abc*[*]" => 'Int',]);
+        }, '“abc*[*]”中包含了非法的\'*\'号');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate([], ["3abc[*]" => 'Int',]);
+        }, '“3abc[*]”中包含了以数字开头的参数名称“3abc”');
+
     }
 
     /**

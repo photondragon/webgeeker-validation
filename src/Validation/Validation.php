@@ -3107,15 +3107,12 @@ class Validation
                     {
                         do {
                             $pos = strpos($segment, '\\', $pos); // 从前往后扫描转义符\
-                            if ($pos === false) // 结尾的/前面没有转义符\, 正则表达式扫描完毕
-                            {
+                            if ($pos === false) { // 结尾的/前面没有转义符\, 正则表达式扫描完毕
                                 $finish = true;
                                 break;
-                            } else if ($pos === $len - 1) // 不可能, $len-1这个位置是字符/
-                            {
+                            } else if ($pos === $len - 1) { // 不可能, $len-1这个位置是字符/
                                 ;
-                            } else if ($pos === $len - 2) // 结尾的/前面有转义符\, 说明/只是正则表达式内容的一部分, 正则表达式尚未结束
-                            {
+                            } else if ($pos === $len - 2) { // 结尾的/前面有转义符\, 说明/只是正则表达式内容的一部分, 正则表达式尚未结束
                                 $pos += 3; // 跳过“\/|”三个字符
                                 break;
                             } else {
@@ -3144,8 +3141,9 @@ class Validation
                 $pos = strpos($segment, ':');
                 if ($pos === false) {
                     if ($segment === 'Required') {
-                        if (count($validatorUnits) > $countOfIfs)
-                            throw new ValidationException("Required只能出现在验证器的开头（IfXxx后面）");
+                        if (count($validatorUnits) > $countOfIfs) {
+                            throw new ValidationException("Required只能出现在验证规则的开头（IfXxx后面）");
+                        }
                         $required = true;
                     } else
                         $validatorUnits[] = [$segment];
@@ -3157,7 +3155,7 @@ class Validation
                             $p = '';
                     }
                     if (strlen($validatorName) === 0) {
-                        throw new ValidationException("无法识别的验证子“${segment}”");
+                        throw new ValidationException("“${segment}”中的':'号前面没有验证器");
                     }
                     switch ($validatorName) {
                         case 'IntEq':
@@ -3224,7 +3222,7 @@ class Validation
                         case 'IfIntGe':
                         case 'IfIntLe':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new ValidationException("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $params = self::_parseIfXxxWith1Param1Int($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
@@ -3234,7 +3232,7 @@ class Validation
                         case 'IfIntIn':
                         case 'IfIntNotIn':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new ValidationException("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $params = self::_parseIfXxxWith1ParamMultiInts($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
@@ -3248,7 +3246,7 @@ class Validation
                         case 'IfStrGe':
                         case 'IfStrLe':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new ValidationException("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $params = self::_parseIfXxxWith1Param1Str($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
@@ -3258,7 +3256,7 @@ class Validation
                         case 'IfStrIn':
                         case 'IfStrNotIn':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new ValidationException("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $params = self::_parseIfXxxWith1ParamMultiStrings($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
@@ -3274,7 +3272,7 @@ class Validation
 //                        case 'IfSame':
 //                        case 'IfNotSame':
                             if (count($validatorUnits) > $countOfIfs)
-                                throw new ValidationException("IfXxx只能出现在验证器的开头");
+                                throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $varname = self::_parseIfXxxWith1Param($p);
                             if ($varname === false)
                                 self::_throwFormatError($validatorName);
@@ -3362,7 +3360,7 @@ class Validation
                             $validator = null;
                             break;
                         default:
-                            throw new ValidationException("无法识别的验证子“${segment}”");
+                            throw new ValidationException("未知的验证器\"${validatorName}\"");
                     }
                     if ($validator)
                         $validatorUnits[] = $validator;
@@ -3709,6 +3707,7 @@ class Validation
          */
         $success = 0;
         $failed = 0;
+        $lastException = null;
         foreach ($validators as $validator) {
 
             $validatorInfo = self::_compileValidator($validator, $alias);
@@ -3750,25 +3749,23 @@ class Validation
 //                    echo "\n\$compareVal = $compareVal\n";
 
                     // 处理条件参数不存在的情况
-                    if ($ignoreRequired) // 这是增量更新
-                    {
-                        if ($value !== null) // 如果参数存在，则其依赖的条件参数也必须存在
-                        {
-                            if ($ifParamValue === null // 依赖的条件参数不存在
-                                && $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
-                            )
+                    if ($ignoreRequired) {// 这是增量更新
+                        if ($value !== null) {// 如果参数存在，则其依赖的条件参数也必须存在
+                            if ($ifParamValue === null && // 依赖的条件参数不存在
+                                $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
+                            ) {
                                 throw new ValidationException("必须提供条件参数“${varkeypath}”，因为“${alias}”的验证依赖它");
-                        } else // 如果参数不存在，则该参数不检测
-                        {
+                            }
+                        } else { // 如果参数不存在，则该参数不检测
                             return $value;
                         }
-                    } else // 不是增量更新
-                    {
+                    } else {// 不是增量更新
                         // 无论参数是否存在，则其依赖的条件参数都必须存在
-                        if ($ifParamValue === null // 依赖的条件参数不存在
-                            && $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
-                        )
+                        if ($ifParamValue === null && // 依赖的条件参数不存在
+                            $ifName !== 'IfExist' && $ifName !== 'IfNotExist'
+                        ) {
                             throw new ValidationException("必须提供条件参数“${varkeypath}”，因为“${alias}”的验证依赖它");
+                        }
                     }
 
                     if (isset($validatorUnit[2]))
@@ -3840,10 +3837,7 @@ class Validation
 
         if ($success || $failed === 0)
             return $value;
-
-        if (isset($lastException))
-            throw $lastException;
-        throw new ValidationException("“${alias}”验证失败"); // 这句应该不会执行
+        throw $lastException; // 此时 $success == 0 && $failed > 0
     }
 
     /**
@@ -3855,14 +3849,12 @@ class Validation
     private static function _compileKeypath($keypath, &$asterisksCount)
     {
         if (strlen($keypath) === 0)
-            throw new ValidationException('$validations数组中包含空的字段名');
+            throw new ValidationException('参数$validations中包含空的参数名称');
 
         if (preg_match('/^[a-zA-Z0-9_.\[\]*]+$/', $keypath) !== 1)
-            throw new ValidationException("非法的字段名“${keypath}”");
+            throw new ValidationException("非法的参数名称“${keypath}”");
 
-        $keys = explode('.', $keypath); // $keys中的数组还没有解析
-        if (count($keys) === 0)
-            throw new ValidationException('$validations数组中包含空的字段名');
+        $keys = explode('.', $keypath); // 不可能返回空数组. $keys中的数组还没有解析
 
         $asterisksCount = 0;
 
@@ -3870,7 +3862,7 @@ class Validation
         // 尝试识别普通数组, 形如'varname[*]'
         foreach ($keys as $key) {
             if (strlen($key) === 0)
-                throw new ValidationException("“${keypath}”中包含空的字段名");
+                throw new ValidationException("“${keypath}”中包含空的参数名称");
 
             $i = strpos($key, '[');
             if ($i === false) // 普通的key
@@ -3881,14 +3873,14 @@ class Validation
                     throw new ValidationException("“${key}”中包含了非法的']'号");
                 if (preg_match('/^[0-9]/', $key) === 1) {
                     if (count($keys) === 1)
-                        throw new ValidationException("字段名“${keypath}”不得以数字开头");
+                        throw new ValidationException("参数名称“${keypath}”不得以数字开头");
                     else
-                        throw new ValidationException("“${keypath}”中包含了以数字开头的字段名“${key}”");
+                        throw new ValidationException("“${keypath}”中包含了以数字开头的参数名称“${key}”");
                 }
                 $filteredKeys[] = $key;
                 continue;
             } else if ($i === 0) {
-                throw new ValidationException("“${keypath}”中'['号前面没有变量名");
+                throw new ValidationException("“${keypath}”中'['号前面没有参数名称");
             } else {
                 $j = strpos($key, ']');
                 if ($j === false)
@@ -3901,7 +3893,7 @@ class Validation
                 if (strpos($varName, '*') !== false)
                     throw new ValidationException("“${key}”中包含了非法的'*'号");
                 if (preg_match('/^[0-9]/', $varName) === 1)
-                    throw new ValidationException("“${keypath}”中包含了以数字开头的字段名“${varName}”");
+                    throw new ValidationException("“${keypath}”中包含了以数字开头的参数名称“${varName}”");
                 $filteredKeys[] = $varName;
 
                 // 识别普通数组的索引值
@@ -3912,7 +3904,7 @@ class Validation
                 } else if (is_numeric($index))
                     $filteredKeys[] = intval($index);
                 else
-                    throw new ValidationException("“${key}”中的方括号[]之间只能包含数字或'*'号");
+                    throw new ValidationException("“${key}”中的方括号[]之间只能包含'*'号或数字");
 
                 // 尝试识别多维数组
                 $len = strlen($key);
@@ -3932,7 +3924,7 @@ class Validation
                     } else if (is_numeric($index))
                         $filteredKeys[] = intval($index);
                     else
-                        throw new ValidationException("“${key}”中的方括号[]之间只能包含数字或'*'号");
+                        throw new ValidationException("“${key}”中的方括号[]之间只能包含*号或数字");
                 }
             }
         }
@@ -4111,7 +4103,7 @@ class Validation
                 $n++;
                 break;
             }
-        }
+        } // end for keys
 
         // 到这里$n表示当前的$value是第几层
         if ($n == $keysCount) {
