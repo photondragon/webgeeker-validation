@@ -721,8 +721,8 @@ MyValidation::validate(["var" => 1.0], [
 | IfStrNe|  IfStrNe:var,editing |  if (var !== 'editing'). 特别要注意的是如果条件参数var的数据类型不匹配, 那么If条件是成立的; 而其它几个IfStrXx当条件参数var的数据类型不匹配时, If条件不成立 |
 | IfStrGt|  IfStrGt:var,a |  if (var > 'a') |
 | IfStrLt|  IfStrLt:var,z |  if (var < 'z') |
-| IfStrGe|  IfStrGe:var,A |  if (var >= '0') |
-| IfStrLe|  IfStrLe:var,Z |  if (var <= '9') |
+| IfStrGe|  IfStrGe:var,A |  if (var >= 'A') |
+| IfStrLe|  IfStrLe:var,Z |  if (var <= 'Z') |
 | IfStrIn|  IfStrIn:var,normal,warning,error |  if (in_array(var, \['normal', 'warning', 'error'], true)) |
 | IfStrNotIn|  IfStrNotIn:var,warning,error |  if (!in_array(var, \['warning', 'error'], true)) |
 
