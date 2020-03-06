@@ -1275,6 +1275,18 @@ class ValidationTest extends TestCase
      */
     public function testValidateRegexp()
     {
+        // 正则匹配中文
+        Validation::validate(["param" => "你好"], ["param" => "Regexp:/^[\x{4e00}-\x{9fa5}]+$/",]);
+        Validation::validate(["param" => "abc你好def"], ["param" => 'Regexp:/[\x{4e00}-\x{9fa5}]+/',]);
+        Validation::validate(["param" => "你好def"], ["param" => 'Regexp:/^[\x{4e00}-\x{9fa5}]+/',]);
+        Validation::validate(["param" => "abc你好"], ["param" => 'Regexp:/[\x{4e00}-\x{9fa5}]+$/',]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(["param" => "abc"], ["param" => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/',]);
+        }, '不匹配正则表达式');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(["param" => "abc"], ["param" => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/|>>>:参数只能是中文',]);
+        }, '参数只能是中文');
+
         $valExps = [
             '0123456789' => '/345/',
             '10.' => '/^[0-9.]+$/',

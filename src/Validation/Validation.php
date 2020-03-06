@@ -1696,7 +1696,16 @@ class Validation
             throw new ValidationException("“${alias}”参数的验证模版(Regexp:)格式错误, 没有提供正则表达式");
 
         if (is_string($value)) {
-            $result = @preg_match($regexp, $value);
+            try {
+                $result = preg_match($regexp, $value);
+            } catch (\Exception $e) {
+                $msg = $e->getMessage();
+                // 中文正则匹配问题，需要开启utf8模式，在正则表达式后面添加u。如: /^[\x{4e00}-\x{9fa5}]+$/u
+                if (strpos($msg, 'preg_match(): Compilation failed: character value in \x{} or \o{} is too large at offset') == 0)
+                    $result = @preg_match($regexp . 'u', $value);
+                else
+                    $result = null;
+            }
             if ($result === 1)
                 return $value;
             else if ($result === false)
