@@ -238,6 +238,19 @@ preg_match('/^string$/', $string);
 ```
 然后把两个`'/'`号及其中间的部分拷贝出来，放在`Regexp:`后面即可，不需要再做额外的转义，即使正则中有`'|'`这种特殊符号，也不需要再转义。
 
+关于正则匹配中文的问题
+用户 preq_match() 匹配中文的代码如下：
+```
+    $matched = preg_match("/^[\x{4e00}-\x{9fa5}]+$/u", "你好");
+```
+注意正则表达式结尾需要加一个'u'，意思是开启UTF8模式。
+
+用我们的验证库代码应该这样写：
+```
+    Validation::validate(["param" => "你好"], ["param" => "Regexp:/^[\x{4e00}-\x{9fa5}]+$/"]);
+```
+注意正则表达式结尾不需要加'u'。
+
 完整的字符串型验证器的列表参考附录 A.4 。
 
 ### 4.5 验证数组型、对象型、文件型、日期时间型参数
@@ -324,6 +337,8 @@ Validation::validate($params, $validations);
 
 条件判断型验证器都以"If"开头。
 
+如果条件不满足，则条件验证器后面的规则都不检测，忽略当前这条验证规则。
+
 比如你想招聘一批模特，男的要求180以上，女的要求170以上，验证可以这样写：
 ```php
 $validations = [
@@ -335,6 +350,16 @@ $validations = [
 ];
 ```
 参数"sex"的值不同，参数"height"的验证规则也不一样。
+
+除了`IfExist`和`IfNotExist`，其它的条件验证器 IfXxx 都要求*条件参数*必须存在。如果希望*条件参数*是可选的，那么可以结合`IfExist`或`IfNotExist`一起使用, 如:  
+```php
+"IfExist:sex|IfStrEq:sex,male|IntGe:180"
+```
+
+注意:  
+设计条件验证器的主要目的是根据一个参数的取值不同，对另外一个参数应用不同的验证规则。  
+"IfXxx:"的后面应该是另一个参数的名称，而不是当前参数，这一点一定要注意。  
+比如上面的例子中，是根据参数"sex"的取值不同，对参数"height"应用了不同的验证规则，"IfXxx:"后面跟的是"sex"。
 
 完整的条件判断型验证器的列表参考附录 A.9 。
 
@@ -569,6 +594,7 @@ MyValidation::validate(["var" => 1.0], [
 | :------| :------ | :------ |
 | Int | Int | “{{param}}”必须是整数 |
 | IntEq | IntEq:100 | “{{param}}”必须等于 {{value}} |
+| IntNe | IntNe:100 | “{{param}}”不能等于 {{value}} |
 | IntGt | IntGt:100 | “{{param}}”必须大于 {{min}} |
 | IntGe | IntGe:100 | “{{param}}”必须大于等于 {{min}} |
 | IntLt | IntLt:100 | “{{param}}”必须小于 {{max}} |
@@ -708,8 +734,8 @@ MyValidation::validate(["var" => 1.0], [
 | IfStrNe|  IfStrNe:var,editing |  if (var !== 'editing'). 特别要注意的是如果条件参数var的数据类型不匹配, 那么If条件是成立的; 而其它几个IfStrXx当条件参数var的数据类型不匹配时, If条件不成立 |
 | IfStrGt|  IfStrGt:var,a |  if (var > 'a') |
 | IfStrLt|  IfStrLt:var,z |  if (var < 'z') |
-| IfStrGe|  IfStrGe:var,A |  if (var >= '0') |
-| IfStrLe|  IfStrLe:var,Z |  if (var <= '9') |
+| IfStrGe|  IfStrGe:var,A |  if (var >= 'A') |
+| IfStrLe|  IfStrLe:var,Z |  if (var <= 'Z') |
 | IfStrIn|  IfStrIn:var,normal,warning,error |  if (in_array(var, \['normal', 'warning', 'error'], true)) |
 | IfStrNotIn|  IfStrNotIn:var,warning,error |  if (!in_array(var, \['warning', 'error'], true)) |
 
