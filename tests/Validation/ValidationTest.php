@@ -1827,7 +1827,7 @@ class ValidationTest extends TestCase
             Validation::validate(['datetime' => '2017-06-15 12:00:00'], ['datetime' => 'DateTimeFrom:2017-06-15 12/00/00']);
         }, 'DateTimeFrom格式错误');
 
-        // DateTo
+        // DateTimeTo
         Validation::validate(['datetime' => '2017-06-15 11:59:59'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
         Validation::validate(['datetime' => '2017-06-15 11:59:58'], ['datetime' => 'DateTimeTo:2017-06-15 12:00:00']);
         $this->_assertThrowExpectionContainErrorString(function () {
