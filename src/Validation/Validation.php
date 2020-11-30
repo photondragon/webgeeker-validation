@@ -2749,7 +2749,7 @@ class Validation
 //        ],
     ];
 
-    private static function getErrorTemplate($validatorName)
+    final protected static function getErrorTemplate($validatorName)
     {
         if (isset(static::$langCode2ErrorTemplates[self::$langCode])) {
             $errorTemplates = static::$langCode2ErrorTemplates[self::$langCode];
@@ -2760,7 +2760,13 @@ class Validation
             }
         }
 
-        $template = self::$errorTemplates[$validatorName];
+        if (isset(self::$errorTemplates[$validatorName]))
+            $template = self::$errorTemplates[$validatorName];
+        else if (isset(static::$errorTemplates[$validatorName]))
+            $template = static::$errorTemplates[$validatorName];
+        else
+            $template = "自定义验证器 $validatorName 验证失败，并且该验证器没有错误提示信息模版";
+
         if (isset(static::$langCodeToErrorTemplates[self::$langCode])) {
             $templates = static::$langCodeToErrorTemplates[self::$langCode];
             if (is_array($templates) && isset($templates[$template])) {
@@ -2795,7 +2801,7 @@ class Validation
      *
      * 输入值一般为字符串
      */
-    static private $errorTemplates = [
+    protected static $errorTemplates = [
         // 整型（不提供length检测,因为负数的符号位会让人混乱, 可以用大于小于比较来做到这一点）
         'Int' => '“{{param}}”必须是整数',
         'IntEq' => '“{{param}}”必须等于 {{value}}',
@@ -3153,8 +3159,28 @@ class Validation
                             throw new ValidationException("Required只能出现在验证规则的开头（IfXxx后面）");
                         }
                         $required = true;
-                    } else
-                        $validators[] = [$segment];
+                    } else {
+                        $validatorName = $segment;
+                        $methodName = 'validate' . $validatorName;
+                        if (method_exists(static::class, $methodName) === false)
+                            throw new ValidationException("未知的验证器\"${validatorName}\"");
+
+                        if (strpos($validatorName, 'Custom') === 0) {
+                            if (strlen($validatorName) == 6)
+                                throw new ValidationException("自定义验证器必须以\"Custom\"开头，但不能是\"Custom\"");
+                            $class = new \ReflectionClass(static::class);
+                            $method = $class->getMethod($methodName);
+                            $reflectParams = $method->getParameters();
+                            $pCount = count($reflectParams) - 3;
+                            if ($pCount < 0) {
+                                throw new ValidationException("自定义验证器\"${validatorName}\"的实现方法 $methodName() 应该至少有3个参数");
+                            } else if ($pCount > 0) {
+                                throw new ValidationException("自定义验证器\"${validatorName}\"应该有 $pCount 个参数");
+                            }
+                        }
+
+                        $validators[] = [$validatorName];
+                    }
                 } else {
                     $validatorName = substr($segment, 0, $pos);
                     $p = substr($segment, $pos + 1);
@@ -3369,6 +3395,43 @@ class Validation
                             $validatorInfo = null;
                             break;
                         default:
+                            // 自定义验证器
+                            $className = static::class;
+                            $methodName = 'validate' . $validatorName;
+                            if (strpos($validatorName, 'Custom') === 0 &&
+                                method_exists($className, $methodName)
+                            ) {
+                                if (strlen($validatorName) == 6)
+                                    throw new ValidationException("自定义验证器必须以\"Custom\"开头，但不能是\"Custom\"");
+                                $class = new \ReflectionClass($className);
+                                $method = $class->getMethod($methodName);
+                                $reflectParams = $method->getParameters();
+                                $pCount = count($reflectParams) - 3;
+                                if ($pCount < 0) {
+                                    throw new ValidationException("自定义验证器\"${validatorName}\"的实现方法 $methodName() 应该至少有3个参数");
+                                } else if ($pCount == 0) {
+                                    throw new ValidationException("自定义验证器\"${validatorName}\"应该没有参数");
+                                } else {
+                                    $parserMethod = "parseParamsOf" . $validatorName;
+                                    if (method_exists($className, $parserMethod)) { // 如果实现了参数解析方法
+                                        $params = call_user_func_array([static::class, $parserMethod], [$p]);
+                                        if (!is_array($params) || count($params) === 0 || $pCount != count($params))
+                                            throw new ValidationException("自定义验证器\"${validatorName}\"的参数解析方法 $parserMethod() 应该返回含有 $pCount 个参数的数组");
+                                    } else if ($pCount == 1) {
+                                        $params = [$p];
+                                    } else {
+                                        $params = explode($p, ',');
+                                        if ($pCount != count($params))
+                                            throw new ValidationException("自定义验证器\"${validatorName}\"应该有 $pCount 个参数");
+                                    }
+                                    $validatorInfo = [$validatorName];
+                                    for ($x = 0; $x < $pCount; $x++) {
+                                        $px = $params[$x];
+                                        $validatorInfo[] = $px;
+                                    }
+                                }
+                                break;
+                            }
                             throw new ValidationException("未知的验证器\"${validatorName}\"");
                     }
                     if ($validatorInfo)
@@ -3822,8 +3885,8 @@ class Validation
 //                        echo "\n$method()\n";
 //                    }
 
-                    if (method_exists(self::class, $method) === false)
-                        throw new ValidationException("找不到验证器${validatorName}的验证方法");
+                    if (method_exists(static::class, $method) === false)
+                        throw new ValidationException("找不到验证器 ${validatorName} 的验证方法");
 
                     $params = [$value];
                     $paramsCount = count($validatorInfo);

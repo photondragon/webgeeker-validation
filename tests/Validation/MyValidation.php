@@ -16,8 +16,6 @@
 
 namespace WebGeeker\ValidationTest;
 
-use \WebGeeker\Validation\Validation;
-
 /**
  * @class MyValidation
  * @package WebGeeker\RestTest
@@ -25,9 +23,12 @@ use \WebGeeker\Validation\Validation;
  *
  * elaborate description
  */
-class MyValidation extends Validation
+class MyValidation extends CustomValidation
 {
-    // “错误提示信息模版”翻译对照表
+    /**
+     * “错误提示信息模版”翻译对照表
+     * @deprecated
+     */
     protected static $langCodeToErrorTemplates = [
         "zh-tw" => [
             "“{{param}}”必须是整数" => "“{{param}}”必須是整數",
@@ -44,10 +45,14 @@ class MyValidation extends Validation
         "zh-tw" => [
             "变量" => "變量",
             "变量必须是整数" => "變量必須是整數",
+            "自定义变量" => '自定義變量',
+            "自定义变量必须是Custom整数" => "自定義變量必須是Custom整數",
         ],
         "en-us" => [
             "变量" => "variable",
             "变量必须是整数" => "variable must be an integer",
+            "自定义变量" => 'custom variable',
+            "自定义变量必须是Custom整数" => "custom variable must be a custom integer",
         ],
     ];
 

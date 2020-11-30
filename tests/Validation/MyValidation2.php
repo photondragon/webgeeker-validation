@@ -16,8 +16,6 @@
 
 namespace WebGeeker\ValidationTest;
 
-use \WebGeeker\Validation\Validation;
-
 /**
  * @class MyValidation2
  * @package WebGeeker\RestTest
@@ -25,23 +23,28 @@ use \WebGeeker\Validation\Validation;
  *
  * elaborate description
  */
-class MyValidation2 extends Validation
+class MyValidation2 extends CustomValidation
 {
     // 新的“错误提示信息模版”翻译对照表
     protected static $langCode2ErrorTemplates = [
         "zh-tw" => [
             'Int' => '“{{param}}”必須是整數', // 🌝
+            'CustomInt' => '“{{param}}”必須是Custom整數', // 🌝
             'IntGt' => '“{{param}}”必須大於 {{min}}',
             'Str' => '“{{param}}”必須是字符串',
         ],
         "en-us" => [
             'Int' => '{{param}} must be an integer',
+            'CustomInt' => '{{param}} must be an custom integer',
             'IntGt' => '{{param}} must be greater than {{min}}',
             'Str' => '{{param}} must be a string',
         ],
     ];
 
-    // 旧的“错误提示信息模版”翻译对照表（不建议使用）
+    /**
+     * 旧的“错误提示信息模版”翻译对照表（不建议使用）
+     * @deprecated
+     */
     protected static $langCodeToErrorTemplates = [
         "zh-tw" => [
             "“{{param}}”必须是整数" => "“{{param}}”必須是整數啊",
