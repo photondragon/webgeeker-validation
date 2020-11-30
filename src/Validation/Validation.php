@@ -2749,18 +2749,18 @@ class Validation
 //        ],
     ];
 
-    private static function getErrorTemplate($validator)
+    private static function getErrorTemplate($validatorName)
     {
         if (isset(static::$langCode2ErrorTemplates[self::$langCode])) {
             $errorTemplates = static::$langCode2ErrorTemplates[self::$langCode];
-            if (is_array($errorTemplates) && isset($errorTemplates[$validator])) {
-                $errorTemplate = $errorTemplates[$validator];
+            if (is_array($errorTemplates) && isset($errorTemplates[$validatorName])) {
+                $errorTemplate = $errorTemplates[$validatorName];
                 if (is_string($errorTemplate) && strlen($errorTemplate))
                     return $errorTemplate;
             }
         }
 
-        $template = self::$errorTemplates[$validator];
+        $template = self::$errorTemplates[$validatorName];
         if (isset(static::$langCodeToErrorTemplates[self::$langCode])) {
             $templates = static::$langCodeToErrorTemplates[self::$langCode];
             if (is_array($templates) && isset($templates[$template])) {
@@ -3041,14 +3041,14 @@ class Validation
     ];
 
     /**
-     * 将验证器(Validator)编译为验证子(Validator Unit)的数组
+     * 编译验证规则(Validator Rule)
      *
      * 示例1:
-     * 输入: $validator = 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/'
+     * 输入: $validationRule = 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/'
      * 输出: [
      *     'countOfIfs' => 0,
      *     'required' => false,
-     *     'units' => [
+     *     'validators' => [
      *         ['StrLen', 6, 16],
      *         ['regex', '/^[a-zA-Z0-9]+$/'],
      *     ],
@@ -3057,11 +3057,11 @@ class Validation
      * ]
      *
      * 示例2（自定义验证失败的提示）:
-     * 输入: $validator = 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/|>>>:参数验证失败了'
+     * 输入: $validationRule = 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/|>>>:参数验证失败了'
      * 输出: [
      *     'countOfIfs' => 0,
      *     'required' => false,
-     *     'units' => [
+     *     'validators' => [
      *         ['StrLen', 6, 16],
      *         ['regex', '/^[a-zA-Z0-9]+$/'],
      *     ],
@@ -3069,29 +3069,28 @@ class Validation
      *     'alias' => $alias,
      * ]
      *
-     * @param $validator string 一条验证字符串
+     * @param $validationRule string 一条验证规则
      * @param $alias string 参数的别名. 如果验证器中包含Alias:xxx, 会用xxx取代这个参数的值
      * @return array 返回包含验证信息的array
      * @throws ValidationException
      */
-    private static function _compileValidator($validator, $alias)
+    private static function _compileValidationRule($validationRule, $alias)
     {
-        if (is_string($validator) === false)
-            throw new ValidationException("编译Validator失败: Validator必须是字符串");;
-        if (strlen($validator) === 0) {
+        if (is_string($validationRule) === false)
+            throw new ValidationException("编译验证规则失败: 验证规则必须是字符串");;
+        if (strlen($validationRule) === 0) {
             return [
                 'countOfIfs' => 0,
                 'required' => false,
-                'units' => [],
+                'validators' => [],
             ];
         }
 
         $countOfIfs = 0; //Ifxxx的个数
-//        $ifUnits = [];
         $required = false;
-        $validatorUnits = [];
+        $validators = [];
 
-        $segments = explode('|', $validator);
+        $segments = explode('|', $validationRule);
         $segCount = count($segments);
         $customReason = null;
         for ($i = 0; $i < $segCount;) {
@@ -3144,18 +3143,18 @@ class Validation
 
                 } while (1);
 
-                $validatorUnits[] = ['Regexp', substr($segment, 7)];
+                $validators[] = ['Regexp', substr($segment, 7)];
             } // end if(strpos($segment, 'Regexp:')===0)
             else {
                 $pos = strpos($segment, ':');
                 if ($pos === false) {
                     if ($segment === 'Required') {
-                        if (count($validatorUnits) > $countOfIfs) {
+                        if (count($validators) > $countOfIfs) {
                             throw new ValidationException("Required只能出现在验证规则的开头（IfXxx后面）");
                         }
                         $required = true;
                     } else
-                        $validatorUnits[] = [$segment];
+                        $validators[] = [$segment];
                 } else {
                     $validatorName = substr($segment, 0, $pos);
                     $p = substr($segment, $pos + 1);
@@ -3166,6 +3165,7 @@ class Validation
                     if (strlen($validatorName) === 0) {
                         throw new ValidationException("“${segment}”中的':'号前面没有验证器");
                     }
+                    $validatorInfo = null;
                     switch ($validatorName) {
                         case 'IntEq':
                         case 'IntNe':
@@ -3184,7 +3184,7 @@ class Validation
                         case 'ArrLenLe':
                             if (self::_isIntOrIntString($p) === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, intval($p)];
+                            $validatorInfo = [$validatorName, intval($p)];
                             break;
                         case 'IntGtLt':
                         case 'IntGeLe':
@@ -3200,20 +3200,20 @@ class Validation
                             $p2 = $vals[1];
                             if (self::_isIntOrIntString($p1) === false || self::_isIntOrIntString($p2) === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, intval($p1), intval($p2)];
+                            $validatorInfo = [$validatorName, intval($p1), intval($p2)];
                             break;
                         case 'IntIn':
                         case 'IntNotIn':
                             $ints = self::_parseIntArray($p);
                             if ($ints === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $ints];
+                            $validatorInfo = [$validatorName, $ints];
                             break;
                         case 'StrEq':
                         case 'StrNe':
                         case 'StrEqI':
                         case 'StrNeI':
-                            $validator = [$validatorName, $p];
+                            $validatorInfo = [$validatorName, $p];
                             break;
                         case 'StrIn':
                         case 'StrNotIn':
@@ -3222,7 +3222,7 @@ class Validation
                             $strings = self::_parseStringArray($p);
                             if ($strings === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $strings];
+                            $validatorInfo = [$validatorName, $strings];
                             break;
                         case 'IfIntEq':
                         case 'IfIntNe':
@@ -3230,22 +3230,22 @@ class Validation
                         case 'IfIntLt':
                         case 'IfIntGe':
                         case 'IfIntLe':
-                            if (count($validatorUnits) > $countOfIfs)
+                            if (count($validators) > $countOfIfs)
                                 throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $params = self::_parseIfXxxWith1Param1Int($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $params[0], $params[1]];
+                            $validatorInfo = [$validatorName, $params[0], $params[1]];
                             $countOfIfs++;
                             break;
                         case 'IfIntIn':
                         case 'IfIntNotIn':
-                            if (count($validatorUnits) > $countOfIfs)
+                            if (count($validators) > $countOfIfs)
                                 throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $params = self::_parseIfXxxWith1ParamMultiInts($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $params[0], $params[1]];
+                            $validatorInfo = [$validatorName, $params[0], $params[1]];
                             $countOfIfs++;
                             break;
                         case 'IfStrEq':
@@ -3254,22 +3254,22 @@ class Validation
                         case 'IfStrLt':
                         case 'IfStrGe':
                         case 'IfStrLe':
-                            if (count($validatorUnits) > $countOfIfs)
+                            if (count($validators) > $countOfIfs)
                                 throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $params = self::_parseIfXxxWith1Param1Str($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $params[0], $params[1]];
+                            $validatorInfo = [$validatorName, $params[0], $params[1]];
                             $countOfIfs++;
                             break;
                         case 'IfStrIn':
                         case 'IfStrNotIn':
-                            if (count($validatorUnits) > $countOfIfs)
+                            if (count($validators) > $countOfIfs)
                                 throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $params = self::_parseIfXxxWith1ParamMultiStrings($p, $validatorName);
                             if ($params === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $params[0], $params[1]];
+                            $validatorInfo = [$validatorName, $params[0], $params[1]];
                             $countOfIfs++;
                             break;
                         case 'If':
@@ -3280,12 +3280,12 @@ class Validation
                         case 'IfFalse':
 //                        case 'IfSame':
 //                        case 'IfNotSame':
-                            if (count($validatorUnits) > $countOfIfs)
+                            if (count($validators) > $countOfIfs)
                                 throw new ValidationException("条件验证器 IfXxx 只能出现在验证规则的开头");
                             $varname = self::_parseIfXxxWith1Param($p);
                             if ($varname === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $varname];
+                            $validatorInfo = [$validatorName, $varname];
                             $countOfIfs++;
                             break;
 //                        case 'IfAny':
@@ -3296,7 +3296,7 @@ class Validation
                         case 'FloatLe':
                             if (is_numeric($p) === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, doubleval($p)];
+                            $validatorInfo = [$validatorName, doubleval($p)];
                             break;
                         case 'FloatGtLt':
                         case 'FloatGeLe':
@@ -3309,7 +3309,7 @@ class Validation
                             $p2 = $vals[1];
                             if (is_numeric($p1) === false || is_numeric($p2) === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, doubleval($p1), doubleval($p2)];
+                            $validatorInfo = [$validatorName, doubleval($p1), doubleval($p2)];
                             break;
                         case 'DateFrom':
                         case 'DateTo':
@@ -3317,14 +3317,14 @@ class Validation
                             $timestamp = self::_parseDateString($p);
                             if ($timestamp === null)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $timestamp];
+                            $validatorInfo = [$validatorName, $timestamp];
                             break;
                         case 'DateFromTo':
                             $p = trim($p);
                             $timestamps = self::_parseTwoDateStrings($p);
                             if ($timestamps === null)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $timestamps[0], $timestamps[1]];
+                            $validatorInfo = [$validatorName, $timestamps[0], $timestamps[1]];
                             break;
                         case 'DateTimeFrom':
                         case 'DateTimeTo':
@@ -3332,27 +3332,27 @@ class Validation
                             $timestamp = self::_parseDateTimeString($p);
                             if ($timestamp === null)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $timestamp];
+                            $validatorInfo = [$validatorName, $timestamp];
                             break;
                         case 'DateTimeFromTo':
                             $p = trim($p);
                             $timestamps = self::_parseTwoDateTimeStrings($p);
                             if ($timestamps === null)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $timestamps[0], $timestamps[1]];
+                            $validatorInfo = [$validatorName, $timestamps[0], $timestamps[1]];
                             break;
                         case 'FileMimes':
                             $mimes = self::_parseMimesArray($p);
                             if ($mimes === false)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $mimes, $p];
+                            $validatorInfo = [$validatorName, $mimes, $p];
                             break;
                         case 'FileMaxSize':
                         case 'FileMinSize':
                             $size = self::_parseSizeString($p);
                             if ($size === null)
                                 self::_throwFormatError($validatorName);
-                            $validator = [$validatorName, $size, $p];
+                            $validatorInfo = [$validatorName, $size, $p];
                             break;
                         case '>>>':
                             $customReason = $p;
@@ -3361,18 +3361,18 @@ class Validation
                                 $customReason .= '|' . $segments[$i];
                             }
                             $customReason = static::translateText($customReason);
-                            $validator = null;
+                            $validatorInfo = null;
                             break;
                         case 'Alias':
                             if (strlen($p))
                                 $alias = static::translateText($p);
-                            $validator = null;
+                            $validatorInfo = null;
                             break;
                         default:
                             throw new ValidationException("未知的验证器\"${validatorName}\"");
                     }
-                    if ($validator)
-                        $validatorUnits[] = $validator;
+                    if ($validatorInfo)
+                        $validators[] = $validatorInfo;
                 } // end if 有冒号:分隔符
             } // end else 不是Regexp
         } // end for ($segments)
@@ -3382,7 +3382,7 @@ class Validation
         return [
             'countOfIfs' => $countOfIfs,
             'required' => $required,
-            'units' => $validatorUnits,
+            'validators' => $validators,
             'reason' => $customReason,
             'alias' => $alias,
         ];
@@ -3691,7 +3691,7 @@ class Validation
     /**
      * 验证一个值
      * @param $value mixed 要验证的值
-     * @param $validator string|string[] 一条验证器, 例: 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/'; 或多条验证器的数组, 多条验证器之间是或的关系
+     * @param $validationRule string|string[] 一条验证规则, 例: 'StrLen:6,16|regex:/^[a-zA-Z0-9]+$/'; 或多条验证规则的数组, 多条验证规则之间是或的关系
      * @param string $alias 要验证的值的别名, 用于在验证不通过时生成提示字符串.
      * @param $ignoreRequired bool 是否忽略所有的Required检测子
      * @param array $originParams 原始参数的数组(这个参数只用于条件验证器的参数的取值)
@@ -3699,14 +3699,14 @@ class Validation
      * @return mixed 返回$value被过滤后的新值
      * @throws ValidationException
      */
-    public static function validateValue($value, $validator, $alias = 'Parameter', $ignoreRequired = false, $originParams = [], $siblings = [])
+    public static function validateValue($value, $validationRule, $alias = 'Parameter', $ignoreRequired = false, $originParams = [], $siblings = [])
     {
-        if (is_array($validator)) {
-            $validators = $validator;
-        } else if (is_string($validator)) {
-            $validators = [$validator];
+        if (is_array($validationRule)) {
+            $validationRules = $validationRule;
+        } else if (is_string($validationRule)) {
+            $validationRules = [$validationRule];
         } else
-            throw new ValidationException(self::class . '::' . __FUNCTION__ . "(): \$validator必须是字符串或字符串数组");
+            throw new ValidationException(self::class . '::' . __FUNCTION__ . "(): \$validationRule必须是字符串或字符串数组");
 
         /*
          * 一个参数可以有一条或多条validator, 检测是否通过的规则如下:
@@ -3717,24 +3717,24 @@ class Validation
         $success = 0;
         $failed = 0;
         $lastException = null;
-        foreach ($validators as $validator) {
+        foreach ($validationRules as $validationRule) {
 
-            $validatorInfo = self::_compileValidator($validator, $alias);
-            $validatorUnits = $validatorInfo['units'];
+            $validationRuleInfo = self::_compileValidationRule($validationRule, $alias);
+            $validators = $validationRuleInfo['validators'];
             try {
 
-                $countOfIfs = $validatorInfo['countOfIfs'];
-                $countOfUnits = count($validatorUnits);
+                $countOfIfs = $validationRuleInfo['countOfIfs'];
+                $countOfValidators = count($validators);
                 for ($i = 0; $i < $countOfIfs; $i++) {
-                    $validatorUnit = $validatorUnits[$i];
-//                    echo "\n".json_encode($validatorUnit)."\n";
+                    $validatorInfo = $validators[$i];
+//                    echo "\n".json_encode($validatorInfo)."\n";
 
-                    $ifName = $validatorUnit[0];
+                    $ifName = $validatorInfo[0];
                     $method = 'validate' . ucfirst($ifName);
                     if (method_exists(self::class, $method) === false)
                         throw new ValidationException("找不到条件判断${$ifName}的验证方法");
 
-                    $varkeypath = $validatorUnit[1]; // 条件参数的路径
+                    $varkeypath = $validatorInfo[1]; // 条件参数的路径
 
                     // 提取条件参数的值
                     if (strpos($varkeypath, '.') === 0) // 以.开头, 是相对路径
@@ -3777,8 +3777,8 @@ class Validation
                         }
                     }
 
-                    if (isset($validatorUnit[2]))
-                        $params = [$ifParamValue, $validatorUnit[2]];
+                    if (isset($validatorInfo[2]))
+                        $params = [$ifParamValue, $validatorInfo[2]];
                     else
                         $params = [$ifParamValue];
                     $trueOfFalse = call_user_func_array([self::class, $method], $params);
@@ -3795,15 +3795,15 @@ class Validation
 
                 if ($value === null) //没有提供参数
                 {
-                    if (($validatorInfo['required'] === false) || $ignoreRequired)
+                    if (($validationRuleInfo['required'] === false) || $ignoreRequired)
                         continue; // 忽略本条validator
                     else {
-                        $reason = $validatorInfo['reason'];
+                        $reason = $validationRuleInfo['reason'];
                         if ($reason !== null)
                             throw new ValidationException($reason);
 
                         $error = self::getErrorTemplate('Required');
-                        $aAlias = $validatorInfo['alias'];
+                        $aAlias = $validationRuleInfo['alias'];
                         if ($aAlias == null)
                             $aAlias = $alias;
                         $error = str_replace('{{param}}', $aAlias, $error);
@@ -3811,27 +3811,27 @@ class Validation
                     }
                 }
 
-                for ($i = $countOfIfs; $i < $countOfUnits; $i++) {
-                    $validatorUnit = $validatorUnits[$i];
+                for ($i = $countOfIfs; $i < $countOfValidators; $i++) {
+                    $validatorInfo = $validators[$i];
 
-                    $validatorUnitName = $validatorUnit[0];
+                    $validatorName = $validatorInfo[0];
 
-                    $method = 'validate' . ucfirst($validatorUnitName);
+                    $method = 'validate' . ucfirst($validatorName);
 
 //                    if ($countOfIfs) {
 //                        echo "\n$method()\n";
 //                    }
 
                     if (method_exists(self::class, $method) === false)
-                        throw new ValidationException("找不到验证子${validatorUnitName}的验证方法");
+                        throw new ValidationException("找不到验证器${validatorName}的验证方法");
 
                     $params = [$value];
-                    $paramsCount = count($validatorUnit);
+                    $paramsCount = count($validatorInfo);
                     for ($j = 1; $j < $paramsCount; $j++) {
-                        $params[] = $validatorUnit[$j];
+                        $params[] = $validatorInfo[$j];
                     }
-                    $params[] = $validatorInfo['reason'];
-                    $params[] = $validatorInfo['alias'];
+                    $params[] = $validationRuleInfo['reason'];
+                    $params[] = $validationRuleInfo['alias'];
 
                     $value = call_user_func_array([static::class, $method], $params);
                 }
@@ -3956,7 +3956,7 @@ class Validation
      * 没有authors和extra参数
      *
      * @param $params array 包含输入参数的数组. 如['page'=>1,'pageSize'=>10]
-     * @param $validations array 包含验证字符串的数组. 如: [
+     * @param $validations array 包含多条验证的数组. 如: [
      *     'keypath1' => 'validator string',
      *     'bookname' => 'StrLen:2',
      *     'summary' => 'StrLen:0',
@@ -3975,7 +3975,7 @@ class Validation
             throw new ValidationException(self::class . '::' . __FUNCTION__ . "(): \$params必须是数组");
 
         $cachedKeyValues = [];
-        foreach ($validations as $keypath => $validator) {
+        foreach ($validations as $keypath => $validationRule) {
 
             // 解析路径
             $asterisksCount = 0;
@@ -3985,7 +3985,7 @@ class Validation
             if ($keysCount > 1 && $cachedKeyValues === null)
                 $cachedKeyValues = [];
 
-            self::_validate($params, $keys, $keysCount, $validator, '', $ignoreRequired, $cachedKeyValues);
+            self::_validate($params, $keys, $keysCount, $validationRule, '', $ignoreRequired, $cachedKeyValues);
         }
 //        if(count($cachedKeyValues))
 //            echo json_encode($cachedKeyValues, JSON_PRETTY_PRINT);
@@ -4053,13 +4053,13 @@ class Validation
      * @param $params array
      * @param $keys array
      * @param $keysCount int
-     * @param $validator string
+     * @param $validationRule string
      * @param string $keyPrefix
      * @param $cachedKeyValues array|null 缓存已取过的值. 存储格式为: ['key1' => val1, 'key2' => val2]
      * @param $ignoreRequired bool 是否忽略所有的Required检测子
      * @throws ValidationException
      */
-    private static function _validate($params, $keys, $keysCount, $validator, $keyPrefix = '', $ignoreRequired = false, &$cachedKeyValues = null)
+    private static function _validate($params, $keys, $keysCount, $validationRule, $keyPrefix = '', $ignoreRequired = false, &$cachedKeyValues = null)
     {
         $keyPath = $keyPrefix;
         $siblings = $params;
@@ -4080,9 +4080,9 @@ class Validation
                         $element = $siblings[$i];
                         $keyPath = $keyPrefix . "[$i]";
                         if ($subKeysCount)
-                            self::_validate($element, $subKeys, $subKeysCount, $validator, $keyPath, $ignoreRequired, $cachedKeyValues);
+                            self::_validate($element, $subKeys, $subKeysCount, $validationRule, $keyPath, $ignoreRequired, $cachedKeyValues);
                         else {
-                            self::validateValue($element, $validator, $keyPath, $ignoreRequired, $params, $siblings);
+                            self::validateValue($element, $validationRule, $keyPath, $ignoreRequired, $params, $siblings);
 
                             // 缓存数组本身的没什么用, 因为提取不到.
                             if ($cachedKeyValues !== null && $keyPrefix) {
@@ -4116,7 +4116,7 @@ class Validation
 
         // 到这里$n表示当前的$value是第几层
         if ($n == $keysCount) {
-            self::validateValue($value, $validator, $keyPath, $ignoreRequired, $params, $siblings);
+            self::validateValue($value, $validationRule, $keyPath, $ignoreRequired, $params, $siblings);
         } else {
             if ($cachedKeyValues !== null) {
                 for (; $n < $keysCount; $n++) {

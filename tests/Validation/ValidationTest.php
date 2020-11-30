@@ -3346,7 +3346,7 @@ class ValidationTest extends TestCase
         // 纯粹为了提高测试覆盖率
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validateValue(123, true);
-        }, '$validator必须是字符串或字符串数组');
+        }, '$validationRule必须是字符串或字符串数组');
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate([], ["param" => "Haha:3"]);
         }, '未知的验证器"Haha"');
