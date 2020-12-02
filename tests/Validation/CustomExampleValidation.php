@@ -37,7 +37,7 @@ class CustomExampleValidation extends CustomDemoValidation
     ];
 
     /**
-     * @var \string[][] “错误提示信息模版”翻译对照表
+     * @var \string[][] “错误提示信息模版” $errorTemplates 的翻译对照表
      *      子类的翻译对照表在运行时会与父类的 $langCode2ErrorTemplates （递归）合并，
      *      如果出现同名的键, 子类的值会覆盖父类的值
      */

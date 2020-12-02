@@ -46,6 +46,7 @@ Validation::validate($params, [
     + [4.14 自定义错误信息输出文本](#414-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%94%99%E8%AF%AF%E4%BF%A1%E6%81%AF%E8%BE%93%E5%87%BA%E6%96%87%E6%9C%AC)
     + [4.15 国际化](#415-%E5%9B%BD%E9%99%85%E5%8C%96)
     + [4.16 国际化（0.4版之前）](#416-%E5%9B%BD%E9%99%85%E5%8C%9604%E7%89%88%E4%B9%8B%E5%89%8D)
+    + [4.17 自定义验证器](#417-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E5%99%A8)
   * [A 附录 - 验证器列表](#a-%E9%99%84%E5%BD%95---%E9%AA%8C%E8%AF%81%E5%99%A8%E5%88%97%E8%A1%A8)
     + [A.1 整型](#a1-%E6%95%B4%E5%9E%8B)
     + [A.2 浮点型](#a2-%E6%B5%AE%E7%82%B9%E5%9E%8B)
@@ -583,6 +584,481 @@ MyValidation::validate(["var" => 1.0], [
 ]); // 会抛出异常：變量必須是整數
 ```
 如果提供了错误的语言代码，或者没有找到翻译的文本，那么就不翻译，输出原始的文本。
+
+### 4.17 自定义验证器
+
+#### 4.17.1 一个简单的自定义验证器示例
+
+下面例子中定义了一个类`CustomCaseValidation`，类中提供一个方法`validateCustomStartWith()`和一个错误提示信息模版`$errorTemplates`，就实现了自定义验证器`CustomCaseValidation`。  
+（不要被代码行数吓到了，实际没多少代码，有一半是注释）
+
+```php
+// 本类实现了自定义验证器 CustomStartWith 用于验证参数是否以指定前缀开头
+class CustomCaseValidation extends Validation
+{
+    // 验证失败时的错误提示信息的模版。子类的模版在运行时会与父类的模版 $errorTemplates 合并，如果出现同名的键，子类的值会覆盖父类的值
+    protected static $errorTemplates = [
+        'CustomStartWith' => '“{{param}}”必须以"{{prefix}}"开头"',
+    ];
+
+    /**
+     * 自定义验证器"CustomStartWith"的实现方法，验证输入参数 $value 是否以指定前缀开头
+     *
+     * @param $value string 待验证的值
+     * @param $prefix string 前缀。如果验证器为"CustomStartWith:head"，则本参数的值为"head"
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 需要自动生成
+     *        如果验证中包含了伪验证器">>>:some reason"，本参数值为"some reason"，
+     *        如果没有提供伪验证器">>>"，本参数值为null
+     * @param $alias string 参数别名, 用于错误提示。
+     *        如果验证中包含了伪验证器"Alias:姓名"，则本参数值为"姓名"
+     *        如果没有提供"Alias"，比如"name" => "StrLenGeLe:2,30"，本参数值为"name"
+     * @return mixed 返回参数 $value 的原值
+     * @throws ValidationException 验证失败抛出异常
+     */
+    public static function validateCustomStartWith($value, $prefix, $reason, $alias)
+    {
+        if (strpos(strval($value), $prefix) === 0)
+            return $value;
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        $error = self::getErrorTemplate('CustomStartWith'); // 获取错误提示信息模版
+        $error = str_replace('{{param}}', $alias, $error);
+        $error = str_replace('{{prefix}}', $prefix, $error);
+        throw new ValidationException($error);
+    }
+}
+```
+用法如下：
+```php
+'name' => 'CustomCaseValidation:head'
+```
+#### 4.17.2 如何实现自定义验证器
+1. 自定义验证器必须以 `Custom` 开头，比如"CustomAbc"、"CustomXyz"
+2. 定义一个类，继承 `\WebGeeker\Validation\Validation`
+3. 在该类中提供"自定义验证器的实现方法"，有几个验证器，就提供几个实现方法。
+4. 类中的错误提示信息模版`$errorTemplates`是可选的，因为你可以在实现方法中直接生成错误提示信息的文本（但是这样就不支持国际化功能了）。
+
+#### 4.17.3 自定义验证器的实现方法的具体要求
+1. 方法必须以"validate"开头，后面加上验证器名称。比如"validateCustomCaseValidation"。
+2. 如果自定义验证器没有参数，其实现方法的格式为：
+    ```
+    public static function validateCustomAbc($value, $reason, $alias) {}
+    ```
+    方法有 3 个参数：
+    * `$value` 待验证的值
+    * `$reason` 验证失败的错误提示字符串。它的值就是伪验证器 `>>>` 提供的字符串
+    * `$alias` 参数别名，用于错误提示。它的值等于伪验证器 `Alias` 提供的字符串
+3. 如果自定义验证器有 `n` 个参数，那么它的验证方法应该有 3 + `n` 个参数，
+    多出来的 n 个参数应该放在参数 `$value` 的后面。
+    带1个参数的验证器示例："CustomStartWith:head"
+    带多个参数的验证器示例："CustomStrIn:started,success,failed"，多个参数用逗号分隔
+4. 如果验证通过，方法的返回值应该是参数 `$value` 的原始值
+5. 如果验证失败，应该抛出异常
+
+下面再给一个示例，实现了三个自定义验证器`CustomInt`、`CustomIntEq`、`CustomIntGeLe`：
+```php
+/**
+ * 自定义验证器示例类Demo
+ *
+ * 本类实现了以下自定义验证器：
+ * CustomInt 用于验证参数是否是整数
+ * CustomIntEq 用于验证参数是否是整数，并且与指定数值相等
+ * CustomIntGeLe 用于验证参数是否是整数，并且其值在[min, max]之间
+ */
+class CustomDemoValidation extends CustomCaseValidation
+{
+    /**
+     * @var array 验证失败时的错误提示信息的模版。
+     *      子类的模版在运行时会与父类的 $errorTemplates 合并，
+     *      如果出现同名的键, 子类的值会覆盖父类的值
+     */
+    protected static $errorTemplates = [
+        'CustomInt' => '“{{param}}”必须是Custom整数',
+        'CustomIntEq' => '“{{param}}”必须等于 {{value}}',
+        'CustomIntGeLe' => '“{{param}}”必须大于等于 {{min}} 小于等于 {{max}}',
+    ];
+
+    /**
+     * 自定义验证器"CustomInt"的实现方法
+     *
+     * @param $value string 待验证的值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 需要自动生成
+     * @param $alias string 参数别名, 用于错误提示。
+     * @return mixed 返回参数 $value 的原值
+     * @throws ValidationException 验证失败抛出异常
+     */
+    public static function validateCustomInt($value, $reason, $alias)
+    {
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value) && strpos($value, '.') === false)
+                return $value;
+        } elseif ($type === 'integer') {
+            return $value;
+        }
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        $error = self::getErrorTemplate('CustomInt');
+        $error = str_replace('{{param}}', $alias, $error);
+        throw new ValidationException($error);
+    }
+
+    /**
+     * 自定义验证器"CustomIntEq"的实现方法。
+     * 检测 $value 与 $equalVal 是否相等。
+     *
+     * @param $value string 待验证的值
+     * @param $equalVal string 要比较的值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 需要自动生成
+     * @param $alias string 参数别名, 用于错误提示。
+     * @return mixed 返回参数 $value 的原值
+     * @throws ValidationException 验证失败抛出异常
+     */
+    public static function validateCustomIntEq($value, $equalVal, $reason, $alias)
+    {
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value) && strpos($value, '.') === false) {
+                $val = intval($value);
+                if ($val == $equalVal)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'integer') {
+            if ($value == $equalVal)
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        if ($isTypeError) {
+            $error = self::getErrorTemplate('CustomInt');
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::getErrorTemplate('CustomIntEq');
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{value}}', $equalVal, $error);
+        }
+        throw new ValidationException($error);
+    }
+
+    /**
+     * 自定义验证器"CustomIntGeLe"的实现方法。
+     * 检测 $value 取值是否在[$min, $max]之间。
+     *
+     * @param $value string 待验证的值
+     * @param $min string 最小值
+     * @param $max string 最大值
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 需要自动生成
+     * @param $alias string 参数别名, 用于错误提示。
+     * @return mixed 返回参数 $value 的原值
+     * @throws ValidationException 验证失败抛出异常
+     */
+    public static function validateCustomIntGeLe($value, $min, $max, $reason, $alias)
+    {
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value) && strpos($value, '.') === false) {
+                $val = intval($value);
+                if ($val >= $min && $val <= $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'integer') {
+            if ($value >= $min && $value <= $max)
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        if ($isTypeError) {
+            $error = self::getErrorTemplate('CustomInt');
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::getErrorTemplate('CustomIntGeLe');
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
+        throw new ValidationException($error);
+    }
+}
+```
+**注意**：上面的 `CustomDemoValidation` 类继承的是另一个自定义验证器类 `CustomCaseValidation`。
+
+你可以通过连续继承的方式把多个自定义验证器类的功能合并，详情可参考 4.17.6 小节
+
+#### 4.17.4 自定义验证器的参数解析方法
+
+如果是带参数的验证器，比如`"CustomFloatGtLt:1.0,10"`，验证器的参数`"1.0,10"`会用默认的参数解析方法处理：
+```php
+explode(',', $paramString)
+```
+默认的参数解析方法的有如下缺点：
+* 解析出来的参数只会是字符串
+* 不会检测验证器的参数的合法性
+* 验证器参数的内容中无法使用逗号，因为逗号是做为参数分隔符来处理的。
+* 无法支持可变个数的验证器参数
+
+解决以上问题的方法就是提供**“自定义验证器的参数解析方法”**（以"CustomFloatGtLt"为例）：
+```php
+protected static function parseParamsOfCustomFloatGtLt($paramString) {}
+```
+* 方法名以"parseParamsOf"开头，后接自定义验证器名称（比如上面的自定义验证器"CustomFloatGtLt"）
+* 方法的参数是一个字符串 `$paramString` ，它的值会是自定义验证器的参数。比如如果验证器是`"CustomFloatGtLt:1.0,10"`，参数的值就是`"1.0,10"`
+* 方法的返回值应该是一个数组（不可为null，也不可为空数组）。比如`"1.0,10"`应该被解析成`[1.0, 10.0]`
+* 如果参数解析失败，需要抛出异常，给出失败的原因。
+
+下面给出第三个示例。  
+注意其中的参数解析方法 `parseParamsOfCustomFloatGtLt()`。  
+另一个要注意的是`$langCode2ErrorTemplates`，它是“错误提示信息模版” `$errorTemplates` 的翻译对照表
+```php
+/**
+ * 自定义验证器示例类Example
+ *
+ * 本类实现了以下自定义验证器：
+ * CustomFloatGtLt 用于验证参数是否是浮点数，并且其值在(min, max)之间
+ */
+class CustomExampleValidation extends Validation
+{
+    /**
+     * @var array 验证失败时的错误提示信息的模版。
+     *      子类的模版在运行时会与父类的 $errorTemplates 合并，
+     *      如果出现同名的键, 子类的值会覆盖父类的值
+     */
+    protected static $errorTemplates = [
+        'CustomFloatGtLt' => '“{{param}}”必须大于 {{min}} 小于 {{max}}',
+    ];
+
+    /**
+     * @var \string[][] “错误提示信息模版” $errorTemplates 的翻译对照表
+     *      子类的翻译对照表在运行时会与父类的 $langCode2ErrorTemplates （递归）合并，
+     *      如果出现同名的键, 子类的值会覆盖父类的值
+     */
+    protected static $langCode2ErrorTemplates = [
+        "zh-tw" => [
+            'CustomFloatGtLt' => '“{{param}}”必須大於 {{min}} 小於 {{max}}',
+        ],
+        "en-us" => [
+            'CustomFloatGtLt' => '{{param}} must be greater than {{min}} and less than {{max}}',
+        ],
+    ];
+
+    /**
+     * 自定义验证器"CustomFloatGtLt"的参数解析方法
+     *
+     * 假设验证器为"CustomFloatGtLt:1.0,10"
+     * 则 $paramString = "1.0,10"
+     * 本函数返回值为: [1.0, 10.0]
+     *
+     * @param $paramString string 验证器的参数
+     * @return array 返回解析后的参数的数组。数组的长度就是验证器的
+     *        参数个数，必须与对应的 validateCustomFloatGtLt() 方法的参数个数匹配。
+     * @throws ValidationException 参数解析失败抛出异常
+     */
+    protected static function parseParamsOfCustomFloatGtLt($paramString)
+    {
+        $vals = explode(',', $paramString);
+        if (count($vals) !== 2)
+            throw new ValidationException("自定义验证器 CustomFloatGtLt 格式错误. 正确格式示例: CustomFloatGtLt:1.0,2.0");
+        $p1 = $vals[0];
+        $p2 = $vals[1];
+        if (is_numeric($p1) === false || is_numeric($p2) === false)
+            throw new ValidationException("自定义验证器 CustomFloatGtLt 参数类型错误. 正确的示例: CustomFloatGtLt:1.0,2.0");
+        return [$p1, $p2];
+    }
+
+    /**
+     * 自定义验证器"CustomFloatGtLt"的验证方法的实现
+     *
+     * @param $value mixed 待验证的值
+     * @param $min float 最小值。对应上面的 parseParamsOfCustomFloatGtLt() 方法
+     *        返回的数组的第0个元素($p1)
+     * @param $max float 最大值。对应上面的 parseParamsOfCustomFloatGtLt() 方法
+     *        返回的数组的第1个元素($p2)
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 需要自动生成
+     * @param $alias string 参数别名, 用于错误提示。
+     * @return mixed 返回参数 $value 的原值
+     * @throws ValidationException 验证失败抛出异常
+     */
+    public static function validateCustomFloatGtLt($value, $min, $max, $reason, $alias)
+    {
+        $type = gettype($value);
+        if ($type === 'string') {
+            if (is_numeric($value)) {
+                $val = floatval($value);
+                if ($val > $min && $val < $max)
+                    return $value;
+                $isTypeError = false;
+            } else
+                $isTypeError = true;
+        } elseif ($type === 'double' || $type === 'integer') {
+            if ($value > $min && $value < $max)
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        if ($isTypeError) {
+            $error = '“{{param}}”必须是浮点数';
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::getErrorTemplate('CustomFloatGtLt');
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{min}}', $min, $error);
+            $error = str_replace('{{max}}', $max, $error);
+        }
+        throw new ValidationException($error);
+    }
+}
+```
+
+#### 4.17.5 参数个数可变的自定义验证器
+
+所谓参数个数可变，就是自定义验证器可以带任意数量的参数（但不能不带参数）。
+比如"CustomStrIn"，既可以带两个参数"CustomStrIn:started,finished，也可以带3个参数如"CustomStrIn:started,success,failed"
+
+具体实现方法这里直接给出一个例子。  
+注意其中的参数解析方法 `parseParamsOfCustomStrIn()`。  
+另一个要注意的是`$langCodeToTranslations`，它是文本翻译对照表，用来翻译伪验证器 `Alias` 或 `>>>` 提供的文本。
+```php
+/**
+ * 自定义验证器示例类Sample
+ *
+ * 本类实现了以下自定义验证器：
+ * CustomStrIn 用于验证参数是否是字符串，并且其取值是指定的几个字符串之一
+ */
+class CustomSampleValidation extends Validation
+{
+    /**
+     * @var array 验证失败时的错误提示信息的模版。
+     *      子类的模版在运行时会与父类的 $errorTemplates 合并，
+     *      如果出现同名的键, 子类的值会覆盖父类的值
+     */
+    protected static $errorTemplates = [
+        'CustomStrIn' => '“{{param}}”只能取这些值: {{valueList}}',
+    ];
+
+    /**
+     * @var \string[][] 文本翻译对照表
+     *      子类的文本翻译对照表在运行时会与父类的 $langCodeToTranslations （递归）合并，
+     *      如果出现同名的键, 子类的值会覆盖父类的值
+     */
+    protected static $langCodeToTranslations = [
+        "zh-tw" => [
+            "状态" => "狀態",
+        ],
+        "en-us" => [
+            "状态" => "status",
+        ],
+    ];
+
+    /**
+     * 自定义验证器"CustomStrIn"的参数解析方法
+     *
+     * 假设验证器为"CustomStrIn:pending,started,success,failed"
+     * 则 $paramString = "pending,started,success,failed"
+     * 则本函数返回值为（数组的数组）: [
+     *     ['pending', 'started', 'success', 'failed']
+     * ]
+     * 返回"数组的数组"可以实现验证器的参数个数可变。
+     *
+     * @param $paramString string 验证器的参数
+     * @return array 返回解析后的参数的数组。数组的长度就是验证器的
+     *        参数个数，必须与对应的 validateCustomStrIn() 方法的参数个数匹配。
+     */
+    protected static function parseParamsOfCustomStrIn($paramString)
+    {
+        $list = explode(',', $paramString);
+        return [$list]; // 注意这里返回的是数组的数组
+    }
+
+    /**
+     * 自定义验证器"CustomStrIn"的验证方法的实现
+     *
+     * @param $value mixed 待验证的值
+     * @param $valueList string[] 可取值的列表。
+     *        对应上面的 parseParamsOfCustomStrIn() 方法返回的数组的第0个元素($list)
+     * @param $reason string|null 验证失败的错误提示字符串. 如果为null, 需要自动生成
+     * @param $alias string 参数别名, 用于错误提示。
+     * @return mixed 返回参数 $value 的原值
+     * @throws ValidationException 验证失败抛出异常
+     */
+    public static function validateCustomStrIn($value, $valueList, $reason, $alias)
+    {
+        if (is_array($valueList) === false || count($valueList) === 0)
+            throw new ValidationException("“${alias}”参数的验证模版(StrIn:)格式错误, 必须提供可取值的列表");
+
+        if (is_string($value)) {
+            if (in_array($value, $valueList, true))
+                return $value;
+            $isTypeError = false;
+        } else
+            $isTypeError = true;
+
+        if ($reason !== null)
+            throw new ValidationException($reason);
+
+        if ($isTypeError) {
+            $error = '“{{param}}”必须是Custom字符串';
+            $error = str_replace('{{param}}', $alias, $error);
+        } else {
+            $error = self::getErrorTemplate('CustomStrIn');
+            $error = str_replace('{{param}}', $alias, $error);
+            $error = str_replace('{{valueList}}', '"'.implode('", "', $valueList).'"', $error);
+        }
+
+        throw new ValidationException($error);
+    }
+}
+```
+
+#### 4.17.6 合并多个自定义验证器类
+
+可以通过连续继承的方式把多个自定义验证器类的功能合并，比如可以按下面的关系来继承：
+```
+MyValidation > CustomDemoValidation > CustomCaseValidation > Validation
+```
+这样当你调用`MyValidation::validate()`时，就可以使用上面四个类中定义的所有的验证器或自定义验证器。
+
+**不建议继承层次太多**。
+
+在运行时，继承链上的所有类的错误提示信息模版 `$errorTemplates` 会被合并成一个总的模版。如果出现重复的键，总是子类的值覆盖父类的值。
+
+如果某些自定义验证器不是全局通用的，而是某个模块专用的。可以写一个这个模块专用的验证器类，如`ModuleXValidation`, `ModuleYValidation`，按如下方式继承：
+```
+ModuleXValidation > MyValidation > CustomDemoValidation > CustomCaseValidation > Validation
+ModuleYValidation > MyValidation > CustomDemoValidation > CustomCaseValidation > Validation
+```
+* 在模块X中，你可以调用`ModuleXValidation::validate()`来验证参数；
+* 在模块Y中，你可以调用`ModuleYValidation::validate()`来验证参数；
+* 而在其它模块中，还是调用`MyValidation::validate()`来验证参数。
+
+#### 4.17.7 自定义验证器的国际化
+
+自定义验证器的国际化的方法与内置验证器是一样，可参考 4.15 小节。
+
+上一小节提到了自定义验证器类的连续继承，继承链上的所有翻译表在运行时，都会被（递归）合并成一张表。
+
+所以我们有几种处理国际化的方式：
+1. 提供一个类 `MyValidation`，专门用于国际化，正如 4.15 小节所介绍的那样；
+2. 把用于国际化的翻译表 `$langCode2ErrorTemplates` 和 `$langCodeToTranslations` 放继承链上的任意一个类中；
+3. 把翻译表分散放到继承链上的多个类中。
 
 ## A 附录 - 验证器列表
 

@@ -8,7 +8,7 @@ use WebGeeker\Validation\ValidationException;
 /*
  * 如何实现自定义验证器：
  * 1. 自定义验证器必须以"Custom"开头，比如"CustomAbc"、"CustomXyz"
- * 1. 定义一个类，继承"\WebGeeker\Validation\Validation"
+ * 1. 定义一个类，继承`\WebGeeker\Validation\Validation`
  * 2. 在该类中提供"自定义验证器的实现方法"，有几个验证器，就提供几个实现方法。
  *
  * 自定义验证器的实现方法的格式示例：
@@ -36,7 +36,7 @@ use WebGeeker\Validation\ValidationException;
  * 自定义验证器示例类
  *
  * 本类实现了以下自定义验证器：
- * CustomStartWith 用于验证参数是否以某个前缀开头
+ * CustomStartWith 用于验证参数是否以指定前缀开头
  *
  */
 class CustomCaseValidation extends Validation
@@ -51,7 +51,7 @@ class CustomCaseValidation extends Validation
     ];
 
     /**
-     * 自定义验证器"CustomStartWith"的实现方法，验证输入参数是否以某个前缀开头
+     * 自定义验证器"CustomStartWith"的实现方法，验证输入参数 $value 是否以指定前缀开头
      *
      * @param $value string 待验证的值
      * @param $prefix string 前缀。如果验证器为"CustomStartWith:head"，则本参数的值为"head"
@@ -72,7 +72,7 @@ class CustomCaseValidation extends Validation
         if ($reason !== null)
             throw new ValidationException($reason);
 
-        $error = self::getErrorTemplate('CustomStartWith');
+        $error = self::getErrorTemplate('CustomStartWith'); // 获取错误提示信息模版
         $error = str_replace('{{param}}', $alias, $error);
         $error = str_replace('{{prefix}}', $prefix, $error);
         throw new ValidationException($error);
