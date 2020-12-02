@@ -590,7 +590,7 @@ MyValidation::validate(["var" => 1.0], [
 
 #### 4.17.1 一个简单的自定义验证器示例
 
-下面例子中定义了一个类`CustomCaseValidation`，类中提供一个方法`validateCustomStartWith()`和一个错误提示信息模版`$errorTemplates`，就实现了自定义验证器`CustomCaseValidation`。  
+下面例子中定义了一个类`CustomCaseValidation`，类中提供一个方法`validateCustomStartWith()`和一个错误提示信息模版`$errorTemplates`，就实现了自定义验证器`CustomStartWith`。  
 （不要被代码行数吓到了，实际没多少代码，有一半是注释）
 
 ```php
@@ -642,7 +642,7 @@ class CustomCaseValidation extends Validation
 4. 类中的错误提示信息模版`$errorTemplates`是可选的，因为你可以在实现方法中直接生成错误提示信息的文本（但是这样就不支持国际化功能了）。
 
 #### 4.17.3 自定义验证器的实现方法的具体要求
-1. 方法必须以"validate"开头，后面加上验证器名称。比如"validateCustomCaseValidation"。
+1. 方法必须以"validate"开头，后面加上验证器名称。比如"validateCustomStartWith"。
 2. 如果自定义验证器没有参数，其实现方法的格式为：
     ```
     public static function validateCustomAbc($value, $reason, $alias) {}
