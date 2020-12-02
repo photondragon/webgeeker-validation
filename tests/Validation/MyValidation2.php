@@ -29,13 +29,13 @@ class MyValidation2 extends CustomValidation
     protected static $langCode2ErrorTemplates = [
         "zh-tw" => [
             'Int' => '“{{param}}”必須是整數', // 🌝
-            'CustomInt' => '“{{param}}”必須是Custom整數', // 🌝
+            'CustomInt' => '“{{param}}”必須是Custom整數',
             'IntGt' => '“{{param}}”必須大於 {{min}}',
             'Str' => '“{{param}}”必須是字符串',
         ],
         "en-us" => [
             'Int' => '{{param}} must be an integer',
-            'CustomInt' => '{{param}} must be an custom integer',
+            'CustomInt' => '{{param}} must be a custom integer',
             'IntGt' => '{{param}} must be greater than {{min}}',
             'Str' => '{{param}} must be a string',
         ],

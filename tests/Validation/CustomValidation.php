@@ -1,7 +1,7 @@
 <?php
 /*
  * Project: webgeeker-validation
- * File: MyValidation3.php
+ * File: CustomValidation.php
  * CreateTime: 2020/11/30 20:01
  * Author: photondragon
  * Email: photondragon@163.com
@@ -13,7 +13,7 @@ use \WebGeeker\Validation\Validation;
 use WebGeeker\Validation\ValidationException;
 
 /**
- * @class MyValidation3
+ * @class CustomValidation
  * @package WebGeeker\RestTest
  * @brief 测试自定义验证器功能
  *
@@ -30,6 +30,7 @@ class CustomValidation extends Validation
         // 整型（不提供length检测,因为负数的符号位会让人混乱, 可以用大于小于比较来做到这一点）
         'CustomInt' => '“{{param}}”必须是Custom整数',
         'CustomIntEq' => '“{{param}}”必须等于 {{value}}',
+        'CustomIntGeLe' => '“{{param}}”必须大于等于 {{min}} 小于等于 {{max}}',
         'CustomFloat' => '“{{param}}”必须是浮点数',
         'CustomFloatGtLt' => '“{{param}}”必须大于 {{min}} 小于 {{max}}',
         'CustomStr' => '“{{param}}”必须是Custom字符串',

@@ -2718,6 +2718,14 @@ class Validation
             self::$langCode = $langCode;
     }
 
+
+    /**
+     * @deprecated  0.4 从0.4版开始弃用
+     * @var array 将继承链上所有类的（旧的）错误提示信息模版合并后，缓存在这个数组中。
+     *      key = 调用类的类名，value = 合并后的 $langCodeToErrorTemplates
+     */
+    private static $langCodeToErrorTemplatesCache = [];
+
     /**
      * @var array “错误提示信息模版”翻译对照表
      * @deprecated 0.4 从0.4版开始，
@@ -2728,6 +2736,12 @@ class Validation
     protected static $langCodeToErrorTemplates = [
 //        'en-us' => [],
     ];
+
+    /**
+     * @var array 将继承链上所有类的翻译对照表合并后，缓存在这个数组中。
+     *      key = 调用类的类名，value = 合并后的 $langCode2ErrorTemplates
+     */
+    private static $langCode2ErrorTemplatesCache = [];
 
     /**
      * @var array “错误提示信息模版”翻译对照表。
@@ -2749,10 +2763,51 @@ class Validation
 //        ],
     ];
 
+    private static function arrayMergeRecursive($arr1, $arr2)
+    {
+        if ($arr1 === null)
+            $arr = [];
+        else if (!is_array($arr1))
+            throw new ValidationException(__CLASS__ . '::' . "() 参数 \$arr1 只能是数组或null");
+        else
+            $arr = [] + $arr1;
+
+        if ($arr2 === null)
+            return $arr;
+        else if (!is_array($arr2))
+            throw new ValidationException(__CLASS__ . '::' . "() 参数 \$arr2 只能是数组或null");
+
+        foreach ($arr2 as $key => $value) {
+            if (is_array($value)) {
+                $oldValue = isset($arr1[$key]) ? $arr1[$key] : null;
+                if (is_array($oldValue))
+                    $value = self::arrayMergeRecursive($oldValue, $value);
+            }
+            $arr[$key] = $value;
+        }
+        return $arr;
+    }
+
     final protected static function getErrorTemplate($validatorName)
     {
-        if (isset(static::$langCode2ErrorTemplates[self::$langCode])) {
-            $errorTemplates = static::$langCode2ErrorTemplates[self::$langCode];
+        $calledClassName = static::class;
+        if (isset(self::$langCode2ErrorTemplatesCache[$calledClassName]))
+            $langCode2ErrorTemplates = self::$langCode2ErrorTemplatesCache[$calledClassName];
+        else {
+            $className = $calledClassName;
+            $langCode2ErrorTemplates = [];
+            while ($className != __CLASS__) {
+                if (isset($className::$langCode2ErrorTemplates)) {
+                    $langCode2ErrorTemplates = self::arrayMergeRecursive(
+                        $className::$langCode2ErrorTemplates, $langCode2ErrorTemplates);
+                }
+                $className = get_parent_class($className);
+            }
+            self::$langCode2ErrorTemplatesCache[$calledClassName] = $langCode2ErrorTemplates;
+        }
+
+        if (isset($langCode2ErrorTemplates[self::$langCode])) {
+            $errorTemplates = $langCode2ErrorTemplates[self::$langCode];
             if (is_array($errorTemplates) && isset($errorTemplates[$validatorName])) {
                 $errorTemplate = $errorTemplates[$validatorName];
                 if (is_string($errorTemplate) && strlen($errorTemplate))
@@ -2760,15 +2815,49 @@ class Validation
             }
         }
 
-        if (isset(self::$errorTemplates[$validatorName]))
-            $template = self::$errorTemplates[$validatorName];
-        else if (isset(static::$errorTemplates[$validatorName]))
-            $template = static::$errorTemplates[$validatorName];
-        else
-            $template = "自定义验证器 $validatorName 验证失败，并且该验证器没有错误提示信息模版";
+        $calledClassName = static::class;
+        if (isset(self::$errorTemplatesCache[$calledClassName]))
+            $errorTemplates = self::$errorTemplatesCache[$calledClassName];
+        else {
+            $className = $calledClassName;
+            $errorTemplates = [];
+            while (true) {
+                if (isset($className::$errorTemplates)) {
+                    $errorTemplates = self::arrayMergeRecursive(
+                        $className::$errorTemplates, $errorTemplates);
+                }
+                if ($className == __CLASS__)
+                    break;
+                $className = get_parent_class($className);
+            }
+            self::$errorTemplatesCache[$calledClassName] = $errorTemplates;
+        }
 
-        if (isset(static::$langCodeToErrorTemplates[self::$langCode])) {
-            $templates = static::$langCodeToErrorTemplates[self::$langCode];
+        if (isset($errorTemplates[$validatorName]))
+            $template = $errorTemplates[$validatorName];
+        else
+            $template = "验证器 $validatorName 验证失败，并且该验证器没有错误提示信息模版";
+
+        // 兼容性代码
+        $calledClassName = static::class;
+        if (isset(self::$langCodeToErrorTemplatesCache[$calledClassName]))
+            $langCodeToErrorTemplates = self::$langCodeToErrorTemplatesCache[$calledClassName];
+        else {
+            $className = $calledClassName;
+            $langCodeToErrorTemplates = [];
+            while (true) {
+                if (isset($className::$langCodeToErrorTemplates)) {
+                    $langCodeToErrorTemplates = self::arrayMergeRecursive(
+                        $className::$langCodeToErrorTemplates, $langCodeToErrorTemplates);
+                }
+                if ($className == __CLASS__)
+                    break;
+                $className = get_parent_class($className);
+            }
+            self::$langCodeToErrorTemplatesCache[$calledClassName] = $langCodeToErrorTemplates;
+        }
+        if (isset($langCodeToErrorTemplates[self::$langCode])) {
+            $templates = $langCodeToErrorTemplates[self::$langCode];
             if (is_array($templates) && isset($templates[$template])) {
                 $newTemplate = $templates[$template];
                 if (is_string($newTemplate) && strlen($newTemplate))
@@ -2778,6 +2867,12 @@ class Validation
         return $template;
     }
 
+    /**
+     * @var array 将继承链上所有类的翻译对照表合并后，缓存在这个数组中。
+     *      key = 调用类的类名，value = 合并后的 $langCodeToTranslations
+     */
+    private static $langCodeToTranslationsCache = [];
+
     // 文本翻译对照表
     protected static $langCodeToTranslations = [
 //        "en-us" => [],
@@ -2785,8 +2880,26 @@ class Validation
 
     private static function translateText($text)
     {
-        if (isset(static::$langCodeToTranslations[self::$langCode])) {
-            $translations = static::$langCodeToTranslations[self::$langCode];
+        $calledClassName = static::class;
+        if (isset(self::$langCodeToTranslationsCache[$calledClassName]))
+            $langCodeToTranslations = self::$langCodeToTranslationsCache[$calledClassName];
+        else {
+            $className = $calledClassName;
+            $langCodeToTranslations = [];
+            while (true) {
+                if (isset($className::$langCodeToTranslations)) {
+                    $langCodeToTranslations = self::arrayMergeRecursive(
+                        $className::$langCodeToTranslations, $langCodeToTranslations);
+                }
+                if ($className == __CLASS__)
+                    break;
+                $className = get_parent_class($className);
+            }
+            self::$langCodeToTranslationsCache[$calledClassName] = $langCodeToTranslations;
+        }
+
+        if (isset($langCodeToTranslations[self::$langCode])) {
+            $translations = $langCodeToTranslations[self::$langCode];
             if (is_array($translations) && isset($translations[$text])) {
                 $newText = $translations[$text];
                 if (is_string($newText) && strlen($newText))
@@ -2795,6 +2908,12 @@ class Validation
         }
         return $text;
     }
+
+    /**
+     * @var array 将继承链上所有类的错误提示信息模版合并后，缓存在这个数组中。
+     *      key = 调用类的类名，value = 合并后的 $errorTemplates
+     */
+    private static $errorTemplatesCache = [];
 
     /**
      * @var array 验证失败时的错误提示信息的模板
@@ -3417,10 +3536,8 @@ class Validation
                                         $params = call_user_func_array([static::class, $parserMethod], [$p]);
                                         if (!is_array($params) || count($params) === 0 || $pCount != count($params))
                                             throw new ValidationException("自定义验证器\"${validatorName}\"的参数解析方法 $parserMethod() 应该返回含有 $pCount 个参数的数组");
-                                    } else if ($pCount == 1) {
-                                        $params = [$p];
                                     } else {
-                                        $params = explode($p, ',');
+                                        $params = explode(',', $p);
                                         if ($pCount != count($params))
                                             throw new ValidationException("自定义验证器\"${validatorName}\"应该有 $pCount 个参数");
                                     }
@@ -3884,9 +4001,6 @@ class Validation
 //                    if ($countOfIfs) {
 //                        echo "\n$method()\n";
 //                    }
-
-                    if (method_exists(static::class, $method) === false)
-                        throw new ValidationException("找不到验证器 ${validatorName} 的验证方法");
 
                     $params = [$value];
                     $paramsCount = count($validatorInfo);
