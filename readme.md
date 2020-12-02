@@ -939,7 +939,7 @@ class CustomExampleValidation extends Validation
 
 具体实现方法参考下面的第四的示例类 `CustomSampleValidation`。  
 注意其中的参数解析方法 `parseParamsOfCustomStrIn()`，它返回的是一个数组的数组，这是实现可变参数的关键。  
-另一个要注意的是`$langCodeToTranslations`，它是文本翻译对照表，用来翻译伪验证器 `Alias` 或 `>>>` 提供的文本（参考4.15 国际化）。
+另一个要注意的是`$langCodeToTranslations`（实际上它不应该出现在这个例子中），它是文本翻译对照表，用来翻译伪验证器 `Alias` 或 `>>>` 提供的文本（参考4.15 国际化）。
 ```php
 /**
  * 自定义验证器示例类Sample
