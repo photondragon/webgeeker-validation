@@ -79,7 +79,7 @@ Validation::validate($params, [
 1. 验证器语义明确，没有“一词多义”的问题
 1. 易学易记。比如整型验证器都是以"Int"开头，浮点型验证器都是以"Float"开头，等等。唯一不符合这一规则的是字符串型验证器，它们一部分以"Str"开头的，但也有一部分不以"Str"开头，比如`Regexp`, `Ip`, `Email`, `Url`等。
 1. 不绑定任何一个框架，无任何依赖。你可以在任何一个框架中使用这个工具，就算你不使用框架，也可以使用本工具。
-1. 支持自定义验证器，可以实现各种自定义验证功能
+1. 支持**自定义验证器**，可以实现各种自定义验证功能
 
 ### 1.3 一个简单示例
 
@@ -588,6 +588,8 @@ MyValidation::validate(["var" => 1.0], [
 
 ### 4.17 自定义验证器
 
+这里先强调一下，**不要滥用自定义验证器功能**。跟业务相关强相关的一些验证，如果用的地方很少，可以考虑直接用PHP代码来验证，或者封装成PHP函数直接调用，不一定非要纳入到 webgeeker-validation 验证体系中。
+
 #### 4.17.1 一个简单的自定义验证器示例
 
 下面例子中定义了一个类`CustomCaseValidation`，类中提供一个方法`validateCustomStartWith()`和一个错误提示信息模版`$errorTemplates`，就实现了自定义验证器`CustomStartWith`。  
@@ -651,14 +653,14 @@ class CustomCaseValidation extends Validation
     * `$value` 待验证的值
     * `$reason` 验证失败的错误提示字符串。它的值就是伪验证器 `>>>` 提供的字符串
     * `$alias` 参数别名，用于错误提示。它的值等于伪验证器 `Alias` 提供的字符串
-3. 如果自定义验证器有 `n` 个参数，那么它的验证方法应该有 3 + `n` 个参数，
-    多出来的 n 个参数应该放在参数 `$value` 的后面。
-    带1个参数的验证器示例："CustomStartWith:head"
+3. 如果自定义验证器有 `n` 个参数，那么它的验证方法应该有 3 + `n` 个参数，  
+    多出来的 n 个参数应该放在参数 `$value` 的后面。  
+    带1个参数的验证器示例："CustomStartWith:head"  
     带多个参数的验证器示例："CustomStrIn:started,success,failed"，多个参数用逗号分隔
 4. 如果验证通过，方法的返回值应该是参数 `$value` 的原始值
 5. 如果验证失败，应该抛出异常
 
-下面再给一个示例，实现了三个自定义验证器`CustomInt`、`CustomIntEq`、`CustomIntGeLe`：
+下面再提供一个示例类`CustomDemoValidation`，实现了三个自定义验证器`CustomInt`、`CustomIntEq`、`CustomIntGeLe`：
 ```php
 /**
  * 自定义验证器示例类Demo
@@ -813,18 +815,18 @@ explode(',', $paramString)
 * 验证器参数的内容中无法使用逗号，因为逗号是做为参数分隔符来处理的。
 * 无法支持可变个数的验证器参数
 
-解决以上问题的方法就是提供**“自定义验证器的参数解析方法”**（以"CustomFloatGtLt"为例）：
+解决以上问题的方法就是提供**自定义验证器的参数解析方法**（以"CustomFloatGtLt"为例）：
 ```php
 protected static function parseParamsOfCustomFloatGtLt($paramString) {}
 ```
 * 方法名以"parseParamsOf"开头，后接自定义验证器名称（比如上面的自定义验证器"CustomFloatGtLt"）
-* 方法的参数是一个字符串 `$paramString` ，它的值会是自定义验证器的参数。比如如果验证器是`"CustomFloatGtLt:1.0,10"`，参数的值就是`"1.0,10"`
+* 方法的参数是一个字符串 `$paramString` ，它的值会是自定义验证器的参数。比如对于验证器`"CustomFloatGtLt:1.0,10"`，`$paramString`就等于`"1.0,10"`
 * 方法的返回值应该是一个数组（不可为null，也不可为空数组）。比如`"1.0,10"`应该被解析成`[1.0, 10.0]`
 * 如果参数解析失败，需要抛出异常，给出失败的原因。
 
-下面给出第三个示例。  
+下面给出第三个示例类 `CustomExampleValidation`。  
 注意其中的参数解析方法 `parseParamsOfCustomFloatGtLt()`。  
-另一个要注意的是`$langCode2ErrorTemplates`，它是“错误提示信息模版” `$errorTemplates` 的翻译对照表
+另一个要注意的是`$langCode2ErrorTemplates`，它是“错误提示信息模版” `$errorTemplates` 的翻译对照表（参考4.15 国际化）
 ```php
 /**
  * 自定义验证器示例类Example
@@ -932,11 +934,12 @@ class CustomExampleValidation extends Validation
 #### 4.17.5 参数个数可变的自定义验证器
 
 所谓参数个数可变，就是自定义验证器可以带任意数量的参数（但不能不带参数）。
+
 比如"CustomStrIn"，既可以带两个参数"CustomStrIn:started,finished，也可以带3个参数如"CustomStrIn:started,success,failed"
 
-具体实现方法这里直接给出一个例子。  
-注意其中的参数解析方法 `parseParamsOfCustomStrIn()`。  
-另一个要注意的是`$langCodeToTranslations`，它是文本翻译对照表，用来翻译伪验证器 `Alias` 或 `>>>` 提供的文本。
+具体实现方法参考下面的第四的示例类 `CustomSampleValidation`。  
+注意其中的参数解析方法 `parseParamsOfCustomStrIn()`，它返回的是一个数组的数组，这是实现可变参数的关键。  
+另一个要注意的是`$langCodeToTranslations`，它是文本翻译对照表，用来翻译伪验证器 `Alias` 或 `>>>` 提供的文本（参考4.15 国际化）。
 ```php
 /**
  * 自定义验证器示例类Sample
@@ -1050,16 +1053,18 @@ ModuleYValidation > MyValidation > CustomDemoValidation > CustomCaseValidation >
 * 在模块Y中，你可以调用`ModuleYValidation::validate()`来验证参数；
 * 而在其它模块中，还是调用`MyValidation::validate()`来验证参数。
 
+这里再强调一下，**不要滥用自定义验证器功能**。跟业务相关强相关的一些验证，如果用的地方很少，可以考虑直接用PHP代码来验证，或者封装成PHP函数直接调用，不一定非要纳入到 webgeeker-validation 验证体系中。
+
 #### 4.17.7 自定义验证器的国际化
 
 自定义验证器的国际化的方法与内置验证器是一样，可参考 4.15 小节。
 
-上一小节提到了自定义验证器类的连续继承，继承链上的所有翻译表在运行时，都会被（递归）合并成一张表。
+上一小节提到了自定义验证器类的连续继承，继承链上的所有翻译表 `$langCode2ErrorTemplates` 或 `$langCodeToTranslations` 在运行时，都会被（递归）合并成一张表。
 
-所以我们有几种处理国际化的方式：
-1. 提供一个类 `MyValidation`，专门用于国际化，正如 4.15 小节所介绍的那样；
-2. 把用于国际化的翻译表 `$langCode2ErrorTemplates` 和 `$langCodeToTranslations` 放继承链上的任意一个类中；
-3. 把翻译表分散放到继承链上的多个类中。
+所以我们有多种放置翻译表的方案：
+1. 提供一个类比如 `MyValidation`，专门用于国际化，所有的翻译表都放在这个类中，正如 4.15 小节所介绍的那样；
+2. 把翻译表分散放到继承链上的多个类中。
+3. 同时使用上面两种方案；
 
 ## A 附录 - 验证器列表
 
