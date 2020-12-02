@@ -70,7 +70,7 @@ Validation::validate($params, [
 为了解决这些问题，所以才写了这么一个工具。
 
 ### 1.2 特点
-1. 每个功能特性都有单元测试（共有 42 tests, 600+ assertions）
+1. 每个功能特性都有单元测试（共有 44 tests, 700+ assertions）
 1. 支持无限嵌套的数据结构的验证（参考 1.3 节的例子）
 1. 支持条件验证，根据参数取值不同，应用不同的验证规则（参考 1.3 节的例子）
 1. 支持正则表达式验证
@@ -633,7 +633,7 @@ class CustomCaseValidation extends Validation
 ```
 用法如下：
 ```php
-'name' => 'CustomCaseValidation:head'
+'name' => 'CustomStartWith:head'
 ```
 #### 4.17.2 如何实现自定义验证器
 1. 自定义验证器必须以 `Custom` 开头，比如"CustomAbc"、"CustomXyz"
