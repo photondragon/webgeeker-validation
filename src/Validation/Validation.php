@@ -1378,7 +1378,7 @@ class Validation
     public static function validateLetters($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (preg_match('/^[a-zA-Z]+$/', $value) === 1)
+            if (@preg_match('/^[a-zA-Z]+$/', $value) === 1)
                 return $value;
             $isTypeError = false;
         } else
@@ -1409,7 +1409,7 @@ class Validation
     public static function validateAlphabet($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (preg_match('/^[a-zA-Z]+$/', $value) === 1)
+            if (@preg_match('/^[a-zA-Z]+$/', $value) === 1)
                 return $value;
             $isTypeError = false;
         } else
@@ -1439,7 +1439,7 @@ class Validation
     public static function validateNumbers($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (preg_match('/^[0-9]+$/', $value) === 1)
+            if (@preg_match('/^[0-9]+$/', $value) === 1)
                 return $value;
             $isTypeError = false;
         } else
@@ -1470,7 +1470,7 @@ class Validation
     public static function validateDigits($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (preg_match('/^[0-9]+$/', $value) === 1)
+            if (@preg_match('/^[0-9]+$/', $value) === 1)
                 return $value;
             $isTypeError = false;
         } else
@@ -1500,7 +1500,7 @@ class Validation
     public static function validateLettersNumbers($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (preg_match('/^[a-zA-Z0-9]+$/', $value) === 1)
+            if (@preg_match('/^[a-zA-Z0-9]+$/', $value) === 1)
                 return $value;
             $isTypeError = false;
         } else
@@ -1532,7 +1532,7 @@ class Validation
     public static function validateNumeric($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (preg_match('/^\-?[0-9.]+$/', $value) === 1) {
+            if (@preg_match('/^-?[0-9.]+$/', $value) === 1) {
                 $count = 0; //小数点的个数
                 $i = 0;
                 while (($i = strpos($value, '.', $i)) !== false) {
@@ -1574,7 +1574,7 @@ class Validation
     public static function validateVarName($value, $reason = null, $alias = 'Parameter')
     {
         if (is_string($value)) {
-            if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value) === 1)
+            if (@preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value) === 1)
                 return $value;
             $isTypeError = false;
         } else
@@ -1697,7 +1697,7 @@ class Validation
 
         if (is_string($value)) {
             try {
-                $result = preg_match($regexp, $value);
+                $result = @preg_match($regexp, $value);
                 // 一些常用框架会set_error_handler()，用自定义错误处理方法将warning/error转换为异常
                 // 如果没有使用任何框架，那么正则表达式不合法只会触发warning，不会抛异常
                 if ($result === false) {
@@ -3633,7 +3633,7 @@ class Validation
     {
         $value = mb_strtolower($value);
         $matches = [];
-        if (preg_match('/^([0-9]+)(kb|k|mb|m)*$/', mb_strtolower($value), $matches) !== 1)
+        if (@preg_match('/^([0-9]+)(kb|k|mb|m)*$/', mb_strtolower($value), $matches) !== 1)
             return null;
 
         $size = intval($matches[1]);
@@ -4047,7 +4047,7 @@ class Validation
         if (strlen($keypath) === 0)
             throw new ValidationException('参数$validations中包含空的参数名称');
 
-        if (preg_match('/^[a-zA-Z0-9_.\[\]*]+$/', $keypath) !== 1)
+        if (@preg_match('/^[a-zA-Z0-9_.\[\]*]+$/', $keypath) !== 1)
             throw new ValidationException("非法的参数名称“${keypath}”");
 
         $keys = explode('.', $keypath); // 不可能返回空数组. $keys中的数组还没有解析
@@ -4067,7 +4067,7 @@ class Validation
                     throw new ValidationException("“${keypath}”中'*'号只能处于方括号[]中");
                 if (strpos($key, ']') !== false)
                     throw new ValidationException("“${key}”中包含了非法的']'号");
-                if (preg_match('/^[0-9]/', $key) === 1) {
+                if (@preg_match('/^[0-9]/', $key) === 1) {
                     if (count($keys) === 1)
                         throw new ValidationException("参数名称“${keypath}”不得以数字开头");
                     else
@@ -4088,7 +4088,7 @@ class Validation
                 $varName = substr($key, 0, $i);
                 if (strpos($varName, '*') !== false)
                     throw new ValidationException("“${key}”中包含了非法的'*'号");
-                if (preg_match('/^[0-9]/', $varName) === 1)
+                if (@preg_match('/^[0-9]/', $varName) === 1)
                     throw new ValidationException("“${keypath}”中包含了以数字开头的参数名称“${varName}”");
                 $filteredKeys[] = $varName;
 
