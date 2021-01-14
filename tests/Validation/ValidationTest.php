@@ -1321,6 +1321,14 @@ class ValidationTest extends TestCase
         Validation::validate(["param" => "abc/"], ["param" => 'Regexp:/^(abc\/|def)$/',]);
         Validation::validate(["param" => "def"], ["param" => 'Regexp:/^(abc\/|def)$/',]);
 
+        // 如果 preg_match() 的传入的正则表达式不合法，会触发warning。
+        // 常用框架会将warning/error等自动转换为Exception。Regexp的中文正则匹配依赖于这种异常处理机制。
+        // 如果没有使用框架，就不会将warning自动转换为Exception。
+        // 下面的代码临时禁用"将warning自动转换为Exception"的机制，以测试Regexp能否在不使用框架的情况下正确处理中文正则
+        $old_error_handler = set_error_handler(null);
+        Validation::validate(['name' => '老王'], ['name' => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/',]);
+        set_error_handler($old_error_handler);
+
     }
 
     /**

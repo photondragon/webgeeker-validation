@@ -1698,6 +1698,16 @@ class Validation
         if (is_string($value)) {
             try {
                 $result = preg_match($regexp, $value);
+                // 一些常用框架会set_error_handler()，用自定义错误处理方法将warning/error转换为异常
+                // 如果没有使用任何框架，那么正则表达式不合法只会触发warning，不会抛异常
+                if ($result === false) {
+                    $error = error_get_last();
+                    if ($error) {
+                        $msg = $error["message"];
+                        if ($msg)
+                            throw new \Exception($msg, 0);
+                    }
+                }
             } catch (\Exception $e) {
                 $msg = $e->getMessage();
                 // 中文正则匹配问题，需要开启utf8模式，在正则表达式后面添加u。如: /^[\x{4e00}-\x{9fa5}]+$/u

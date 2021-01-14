@@ -121,7 +121,7 @@ Validation::validate($params, $validations);
 
 通过Composer安装
 ```
-composer require webgeeker/validation:^0.5
+composer require webgeeker/validation:^0.5.1
 ```
 
 ## 3 快速上手
