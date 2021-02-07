@@ -1327,7 +1327,20 @@ class ValidationTest extends TestCase
         // 下面的代码临时禁用"将warning自动转换为Exception"的机制，以测试Regexp能否在不使用框架的情况下正确处理中文正则
         $old_error_handler = set_error_handler(null);
         Validation::validate(['name' => '老王'], ['name' => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/',]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['name' => '老王abc'], ['name' => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/',]);
+        }, '不匹配正则表达式');
         set_error_handler($old_error_handler);
+
+        // 测试关闭错误报告的情况下是否能检测中文
+        ini_set("display_errors", 'Off');
+        error_reporting(0);
+        Validation::validate(['name' => '老王'], ['name' => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/',]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(['name' => '老王abc'], ['name' => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/',]);
+        }, '不匹配正则表达式');
+        ini_set("display_errors", 'On');
+        error_reporting(E_ALL);
 
     }
 

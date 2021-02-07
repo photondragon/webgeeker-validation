@@ -1706,12 +1706,15 @@ class Validation
                         $msg = $error["message"];
                         if ($msg)
                             throw new \Exception($msg, 0);
+                    } else { // 某些框架，比如ThinkPHP3.2，会把错误或警告都闷掉，此时$error会等于null（但是在测试用例中无法复现这种状况，所以没有相关测试用例）
+                        throw new \Exception("eRrOrIsBlOcKeD", 0);
                     }
                 }
             } catch (\Exception $e) {
                 $msg = $e->getMessage();
                 // 中文正则匹配问题，需要开启utf8模式，在正则表达式后面添加u。如: /^[\x{4e00}-\x{9fa5}]+$/u
-                if (strpos($msg, 'preg_match(): Compilation failed: character value in \x{} or \o{} is too large at offset') == 0)
+                if (false !== strpos($msg, 'preg_match(): Compilation failed: character value in \x{} or \o{} is too large at offset') ||
+                    $msg === "eRrOrIsBlOcKeD")
                     $result = @preg_match($regexp . 'u', $value);
                 else
                     $result = null;
